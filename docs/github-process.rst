@@ -7,17 +7,12 @@ Storypointing
 At the start of each sprint, we'll storypoint a set of issues as a team. These
 will be the issues that are open to work on in that sprint.
 
-For project team leads:
-
-- This means the stories should be moved to a sprint-specific
-  milestone, like `rXX-sprint-1`.
-
-- After storypointing is complete, please edit the description of the issue
-  to add a line like "Storypoints: 4"
+- After storypointing is complete, team leads will edit the description of the issue
+  to add a line like "Estimated Storypoints: 4"
 
 - When a sprint ends, if there are issues that should move to the next sprint,
-  please change their milestone to the next sprint. If there are issues that
-  wouldn't make sense for the next sprint, leave them in this milestone, even
+  team leads will move the milestone to the next sprint. If there are issues that
+  wouldn't make sense for the next sprint, they'll leave them in this milestone, even
   as incomplete.
 
 Working on an issue
@@ -55,7 +50,7 @@ When you begin working on it:
    gone down", "We're waiting on ______ other issue to be completed, so pausing
    on this", etc.
 
-   Add the team leads as reviewers.
+   Add the team leads as reviewers: Kadeem @kadeembestteaches & Sarah @stocktons
 
    If you want a review but do not believe you have completed the task, please
    add the label `-wip` to the PR.
@@ -64,24 +59,27 @@ When you begin working on it:
    Even if this is a WIP, add that --- when this PR is merged & closed, this
    will mark the issue as done. (It will also link the two in general, so you
    can navigate to the issue easily under the heading "linked issues")
+   
+   As a last step, please add a line below "Estimated Storypoints" with the 
+   actual storypoints it took to resolve the issue, like "Actual Storypoints: 5".
 
-The reviewers will receive an automated email requesting their review. (You're
-welcome to also ping them on Slack as a heads-up, since not all of us check our
-email as often).
+The reviewers will receive an automated email requesting their review. (Please 
+also ping them on Slack as a heads-up, since not everyone checks their email as 
+often).
 
 After the reviewer(s) are done, they'll either accept & close it, add comments,
 or request changes. If changes are requested, complete them, commit & push your
-work. The reviewers will receive an automated email---but, again, you can ping
+work. The reviewers will receive an automated email---but, again, please ping
 them on Slack to give them a heads-up.
 
 When the issue is marked as `-wip`, reviewers will not resolve the issue. So if
 you originally had that label, make sure to remove it when requesting a review
 where you believe the work is complete.
 
-Reviewing an issues
+Reviewing an issue
 -------------------
 
-Team lead reviewers should check for:
+Team lead reviewers will check for:
 
 - correctness, obviously
 
@@ -96,7 +94,8 @@ Team lead reviewers should check for:
 
 - conformance to our code style guide
 
-If you're satisfied with the work, you should approve it and merge it in using
-"Squash and merge". This will squash all of the commits into one commit; tidy
-the commit message to reduce it to just the things needed (not descriptions of
-now-unimportant-middle-work). Delete the branch associated with it. You're done!
+Once satisfied with the work, reviewers will approve it and merge it in using
+"Squash and merge". This will squash all of the commits into one commit; they 
+will also tidy the commit message to reduce it to just the things needed (not 
+descriptions of now-unimportant-middle-work). Then they'll delete the branch 
+associated with it.
