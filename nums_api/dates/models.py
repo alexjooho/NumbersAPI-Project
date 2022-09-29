@@ -70,23 +70,42 @@ class Date (db.Model):
 
             >>> Date.date_to_day_of_year(12, 31)
             366
+
+            >>> Date.date_to_day_of_year(1, 300)
+            Traceback (most recent call last):
+            ...
+            ValueError: invalid value for day
+
+            >>> Date.date_to_day_of_year(200, 25)
+            Traceback (most recent call last):
+            ...
+            ValueError: invalid value for month
+
+            >>> Date.date_to_day_of_year(2, 30)
+            Traceback (most recent call last):
+            ...
+            ValueError: invalid value for day
         """
-        
+
         """
         Amount of days in each month relating to a leap year
         MONTHS_TO_DAYS[0] = Start of January
         MONTHS_TO_DAYS[1] = Start of February
         MONTHS_TO_DAYS[11] = Start of December
         """
-        MONTHS_TO_DAYS = [0,31,29,31,30,31,30,31,31,30,31,30]
-        
+        MONTHS_TO_DAYS = [0,31,29,31,30,31,30,31,31,30,31,30,31]
+
+        if month < 1 or month > 12: raise ValueError("invalid value for month")
+        if day < 1 or day > MONTHS_TO_DAYS[month]:
+            raise ValueError("invalid value for day")
+
         day_of_year = 0
-        
-        for m in range(0,month):
+
+        for m in range(0, month):
             day_of_year += MONTHS_TO_DAYS[m]
-            
+
         day_of_year += day
-        
+
         return day_of_year
-        
-        
+
+

@@ -20,11 +20,11 @@ class DateModelTestCase(TestCase):
         Date.query.delete()
 
         self.d1 = Date(
-            day_of_year = 1,
-            year = 1,
-            fact_fragment = "the date of d1 fact fragment",
-            fact_statement = "1/1/1 is the date of d1 fact statement",
-            was_submitted = True
+            day_of_year=1,
+            year=1,
+            fact_fragment="the date of d1 fact fragment",
+            fact_statement="January 1st is the date of d1 fact statement",
+            was_submitted=False
         )
 
     def tearDown(self):
@@ -35,13 +35,15 @@ class DateModelTestCase(TestCase):
         """Test to make sure tests are set up correctly"""
         test_setup_correct = True
         self.assertEqual(test_setup_correct, True)
-        
+
     def test_model(self):
+        """Test if data correcly inputs to Date"""
         self.assertIsInstance(self.d1, Date)
         self.assertEqual(Date.query.count(), 0)
-        
+
         db.session.add(self.d1)
         db.session.commit()
-        
+
         self.assertEqual(Date.query.count(), 1)
         self.assertEqual(Date.query.filter_by(day_of_year=1).one().year, 1)
+
