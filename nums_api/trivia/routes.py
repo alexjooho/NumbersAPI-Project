@@ -17,13 +17,11 @@ def get_trivia_fact(number):
     """
 
     trivia = Trivia.query.filter_by(number=number).all()
-    
-
 
     if not trivia:
         error = {
-            'status': 404,
-            'message': f'A trivia fact for { number } not found'
+            "status": 404,
+            "message": f"A trivia fact for { number } not found"
         }
 
         return jsonify({"error": error}), 404
@@ -39,11 +37,14 @@ def get_trivia_fact(number):
 def get_trivia_fact_random():
     """
     Route for getting random trivia fact.
-    Returns json { random: fact }
+    Queries all rows in trivia table and randomly picks one
+    Returns json {"number": trivia.number, "fragment": trivia.fact_fragment,
+                   "statement": trivia.fact_statement, "type": "trivia"}
     """
 
     random_trivia = choice(Trivia.query.all())
 
-    # session.query(Trivia).order_by(func.rand()).first()
+    trivia_resp = {"number": random_trivia.number, "fragment": random_trivia.fact_fragment,
+                   "statement": random_trivia.fact_statement, "type": "trivia"}
 
-    return jsonify(random=random_trivia.fact_fragment)
+    return jsonify(trivia_resp)

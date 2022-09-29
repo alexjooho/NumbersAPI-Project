@@ -16,37 +16,35 @@ db.create_all()
 class TriviaRouteTestCase(TestCase):
     def setUp(self):
         """Set up test data here"""
+        self.client = app.test_client()
         Trivia.query.delete()
 
-        t1 = Trivia(
-            number=1,
-            fact_fragment='cool number',
-            fact_statement='1 is the first number after 0.',
-            was_submitted=True
-        )
+        self.t1 = Trivia(
+             number=1,
+             fact_fragment="the number for this test fact fragment",
+             fact_statement="1 is the number for this test fact statement.",
+             was_submitted=False
+         )
 
-        t2 = Trivia(
-            number=2,
-            fact_fragment='not a cool number',
-            fact_statement='2 is the most lame number.',
-            was_submitted=True
-        )
+        self.t2 = Trivia(
+             number=2,
+             fact_fragment="the number for this test fact fragment",
+             fact_statement="2 is the number for this test fact statement.",
+             was_submitted=False
+         )
 
-        t3 = Trivia(
-            number=3,
-            fact_fragment='meh number',
-            fact_statement='3 is honestly a meh number.',
-            was_submitted=True
-        )
+        self.t3 = Trivia(
+             number=3,
+             fact_fragment="the number for this test fact fragment",
+             fact_statement="3 is the number for this test fact statement.",
+             was_submitted=False
+         )
 
-        db.session.add_all([t1, t2, t3])
+        db.session.add_all([self.t1, self.t2, self.t3])
         db.session.commit()
 
-        self.t1_id = t1.id
-        self.t2_id = t2.id
-        self.t3_id = t3.id
 
-        self.client = app.test_client()
+
 
     def tearDown(self):
         """Clean up any fouled transaction."""
@@ -57,20 +55,23 @@ class TriviaRouteTestCase(TestCase):
         test_setup_correct = True
         self.assertEqual(test_setup_correct, True)
 
-    def test_specific_number(self):
-        """ Tests for getting a fact about a specific number """
+    def test_get_trivia_fact(self):
+        """ Tests for getting a fact for number 1 """
         with self.client as c:
             resp = c.get("/api/trivia/1")
             data = resp.json
 
-            self.assertEqual(data, {
-                "number": 1, "fragment": 'cool number',
-                "statement": '1 is the first number after 0.', "type": "trivia"
+            self.assertEqual(data,
+             {
+                "number": 1,
+                "fragment": "the number for this test fact fragment",
+                "statement": "1 is the number for this test fact statement.",
+                "type": "trivia"
             })
             self.assertEqual(resp.status_code, 200)
 
-    def test_specific_number_invalid(self):
-        """ Tests for an invalid number """
+    def test_error_for_number_with_no_fact(self):
+        """ Tests that a number with no fact will return an error """
         with self.client as c:
             resp = c.get("/api/trivia/5")
             data = resp.json
@@ -83,23 +84,16 @@ class TriviaRouteTestCase(TestCase):
             })
             self.assertEqual(resp.status_code, 404)
 
-    def test_get_random_trivia(self):
+    def test_get_random_trivia_fact(self):
         """ Tests getting a random fact """
         with self.client as c:
             resp = c.get("/api/trivia/random")
             data = resp.json
             resp1 = c.get("/api/trivia/1")
-            data1= resp1.json
             resp2 = c.get("/api/trivia/2")
-            data2= resp2.json
             resp3 = c.get("/api/trivia/3")
-            data3= resp3.json
 
-            possible_results = [
-                {"random": data1["fragment"]},
-                {"random": data2["fragment"]},
-                {"random": data3["fragment"]}
-            ]
 
-            self.assertIn(data, possible_results)
+
+            self.assertIn(data, [resp1.json, resp2.json, resp3.json])
             self.assertEqual(resp.status_code, 200)
