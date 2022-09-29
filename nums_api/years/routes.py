@@ -37,12 +37,12 @@ def get_year_fact(year):
             'fact_statement': year_data.fact_statement
         }
 
-        return jsonify(fact = year_fact), 200
+        return (jsonify(fact = year_fact), 200)
     else:
-        err = { 'error' : {
+        err = {
             'message': f"A fact for { year } not found",
-        }}
-        return jsonify(err), 404
+        }
+        return (jsonify(error=err), 404)
 
 
 
@@ -68,4 +68,4 @@ def get_year_fact_random():
         'fact_statement': year_data.fact_statement
     }
 
-    return jsonify(fact = year_fact), 200
+    return (jsonify(fact = year_fact), 200)
