@@ -22,14 +22,12 @@ class Year (db.Model):
     fact_fragment = db.Column(
         db.String(200),
         nullable=False,
-        unique=True,
     )
 
     # fact with prefix, first word is number, has punctuation at the end
     fact_statement = db.Column(
         db.String(250),
         nullable=False,
-        unique=True,
     )
 
     added_at = db.Column(

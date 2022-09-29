@@ -19,9 +19,9 @@ class YearModelTestCase(TestCase):
         Year.query.delete()
 
         self.y1 = Year(
-            year=2000,
-            fact_fragment="the year all the computers crashed",
-            fact_statement="2000 is the year all the computers crashed.",
+            year=1,
+            fact_fragment="the year for this test fact fragment",
+            fact_statement="1 is the year for this test fact statement.",
             was_submitted=False
         )
 
@@ -43,4 +43,4 @@ class YearModelTestCase(TestCase):
         db.session.commit()
 
         self.assertEqual(Year.query.count(), 1)
-        self.assertEqual(Year.query.filter_by(year=2000).one().year, 2000)
+        self.assertEqual(Year.query.filter_by(year=1).one().year, 1)
