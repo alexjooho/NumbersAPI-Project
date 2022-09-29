@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from models import Date
+from nums_api.dates.models import Date
 from random import choice, randint
 
 dates = Blueprint("dates", __name__)
@@ -20,7 +20,7 @@ months_days = {
 }
 
 
-@dates.get("/<int: month>/<int: day>")
+@dates.get("/<int:month>/<int:day>")
 def get_date_fact(month, day):
     """route to retreive a random date fact on specified month/day
         returns json

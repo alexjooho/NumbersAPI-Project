@@ -1,5 +1,6 @@
 from datetime import datetime
 from nums_api.database import db
+from nums_api.config import DATABASE_URL_TEST
 
 
 class Date (db.Model):
@@ -72,5 +73,17 @@ class Date (db.Model):
             366
         """
 
-        # TODO
-        ...
+        #Amount of days in each month relating to a leap year
+        #MONTHS_TO_DAYS[0] = Start of January
+        #MONTHS_TO_DAYS[1] = Start of February
+        #MONTHS_TO_DAYS[11] = Start of December
+        MONTHS_TO_DAYS = [0,31,29,31,30,31,30,31,31,30,31,30]
+
+        day_of_year = 0
+
+        for m in range(0,month):
+            day_of_year += MONTHS_TO_DAYS[m]
+
+        day_of_year += day
+
+        return day_of_year
