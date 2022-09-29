@@ -2,6 +2,7 @@ from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
+from models import Date
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
@@ -11,9 +12,34 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.drop_all()
 db.create_all()
 
+
 class DateRouteTestCase(TestCase):
     def setUp(self):
         """Set up test data here"""
+        self.client = app.test_client()
+
+        test1 = Date(
+            day_of_year=10,
+            year=1900,
+            fact_fragment="test1 fragment",
+            fact_statement="test1 statement",
+            was_submitted=True
+        )
+
+        test2 = Date(
+            day_of_year=50,
+            year=1900,
+            fact_fragment="test2 fragment",
+            fact_statement="test2 statement",
+            was_submitted=False
+        )
+
+        db.session.add_all([test1, test2])
+        db.session.commit()
+
+        self.test1_id = test1.id
+        self.test2_id = test2.id
+
         self.client = app.test_client()
 
     def tearDown(self):
@@ -24,3 +50,21 @@ class DateRouteTestCase(TestCase):
         """Test to make sure tests are set up correctly"""
         test_setup_correct = True
         self.assertEqual(test_setup_correct, True)
+
+    def test_date_fact(self):
+        """Test to retrieve random fact by specific month/day"""
+        with self.client as c:
+            resp = c.get("/api/date/1/10")
+
+            self.assertEqual(resp.status_code, 200)
+
+            data = resp.json
+
+            self.assertEqual(data, ({
+                'month': 1,
+                'day': 10,
+                'year': 1900,
+                'fact_fragment': "test1 fragment",
+                'fact_statement': "test1 statement",
+                'type': 'date'
+            }))
