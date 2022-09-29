@@ -60,7 +60,7 @@ def get_year_fact_random():
             "fact_statement": "text",
             }}
     """
-    # year_data = Year.query.order_by(func.random()).first()
+
     year_data = Year.query.all()
 
     single_year_data = random.choice(year_data)
