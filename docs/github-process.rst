@@ -37,8 +37,11 @@ When you begin working on it:
 3. Work on the issue in that branch. We expect testing for new code and
    professional documentation & code quality, so make sure you're doing those
    things.
+   
+4. When you push to GitHub, don't push to main! Push to your branch: 
+   `git push origin 265-ninja-api`.
 
-4. When you would like a code review, make a pull request for the issue.
+5. When you would like a code review, make a pull request for the issue.
 
    Make the title of your PR the same as your branch name.
 
