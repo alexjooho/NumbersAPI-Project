@@ -26,7 +26,15 @@ class MathRouteBaseTestCase(TestCase):
             was_submitted=False
         )
 
+        self.m2 = Math(
+            number=10,
+            fact_fragment="the number for this m2 test fact fragment",
+            fact_statement="10 is the number for m2 this test fact statement.",
+            was_submitted=False
+        )
+
         db.session.add(self.m1)
+        db.session.add(self.m2)
         db.session.commit()
 
     def tearDown(self):
@@ -39,7 +47,7 @@ class MathRouteBaseTestCase(TestCase):
         self.assertEqual(test_setup_correct, True)
 
 class MathRouteNumberTestCase(MathRouteBaseTestCase):
-    def test_get_number(self):
+    def test_get_math_fact(self):
         """Test GET route for math/number returns correct JSON response"""
         with app.test_client() as client:
             url = f"/api/math/{self.m1.number}"
@@ -47,14 +55,14 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
 
             self.assertEqual(resp.status_code, 200)
             data = resp.json
-            self.assertEqual(data, {
+            self.assertEqual(data, {"fact": {
                 "number": "5",
                 "fact_fragment":"the number for this m1 test fact fragment",
                 "fact_statement":"5 is the number for m1 this test fact statement.",
                 "type": "math"
-            })
+            }})
 
-    def test_get_number_404_number_not_found(self):
+    def test_error_for_number_with_no_fact(self):
         """Test GET route for math/number returns 404 if number not found"""
         with app.test_client() as client:
             url = f"/api/math/0"
@@ -66,7 +74,7 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
                     'message': "A math fact for 0 not found",
                     'status': 404 } })
 
-    def test_get_number_404_not_a_valid_number(self):
+    def test_error_for_invalid_number(self):
         """Test GET route for math/number returns 404 if number not valid"""
         with app.test_client() as client:
             url = f"/api/math/minaj"
@@ -75,17 +83,16 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
             self.assertEqual(resp.status_code, 404)
 
 class MathRouteRandomTestCase(MathRouteBaseTestCase):
-    def test_get_number(self):
+    def test_get_random_math_fact(self):
         """Test GET route for math/random returns correct JSON response"""
         with app.test_client() as client:
-            url = f"/api/math/random"
-            resp = client.get(url)
 
-            self.assertEqual(resp.status_code, 200)
-            data = resp.json
-            self.assertEqual(data, {
-                "number": "5",
-                "fact_fragment":"the number for this m1 test fact fragment",
-                "fact_statement":"5 is the number for m1 this test fact statement.",
-                "type": "math"
-            })
+            resp1 = client.get(f"/api/math/{self.m1.number}")
+            resp2 = client.get(f"/api/math/{self.m2.number}")
+            resp_list = [resp1.json, resp2.json]
+
+            resp_random = client.get("/api/math/random")
+
+            self.assertEqual(resp_random.status_code, 200)
+            data = resp_random.json
+            self.assertTrue(data in resp_list)

@@ -1,52 +1,66 @@
 from flask import Blueprint, jsonify
 from nums_api.maths.models import Math
-from sqlalchemy.sql import func
+import random
 
 math = Blueprint("math", __name__)
 
 
 @math.get("/<int:number>")
 def get_math_fact(number):
-    """ GET route for a given number
-    - validate the number (must be an integer)
-    - query the number in Math Model
-    - if query found, return JSON response with number data
-        {number, fact_fragment, fact_statement, type}
-    - else, return 404 err
-    """
-    num_fact = Math.query.filter_by(number = number).one_or_none()
+    """Returns a random math fact in JSON about a number passed as a
+    URL parameter.
 
-    if num_fact:
-        num = {
+        - If fact is found, returns JSON response:
+        { "fact": {
+            "number": number
+            "fact_fragment": fact_fragment
+            "fact_statement": fact_statement
+            "type": "math"
+        }}
+
+        - If fact is not found, returns JSON response:
+            { 'error': {
+                'message': f"A math fact for { number } not found",
+                'status': 404 } }
+    """
+    num_facts = Math.query.filter_by(number = number).all()
+
+    if num_facts:
+        num_fact = random.choice(num_facts)
+        fact = { 'fact': {
             'number': num_fact.number,
             'fact_fragment': num_fact.fact_fragment,
             'fact_statement': num_fact.fact_statement,
             'type': 'math'
-        }
-        return (jsonify(num), 200)
+        }}
+        return jsonify(fact)
     else:
         error = { 'error': {
                     'message': f"A math fact for { number } not found",
                     'status': 404 } }
         return (jsonify(error), 404)
 
-    # discuss JSON structure above ^ add type: math
 
 
 @math.get("/random")
 def get_math_fact_random():
-    """ GET route for a random number
-    - query random record from Math Model
-    - create dict and return JSON response with number data
-        {number, fact_fragment, fact_statement, type}
+    """Returns a random math fact in JSON about a random number.
+
+        - Returns JSON response:
+        { "fact": {
+            "number": random number
+            "fact_fragment": fact_fragment
+            "fact_statement": fact_statement
+            "type": "math"
+        }}
     """
 
-    num_fact = Math.query.order_by(func.random()).first()
+    num_fact = random.choice(Math.query.all())
 
-    num = {
+    fact = { 'fact': {
             'number': num_fact.number,
             'fact_fragment': num_fact.fact_fragment,
             'fact_statement': num_fact.fact_statement,
             'type': 'math'
-        }
-    return (jsonify(num), 200)
+        }}
+    return jsonify(fact)
