@@ -40,8 +40,6 @@ def get_math_fact(number):
                     'status': 404 } }
         return (jsonify(error), 404)
 
-
-
 @math.get("/random")
 def get_math_fact_random():
     """Returns a random math fact in JSON about a random number.
