@@ -7,6 +7,7 @@ from nums_api.trivia.routes import trivia
 from nums_api.maths.routes import math
 from nums_api.dates.routes import dates
 from nums_api.years.routes import years
+from nums_api.root.routes import root
 
 # create app and add configuration
 app = Flask(__name__)
@@ -15,6 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
 # register blueprints
+app.register_blueprint(root)
 app.register_blueprint(trivia, url_prefix='/api/trivia')
 app.register_blueprint(math, url_prefix='/api/math')
 app.register_blueprint(dates, url_prefix='/api/dates')
