@@ -85,6 +85,11 @@ class Date (db.Model):
             Traceback (most recent call last):
             ...
             ValueError: invalid value for day
+
+            >>> Date.date_to_day_of_year(0, 30)
+            Traceback (most recent call last):
+            ...
+            ValueError: invalid value for month
         """
 
         """
