@@ -5,7 +5,7 @@ from nums_api.config import DATABASE_URL
 from nums_api.database import connect_db
 from nums_api.trivia.routes import trivia
 from nums_api.maths.routes import math
-from nums_api.date.routes import dates
+from nums_api.dates.routes import dates
 from nums_api.years.routes import years
 
 # create app and add configuration

@@ -2,7 +2,7 @@ from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
-from nums_api.date.models import Date
+from nums_api.dates.models import Date
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
