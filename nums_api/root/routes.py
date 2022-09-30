@@ -19,11 +19,5 @@ def homepage():
     html = markdown.markdown(text, output_format="xhtml",
                              extensions=["fenced_code"])
 
-    return render_template('home.html', documentation=html)
+    return render_template('index.html', documentation=html)
 
-
-@root.route('/favicon.ico')
-def favicon():
-    """Display favicon, saving the extra redirect request"""
-    return send_from_directory(os.path.join(root.root_path, 'static'),
-                               'favicon.ico', mimetype='static/favicon.ico')
