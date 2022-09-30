@@ -53,7 +53,6 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
             url = f"/api/math/{self.m1.number}"
             resp = client.get(url)
 
-            self.assertEqual(resp.status_code, 200)
             data = resp.json
             self.assertEqual(data, {"fact": {
                 "number": "5",
@@ -61,6 +60,7 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
                 "statement":"5 is the number for m1 this test fact statement.",
                 "type": "math"
             }})
+            self.assertEqual(resp.status_code, 200)
 
     def test_error_for_number_with_no_fact(self):
         """Test GET route for math/number returns 404 if number not found"""
@@ -68,11 +68,11 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
             url = f"/api/math/0"
             resp = client.get(url)
 
-            self.assertEqual(resp.status_code, 404)
             data = resp.json
             self.assertEqual(data, {'error': {
                     'message': "A math fact for 0 not found",
                     'status': 404 } })
+            self.assertEqual(resp.status_code, 404)
 
     def test_error_for_invalid_number(self):
         """Test GET route for math/number returns 404 if number not valid"""
@@ -93,6 +93,6 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
 
             resp_random = client.get("/api/math/random")
 
-            self.assertEqual(resp_random.status_code, 200)
             data = resp_random.json
-            self.assertTrue(data in resp_list)
+            self.assertIn(data, resp_list)
+            self.assertEqual(resp_random.status_code, 200)
