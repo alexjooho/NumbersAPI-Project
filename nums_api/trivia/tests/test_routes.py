@@ -20,31 +20,28 @@ class TriviaRouteTestCase(TestCase):
         Trivia.query.delete()
 
         self.t1 = Trivia(
-             number=1,
-             fact_fragment="the number for this test fact fragment",
-             fact_statement="1 is the number for this test fact statement.",
-             was_submitted=False
-         )
+            number=1,
+            fact_fragment="test 1",
+            fact_statement="1 is the number for this test fact statement.",
+            was_submitted=False
+        )
 
         self.t2 = Trivia(
-             number=2,
-             fact_fragment="the number for this test fact fragment",
-             fact_statement="2 is the number for this test fact statement.",
-             was_submitted=False
-         )
+            number=2,
+            fact_fragment="test 2",
+            fact_statement="2 is the number for this test fact statement.",
+            was_submitted=False
+        )
 
         self.t3 = Trivia(
-             number=3,
-             fact_fragment="the number for this test fact fragment",
-             fact_statement="3 is the number for this test fact statement.",
-             was_submitted=False
-         )
+            number=3,
+            fact_fragment="test 3",
+            fact_statement="3 is the number for this test fact statement.",
+            was_submitted=False
+        )
 
         db.session.add_all([self.t1, self.t2, self.t3])
         db.session.commit()
-
-
-
 
     def tearDown(self):
         """Clean up any fouled transaction."""
@@ -61,13 +58,15 @@ class TriviaRouteTestCase(TestCase):
             resp = c.get("/api/trivia/1")
             data = resp.json
 
-            self.assertEqual(data,
-             {
-                "number": 1,
-                "fragment": "the number for this test fact fragment",
-                "statement": "1 is the number for this test fact statement.",
-                "type": "trivia"
-            })
+            self.assertEqual(
+                data,
+                {"fact": {
+                    "number": 1,
+                    "fragment": "test 1",
+                    "statement": "1 is the number for this test fact statement.",
+                    "type": "trivia"
+                }
+                })
             self.assertEqual(resp.status_code, 200)
 
     def test_error_for_number_with_no_fact(self):
@@ -84,16 +83,27 @@ class TriviaRouteTestCase(TestCase):
             })
             self.assertEqual(resp.status_code, 404)
 
+    def test_get_trivia_fact_invalid_number(self):
+        """ Tests that an error will be thrown if an invalid number is given in URL parameter """
+        with self.client as c:
+            resp = c.get("/api/trivia/test")
+            data = resp.json
+
+            self.assertEqual(resp.status_code, 404)
+
     def test_get_random_trivia_fact(self):
         """ Tests getting a random fact """
         with self.client as c:
             resp = c.get("/api/trivia/random")
             data = resp.json
-            resp1 = c.get("/api/trivia/1")
-            resp2 = c.get("/api/trivia/2")
-            resp3 = c.get("/api/trivia/3")
 
+            t1resp = c.get("/api/trivia/1")
+            t2resp = c.get("/api/trivia/2")
+            t3resp = c.get("/api/trivia/3")
 
+            t1_fact_data = t1resp.json
+            t2_fact_data = t2resp.json
+            t3_fact_data = t3resp.json
 
-            self.assertIn(data, [resp1.json, resp2.json, resp3.json])
+            self.assertIn(data, [t1_fact_data, t2_fact_data, t3_fact_data])
             self.assertEqual(resp.status_code, 200)
