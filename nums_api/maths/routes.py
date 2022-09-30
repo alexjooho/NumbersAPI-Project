@@ -13,8 +13,8 @@ def get_math_fact(number):
         - If fact is found, returns JSON response:
         { "fact": {
             "number": number
-            "fact_fragment": fact_fragment
-            "fact_statement": fact_statement
+            "fragment": fact_fragment
+            "statement": fact_statement
             "type": "math"
         }}
 
@@ -29,8 +29,8 @@ def get_math_fact(number):
         num_fact = random.choice(num_facts)
         fact = { 'fact': {
             'number': num_fact.number,
-            'fact_fragment': num_fact.fact_fragment,
-            'fact_statement': num_fact.fact_statement,
+            'fragment': num_fact.fact_fragment,
+            'statement': num_fact.fact_statement,
             'type': 'math'
         }}
         return jsonify(fact)
@@ -47,8 +47,8 @@ def get_math_fact_random():
         - Returns JSON response:
         { "fact": {
             "number": random number
-            "fact_fragment": fact_fragment
-            "fact_statement": fact_statement
+            "fragment": fact_fragment
+            "statement": fact_statement
             "type": "math"
         }}
     """
@@ -57,8 +57,8 @@ def get_math_fact_random():
 
     fact = { 'fact': {
             'number': num_fact.number,
-            'fact_fragment': num_fact.fact_fragment,
-            'fact_statement': num_fact.fact_statement,
+            'fragment': num_fact.fact_fragment,
+            'statement': num_fact.fact_statement,
             'type': 'math'
         }}
     return jsonify(fact)

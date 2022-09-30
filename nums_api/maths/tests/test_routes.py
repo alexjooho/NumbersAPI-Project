@@ -57,8 +57,8 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
             data = resp.json
             self.assertEqual(data, {"fact": {
                 "number": "5",
-                "fact_fragment":"the number for this m1 test fact fragment",
-                "fact_statement":"5 is the number for m1 this test fact statement.",
+                "fragment":"the number for this m1 test fact fragment",
+                "statement":"5 is the number for m1 this test fact statement.",
                 "type": "math"
             }})
 
