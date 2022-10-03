@@ -75,21 +75,6 @@ class Date (db.Model):
             Traceback (most recent call last):
             ...
             ValueError: invalid value for day
-
-            >>> Date.date_to_day_of_year(200, 25)
-            Traceback (most recent call last):
-            ...
-            ValueError: invalid value for month
-
-            >>> Date.date_to_day_of_year(2, 30)
-            Traceback (most recent call last):
-            ...
-            ValueError: invalid value for day
-
-            >>> Date.date_to_day_of_year(0, 30)
-            Traceback (most recent call last):
-            ...
-            ValueError: invalid value for month
         """
 
         """
@@ -99,10 +84,12 @@ class Date (db.Model):
         MONTHS_TO_DAYS[11] = Start of December
         """
         MONTHS_TO_DAYS = [0,31,29,31,30,31,30,31,31,30,31,30,31]
+        MONTHS_IN_YEAR = 12
 
-        if month < 1 or month > 12: raise ValueError("invalid value for month")
-        if day < 1 or day > MONTHS_TO_DAYS[month]:
-            raise ValueError("invalid value for day")
+        if not 0 < month <= MONTHS_IN_YEAR: 
+            raise ValueError("Invalid value for month")
+        if not 0 < day <= MONTHS_TO_DAYS[month]:
+            raise ValueError("Invalid value for day")
 
         day_of_year = 0
 
