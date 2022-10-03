@@ -74,7 +74,7 @@ class Date (db.Model):
             >>> Date.date_to_day_of_year(1, 300)
             Traceback (most recent call last):
             ...
-            ValueError: invalid value for day
+            ValueError: Invalid value for day
         """
 
         """
