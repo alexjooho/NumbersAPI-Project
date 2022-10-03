@@ -12,11 +12,10 @@ def get_year_fact(year):
 
     If fact found, returns JSON like:
         {fact: {
-            "type": year,
-            "id" : 1,
             "year" : 1,
-            "fact_fragment": "text",
-            "fact_statement": "text",
+            "fragment": "text",
+            "statement": "text",
+            "type": year,
             }
         }
 
@@ -33,11 +32,10 @@ def get_year_fact(year):
     if year_data:
         single_year_data = random.choice(year_data)
         year_fact = {
-            'type': 'year',
-            'id' : single_year_data.id,
             'year': single_year_data.year,
-            'fact_fragment': single_year_data.fact_fragment,
-            'fact_statement': single_year_data.fact_statement
+            'fragment': single_year_data.fact_fragment,
+            'statement': single_year_data.fact_statement,
+            'type': 'year',
         }
 
         return jsonify(fact = year_fact)
@@ -53,11 +51,10 @@ def get_year_fact_random():
     """ Route for getting fact about random year.
         Returns JSON like:
         { fact: {
-            "type": year,
-            "id" : 1,
             "year" : 1,
-            "fact_fragment": "text",
-            "fact_statement": "text",
+            "fragment": "text",
+            "statement": "text",
+            "type": year,
             }}
     """
 
@@ -66,11 +63,10 @@ def get_year_fact_random():
     single_year_data = random.choice(year_data)
 
     year_fact = {
-        'type': 'year',
-        'id' : single_year_data.id,
         'year': single_year_data.year,
-        'fact_fragment': single_year_data.fact_fragment,
-        'fact_statement': single_year_data.fact_statement
+        'fragment': single_year_data.fact_fragment,
+        'statement': single_year_data.fact_statement,
+        'type': 'year',
     }
 
     return jsonify(fact = year_fact)

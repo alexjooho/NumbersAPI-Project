@@ -22,7 +22,7 @@ class YearRouteTestCase(TestCase):
         self.y1 = Year(
             year=1,
             fact_fragment="the year for the first test entry",
-            fact_statement="First test for year 1",
+            fact_statement="1 is the year for this test fact statement.",
             was_submitted=False
         )
         self.y2 = Year(
@@ -32,9 +32,9 @@ class YearRouteTestCase(TestCase):
             was_submitted=False
         )
         self.y3 = Year(
-            year=1,
+            year=3,
             fact_fragment="the year for the third test entry",
-            fact_statement="Another test for year 1.",
+            fact_statement="3 is the year for this test fact statement.",
             was_submitted=False
         )
 
@@ -56,8 +56,15 @@ class YearRouteTestCase(TestCase):
         with self.client as c:
 
             resp = c.get("/api/years/1")
-            print("FACT ", resp.json["fact"])
-            self.assertIn("year 1", resp.json["fact"]["fact_statement"])
+            self.assertEqual(
+                resp.json,
+                {'fact': {
+                    'year': 1,
+                    'fragment': 'the year for the first test entry',
+                    'statement': '1 is the year for this test fact statement.',
+                    'type': 'year',
+                }})
+
             self.assertEqual(resp.status_code, 200)
 
     def test_error_for_year_without_fact(self):
@@ -66,18 +73,29 @@ class YearRouteTestCase(TestCase):
         with self.client as c:
 
             resp = c.get("api/years/100000")
-            self.assertIn("not found", resp.json["error"]["message"])
+            self.assertEqual(
+                resp.json,
+                {'error': {
+                    'status': 404,
+                    'message': 'A fact for 100000 not found',
+                }})
+            
             self.assertEqual(resp.status_code, 404)
 
     def test_get_year_fact_random(self):
         """Test for getting a single fact on a random year."""
         with self.client as c:
+            
+            y1_resp = c.get("api/years/1")
+            y2_resp = c.get("api/years/2")
+            y3_resp = c.get("api/years/3")
+            
+            resp_list = [y1_resp.json, y2_resp.json, y3_resp.json]
 
-            resp = c.get("api/years/random")
-            self.assertTrue(resp.json["fact"]["fact_fragment"])
-            with self.assertRaises(KeyError):
-                resp.json["error"]["message"]
-            self.assertEqual(resp.status_code, 200)
+            random_resp = c.get("api/years/random")
+            
+            self.assertIn(random_resp.json, resp_list)
+            self.assertEqual(random_resp.status_code, 200)
 
     def test_invalid_year_url_input(self):
         """Test for invalid URL input for a year."""
