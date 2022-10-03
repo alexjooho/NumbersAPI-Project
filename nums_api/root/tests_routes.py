@@ -3,9 +3,6 @@
 from unittest import TestCase
 from nums_api import app
 
-
-
-
 class HomepageView(TestCase):
     def setUp(self):
         """Set up test data here"""
