@@ -24,3 +24,7 @@ ranges of numbers
     "10": "10 is the highest score possible in Olympics gymnastics competitions."
 }
 ```
+
+## Table Schema
+
+![db Table Schema](../nums_api/static/numbers-api-table-schema.png)
