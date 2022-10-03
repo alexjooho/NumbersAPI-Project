@@ -1,1 +1,1 @@
-![db Table Schema](../nums_api/static/table-schema.png)
+![db Table Schema](../nums_api/static/numbers-api-table-schema.png)
