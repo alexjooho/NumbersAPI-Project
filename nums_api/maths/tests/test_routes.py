@@ -1,7 +1,6 @@
 """ Tests for maths routes.
     To run tests in venv: python3 -m unittest test_routes.py -v
-    """
-
+"""
 
 from unittest import TestCase
 from nums_api import app
@@ -69,10 +68,10 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
 
     def test_get_math_fact_with_notfound_query_floor(self):
         """Test GET route for math/number with no math fact and
-            notfound = 'floor' query parameter,
-            returns correct JSON response"""
+        notfound = 'floor' query parameter, finds the previous existing math
+        fact and returns correct JSON response"""
         with app.test_client() as client:
-            url = f"/api/math/15?notfound=floor"
+            url = "/api/math/15?notfound=floor"
             resp = client.get(url)
 
             data = resp.json
@@ -86,10 +85,10 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
 
     def test_get_math_fact_with_notfound_query_ceil(self):
         """Test GET route for math/number with no math fact and
-            notfound = 'ceil' query parameter,
-            returns correct JSON response"""
+        notfound = 'ceil' query parameter, finds the next existing math fact
+        and returns correct JSON response"""
         with app.test_client() as client:
-            url = f"/api/math/3?notfound=ceil"
+            url = "/api/math/3?notfound=ceil"
             resp = client.get(url)
 
             data = resp.json
@@ -101,11 +100,50 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
             }})
             self.assertEqual(resp.status_code, 200)
 
+    def test_error_for_number_with_no_fact_and_notfound_floor_doesnotexist(self):
+        """Test GET route for math/number returns 404 if number not found and no
+        existing math fact for previous number"""
+        with app.test_client() as client:
+            url = "/api/math/3?notfound=floor"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(data, {'error': {
+                    'message': "A math fact for 3 not found",
+                    'status': 404 } })
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_number_with_no_fact_and_notfound_ceil_doesnotexist(self):
+        """Test GET route for math/number returns 404 if number not found and no
+        existing math fact for next number"""
+        with app.test_client() as client:
+            url = "/api/math/15?notfound=ceil"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(data, {'error': {
+                    'message': "A math fact for 15 not found",
+                    'status': 404 } })
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_number_with_no_fact_and_invalid_notfound_query(self):
+        """Test GET route for math/number returns 404 if number not found and
+        notfound query parameter is invalid (not "ceil" or "floor")"""
+        with app.test_client() as client:
+            url = "/api/math/0?notfound=true"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(data, {'error': {
+                    'message': "A math fact for 0 not found",
+                    'status': 404 } })
+            self.assertEqual(resp.status_code, 404)
 
     def test_error_for_number_with_no_fact_and_no_notfound_query(self):
-        """Test GET route for math/number returns 404 if number not found"""
+        """Test GET route for math/number returns 404 if number not found and no
+        notfound query parameter supplied in request"""
         with app.test_client() as client:
-            url = f"/api/math/0"
+            url = "/api/math/0"
             resp = client.get(url)
 
             data = resp.json
@@ -115,9 +153,10 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
             self.assertEqual(resp.status_code, 404)
 
     def test_error_for_invalid_number(self):
-        """Test GET route for math/number returns 404 if number not valid"""
+        """Test GET route for math/number returns 404 if number is not a valid
+        integer number"""
         with app.test_client() as client:
-            url = f"/api/math/minaj"
+            url = "/api/math/minaj"
             resp = client.get(url)
 
             self.assertEqual(resp.status_code, 404)
