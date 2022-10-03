@@ -37,11 +37,6 @@ class DateRouteTestCase(TestCase):
         db.session.add_all([self.test1, self.test2])
         db.session.commit()
 
-        self.test1_id = self.test1.id
-        self.test2_id = self.test2.id
-
-        self.client = app.test_client()
-
     def tearDown(self):
         """Clean up any fouled transaction."""
         db.session.rollback()

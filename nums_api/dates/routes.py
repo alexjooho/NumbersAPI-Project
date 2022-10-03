@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from nums_api.dates.models import Date
-from random import random, choice, randint
+from random import choice
 
 dates = Blueprint("dates", __name__)
 
