@@ -1,7 +1,6 @@
 """ Tests for maths routes.
     To run tests in venv: python3 -m unittest test_routes.py -v
-    """
-
+"""
 
 from unittest import TestCase
 from nums_api import app
@@ -69,8 +68,8 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
 
     def test_get_math_fact_with_notfound_query_floor(self):
         """Test GET route for math/number with no math fact and
-            notfound = 'floor' query parameter,
-            returns correct JSON response"""
+            notfound = 'floor' query parameter, finds the previous existing math
+            fact and returns correct JSON response"""
         with app.test_client() as client:
             url = f"/api/math/15?notfound=floor"
             resp = client.get(url)
@@ -86,8 +85,8 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
 
     def test_get_math_fact_with_notfound_query_ceil(self):
         """Test GET route for math/number with no math fact and
-            notfound = 'ceil' query parameter,
-            returns correct JSON response"""
+            notfound = 'ceil' query parameter, finds the next existing math fact
+            and returns correct JSON response"""
         with app.test_client() as client:
             url = f"/api/math/3?notfound=ceil"
             resp = client.get(url)
@@ -101,6 +100,41 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
             }})
             self.assertEqual(resp.status_code, 200)
 
+    def test_error_for_number_with_no_fact_and_notfound_floor_doesnotexist(self):
+        """Test GET route for math/number returns 404 if number not found"""
+        with app.test_client() as client:
+            url = f"/api/math/3?notfound=floor"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(data, {'error': {
+                    'message': "A math fact for 3 not found",
+                    'status': 404 } })
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_number_with_no_fact_and_notfound_ceil_doesnotexist(self):
+        """Test GET route for math/number returns 404 if number not found"""
+        with app.test_client() as client:
+            url = f"/api/math/15?notfound=ceil"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(data, {'error': {
+                    'message': "A math fact for 15 not found",
+                    'status': 404 } })
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_number_with_no_fact_and_invalid_notfound_query(self):
+        """Test GET route for math/number returns 404 if number not found"""
+        with app.test_client() as client:
+            url = f"/api/math/0?notfound=true"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(data, {'error': {
+                    'message': "A math fact for 0 not found",
+                    'status': 404 } })
+            self.assertEqual(resp.status_code, 404)
 
     def test_error_for_number_with_no_fact_and_no_notfound_query(self):
         """Test GET route for math/number returns 404 if number not found"""

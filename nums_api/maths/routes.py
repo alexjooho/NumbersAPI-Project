@@ -9,11 +9,11 @@ math = Blueprint("math", __name__)
 def get_math_fact(number):
     """Returns a random math fact in JSON about a number passed as a
     URL parameter.
-        Accepts optional query parameter: notfound = "floor" or "ceil",
-        returns the previous or next found number if number not found.
+    Accepts optional query parameter: notfound = "floor" or "ceil",
+    returns the previous or next found number if number not found.
 
-        - If math fact is found and/or notfound query is provided,
-            returns JSON response:
+    - If math fact is found and/or notfound query is provided,
+    returns JSON response:
         { "fact": {
             "number": number
             "fragment": fact_fragment
@@ -21,11 +21,11 @@ def get_math_fact(number):
             "type": "math"
         }}
 
-        - If math fact is not found and notfound query is not provided,
-            returns JSON response:
-            { 'error': {
-                'message': f"A math fact for { number } not found",
-                'status': 404 } }
+    - If math fact is not found and notfound query is not provided,
+    returns JSON response:
+        { 'error': {
+            'message': f"A math fact for { number } not found",
+            'status': 404 } }
     """
     num_facts = Math.query.filter_by(number = number).all()
     notfound_query = request.args.get('notfound')
@@ -34,14 +34,14 @@ def get_math_fact(number):
 
         num_query = Math.query.filter(
             Math.number < number).order_by(Math.number.desc()).first()
-
-        num_facts = Math.query.filter_by(number = num_query.number).all()
+        if num_query:
+            num_facts = Math.query.filter_by(number = num_query.number).all()
 
     if notfound_query == "ceil" and not num_facts:
         num_query = Math.query.filter(
             Math.number > number).order_by(Math.number.asc()).first()
-
-        num_facts = Math.query.filter_by(number = num_query.number).all()
+        if num_query:
+            num_facts = Math.query.filter_by(number = num_query.number).all()
 
     if num_facts:
         num_fact = random.choice(num_facts)
