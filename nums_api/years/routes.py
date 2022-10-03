@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify
 from nums_api.years.models import Year
-from sqlalchemy.sql import func
 import random
 
 years = Blueprint("years", __name__)
