@@ -1,3 +1,8 @@
+""" Tests for maths routes.
+    To run tests in venv: python3 -m unittest test_routes.py -v
+    """
+
+
 from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
@@ -62,7 +67,42 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
             }})
             self.assertEqual(resp.status_code, 200)
 
-    def test_error_for_number_with_no_fact(self):
+    def test_get_math_fact_with_notfound_query_floor(self):
+        """Test GET route for math/number with no math fact and
+            notfound = 'floor' query parameter,
+            returns correct JSON response"""
+        with app.test_client() as client:
+            url = f"/api/math/15?notfound=floor"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(data, {"fact": {
+                "number": "10",
+                "fragment":"the number for this m2 test fact fragment",
+                "statement":"10 is the number for m2 this test fact statement.",
+                "type": "math"
+            }})
+            self.assertEqual(resp.status_code, 200)
+
+    def test_get_math_fact_with_notfound_query_ceil(self):
+        """Test GET route for math/number with no math fact and
+            notfound = 'ceil' query parameter,
+            returns correct JSON response"""
+        with app.test_client() as client:
+            url = f"/api/math/3?notfound=ceil"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(data, {"fact": {
+                "number": "5",
+                "fragment":"the number for this m1 test fact fragment",
+                "statement":"5 is the number for m1 this test fact statement.",
+                "type": "math"
+            }})
+            self.assertEqual(resp.status_code, 200)
+
+
+    def test_error_for_number_with_no_fact_and_no_notfound_query(self):
         """Test GET route for math/number returns 404 if number not found"""
         with app.test_client() as client:
             url = f"/api/math/0"

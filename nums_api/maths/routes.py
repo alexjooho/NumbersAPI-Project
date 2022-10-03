@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from nums_api.maths.models import Math
 import random
 
@@ -9,8 +9,11 @@ math = Blueprint("math", __name__)
 def get_math_fact(number):
     """Returns a random math fact in JSON about a number passed as a
     URL parameter.
+        Accepts optional query parameter: notfound = "floor" or "ceil",
+        returns the previous or next found number if number not found.
 
-        - If fact is found, returns JSON response:
+        - If math fact is found and/or notfound query is provided,
+            returns JSON response:
         { "fact": {
             "number": number
             "fragment": fact_fragment
@@ -18,12 +21,27 @@ def get_math_fact(number):
             "type": "math"
         }}
 
-        - If fact is not found, returns JSON response:
+        - If math fact is not found and notfound query is not provided,
+            returns JSON response:
             { 'error': {
                 'message': f"A math fact for { number } not found",
                 'status': 404 } }
     """
     num_facts = Math.query.filter_by(number = number).all()
+    notfound_query = request.args.get('notfound')
+
+    if notfound_query == "floor" and not num_facts:
+
+        num_query = Math.query.filter(
+            Math.number < number).order_by(Math.number.desc()).first()
+
+        num_facts = Math.query.filter_by(number = num_query.number).all()
+
+    if notfound_query == "ceil" and not num_facts:
+        num_query = Math.query.filter(
+            Math.number > number).order_by(Math.number.asc()).first()
+
+        num_facts = Math.query.filter_by(number = num_query.number).all()
 
     if num_facts:
         num_fact = random.choice(num_facts)
@@ -39,6 +57,7 @@ def get_math_fact(number):
                     'message': f"A math fact for { number } not found",
                     'status': 404 } }
         return (jsonify(error), 404)
+
 
 @math.get("/random")
 def get_math_fact_random():
