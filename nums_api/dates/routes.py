@@ -32,6 +32,7 @@ def get_date_fact(month, day):
 
     try:
         date_fact_res = Date.query.filter_by(day_of_year=days).one()
+        print(date_fact_res)
 
     except (IndexError):
         return (jsonify(error=error_msg), 404)
