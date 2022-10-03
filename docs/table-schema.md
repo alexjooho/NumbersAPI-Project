@@ -1,0 +1,1 @@
+![db Table Schema](../nums_api/static/table-schema.png)
