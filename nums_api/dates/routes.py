@@ -17,8 +17,16 @@ def get_date_fact(month, day):
             'type': 'date'
             }
         }
-        returns value error if month/day not in range
-        returns 404 error if no fact for specified month/day
+        returns json 404 error if month/day not in range:
+        {"error": {
+                "message": "Invalid value for month/day",
+                "status": 404
+        }}
+        returns json 404 error if no fact for specified month/day:
+        {"error": {
+                "message": "A date fact for 1/30 not found",
+                "status": 404
+        }}
         """
 
     error_msg = {
@@ -70,6 +78,7 @@ def get_date_fact_random():
 
     random_date_fact = {
         'day_of_year': random_fact.day_of_year,
+        'year': random_fact.year,
         'fact_fragment': random_fact.fact_fragment,
         'fact_statement': random_fact.fact_statement,
         'type': 'date'

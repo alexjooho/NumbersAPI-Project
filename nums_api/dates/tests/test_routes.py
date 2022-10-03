@@ -23,7 +23,7 @@ class DateRouteTestCase(TestCase):
             year=1900,
             fact_fragment="test1 fragment",
             fact_statement="test1 statement",
-            was_submitted=True
+            was_submitted=False
         )
 
         self.test2 = Date(
@@ -51,9 +51,10 @@ class DateRouteTestCase(TestCase):
         test_setup_correct = True
         self.assertEqual(test_setup_correct, True)
 
+class DatesRouteTests(DateRouteTestCase):
     def test_date_fact(self):
-        """Test route to retrieve random fact by specific month/day"""
-        with self.client as c:
+        """Test GET route for dates/month/day returns correct JSON response"""
+        with app.test_client() as c:
             resp = c.get("/api/dates/1/10")
 
             self.assertEqual(resp.status_code, 200)
@@ -69,9 +70,9 @@ class DateRouteTestCase(TestCase):
                                          'type': 'date'
                                      }}))
 
-    def test_invalid_dates(self):
-        """Test route for invalid dates"""
-        with self.client as c:
+    def test_invalid_day(self):
+        """Test GET route for dates/month/day returns 404 if invalid day"""
+        with app.test_client() as c:
             resp = c.get("/api/dates/10/32")
 
             self.assertEqual(resp.status_code, 404)
@@ -82,3 +83,49 @@ class DateRouteTestCase(TestCase):
                 "message": "Invalid value for day",
                 "status": 404
             }})
+
+    def test_invalid_month(self):
+        """Test GET route for dates/month/day returns 404 if invalid month"""
+        with app.test_client() as c:
+            resp = c.get("/api/dates/100/30")
+
+            self.assertEqual(resp.status_code, 404)
+
+            data = resp.json
+
+            self.assertEqual(data, {"error": {
+                "message": "Invalid value for month",
+                "status": 404
+            }})
+
+    def test_date_without_fact(self):
+        """Test GET route for dates/month/day returns 404 if date does not have fact"""
+        with app.test_client() as c:
+            resp = c.get("/api/dates/1/30")
+
+            self.assertEqual(resp.status_code, 404)
+
+            data = resp.json
+
+            self.assertEqual(data, {"error": {
+                "message": "A date fact for 1/30 not found",
+                "status": 404
+            }})
+
+
+class DatesRandomRouteTests(DateRouteTestCase):
+    def test_random_date_fact(self):
+        """Test GET route for dates/random returns correct JSON response"""
+        with app.test_client() as c:
+
+            resp1 = c.get("/api/dates/1/10") # this is test1 input month/day
+            resp2 = c.get("/api/dates/2/19") # this is test2 input month/day
+            resp_list = [resp1.json, resp2.json]
+
+            resp_random = c.get("/api/dates/random")
+
+            data = resp_random.json
+
+            self.assertEqual(resp_random.status_code, 200)
+
+            self.assertIn(data, resp_list)
