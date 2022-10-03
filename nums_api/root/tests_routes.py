@@ -16,6 +16,7 @@ class HomepageView(TestCase):
         with self.client as c:
 
             resp = c.get("/")
+            html = resp.get_data(as_text=True)
 
-            self.assertEqual(resp.status_code, 200)
-            self.assertIn("<body>", str(resp.data))
+            self.assertIn('Numbers API V2 Documentation', html)
+            self.assertEqual(200, resp.status_code)
