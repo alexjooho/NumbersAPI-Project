@@ -1,3 +1,7 @@
+""" Tests for trivia routes.
+    To run tests in venv: python3 -m unittest test_routes.py -v
+"""
+
 from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
@@ -69,10 +73,94 @@ class TriviaRouteTestCase(TestCase):
                 })
             self.assertEqual(resp.status_code, 200)
 
-    def test_error_for_number_with_no_fact(self):
-        """ Tests that a number with no fact will return an error """
+    def test_get_trivia_fact_with_notfound_query_floor(self):
+        """Test GET route for trivia/number with no trivia fact and
+        notfound = 'floor' query parameter, finds the previous existing trivia
+        fact and returns correct JSON response """
+        with self.client as c:
+            resp = c.get("/api/trivia/4?notfound=floor")
+            data = resp.json
+
+            self.assertEqual(
+                data,
+                {"fact": {
+                    "number": 3,
+                    "fragment": "test 3",
+                    "statement": "3 is the number for this test fact statement.",
+                    "type": "trivia"
+                }
+                })
+            self.assertEqual(resp.status_code, 200)
+
+    def test_get_trivia_fact_with_notfound_query_ceil(self):
+        """Test GET route for trivia/number with no trivia fact and
+        notfound = 'ceil' query parameter, finds the next existing trivia fact
+        and returns correct JSON response"""
+        with self.client as c:
+            resp = c.get("/api/trivia/0?notfound=ceil")
+            data = resp.json
+
+            self.assertEqual(
+                data,
+                {"fact": {
+                    "number": 1,
+                    "fragment": "test 1",
+                    "statement": "1 is the number for this test fact statement.",
+                    "type": "trivia"
+                }
+                })
+            self.assertEqual(resp.status_code, 200)
+
+    def test_error_for_number_with_no_fact_and_notfound_floor_doesnotexist(self):
+        """Test GET route for trivia/number returns 404 if number not found and
+        no existing trivia fact for previous number"""
+        with self.client as c:
+            resp = c.get("/api/trivia/0?notfound=floor")
+            data = resp.json
+
+            self.assertEqual(
+                data,{
+                "error": {
+                    "message": "A trivia fact for 0 not found",
+                    "status": 404
+                }})
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_number_with_no_fact_and_notfound_ceil_doesnotexist(self):
+        """Test GET route for trivia/number returns 404 if number not found and
+        no existing trivia fact for next number"""
+        with self.client as c:
+            resp = c.get("/api/trivia/5?notfound=ceil")
+            data = resp.json
+
+            self.assertEqual(
+                data,{
+                "error": {
+                    "message": "A trivia fact for 5 not found",
+                    "status": 404
+                }})
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_number_with_no_fact_and_no_notfound_query(self):
+        """Test GET route for trivia/number returns 404 if number not found and
+        no notfound query parameter supplied in request"""
         with self.client as c:
             resp = c.get("/api/trivia/5")
+            data = resp.json
+
+            self.assertEqual(data, {
+                "error": {
+                    "message": "A trivia fact for 5 not found",
+                    "status": 404
+                }
+            })
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_number_with_no_fact_and_invalid_notfound_query(self):
+        """Test GET route for trivia/number returns 404 if number not found and
+        notfound query parameter is invalid (not "ceil" or "floor")"""
+        with self.client as c:
+            resp = c.get("/api/trivia/5?notfound=true")
             data = resp.json
 
             self.assertEqual(data, {
