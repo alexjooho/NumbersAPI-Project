@@ -46,13 +46,21 @@ class DateModelTestCase(TestCase):
 
         self.assertEqual(Date.query.count(), 1)
         self.assertEqual(Date.query.filter_by(day_of_year=1).one().year, 1)
-        
+
     def test_invalid_inputs(self):
         """Test invalid day/month inputs raise errors"""
-        #Good month, bad day
-        self.assertRaises(ValueError, Date.date_to_day_of_year, 1, 0)
-        self.assertRaises(ValueError, Date.date_to_day_of_year, 2, 30)
-        #Bad month, good day
-        self.assertRaises(ValueError, Date.date_to_day_of_year, 0, 1)
-        self.assertRaises(ValueError, Date.date_to_day_of_year, 13, 1)
-
+        # Good month, bad day
+        with self.assertRaises(ValueError) as exc:
+            Date.date_to_day_of_year(1, 0)
+        self.assertEqual(str(exc.exception), "Invalid value for day")
+        with self.assertRaises(ValueError) as exc:
+            Date.date_to_day_of_year(2, 30)
+        self.assertEqual(str(exc.exception), "Invalid value for day")
+        
+        # Bad month, good day
+        with self.assertRaises(ValueError) as exc:
+            Date.date_to_day_of_year(0, 1)
+        self.assertEqual(str(exc.exception), "Invalid value for month")
+        with self.assertRaises(ValueError) as exc:
+            Date.date_to_day_of_year(13, 1)
+        self.assertEqual(str(exc.exception), "Invalid value for month")
