@@ -18,7 +18,7 @@ class DateRouteTestCase(TestCase):
         """Set up test data here"""
         self.client = app.test_client()
 
-        test1 = Date(
+        self.test1 = Date(
             day_of_year=10,
             year=1900,
             fact_fragment="test1 fragment",
@@ -26,7 +26,7 @@ class DateRouteTestCase(TestCase):
             was_submitted=True
         )
 
-        test2 = Date(
+        self.test2 = Date(
             day_of_year=50,
             year=1900,
             fact_fragment="test2 fragment",
@@ -34,11 +34,11 @@ class DateRouteTestCase(TestCase):
             was_submitted=False
         )
 
-        db.session.add_all([test1, test2])
+        db.session.add_all([self.test1, self.test2])
         db.session.commit()
 
-        self.test1_id = test1.id
-        self.test2_id = test2.id
+        self.test1_id = self.test1.id
+        self.test2_id = self.test2.id
 
         self.client = app.test_client()
 
@@ -54,7 +54,7 @@ class DateRouteTestCase(TestCase):
     def test_date_fact(self):
         """Test to retrieve random fact by specific month/day"""
         with self.client as c:
-            resp = c.get("/api/date/1/10")
+            resp = c.get("/api/dates/1/10")
 
             self.assertEqual(resp.status_code, 200)
 

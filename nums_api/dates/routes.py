@@ -4,21 +4,6 @@ from random import choice, randint
 
 dates = Blueprint("dates", __name__)
 
-months_days = {
-    1: 31,
-    2: 29,
-    3: 31,
-    4: 30,
-    5: 31,
-    6: 30,
-    7: 31,
-    8: 31,
-    9: 30,
-    10: 31,
-    11: 30,
-    12: 31,
-}
-
 
 @dates.get("/<int:month>/<int:day>")
 def get_date_fact(month, day):
@@ -40,13 +25,14 @@ def get_date_fact(month, day):
         "status": 404
     }
 
-    if (day > months_days[month]) or (not months_days[month]):
-        return (jsonify(error=error_msg), 404)
-
-    days = Date.date_to_day_of_year(month, day)
+    try:
+        days = Date.date_to_day_of_year(month, day)
+    except ValueError as e:
+        return e
 
     try:
-        date_fact_res = choice(Date.query.filter_by(day_of_year=days))
+        date_fact_res = Date.query.filter_by(day_of_year=days).one()
+
     except (IndexError):
         return (jsonify(error=error_msg), 404)
 
