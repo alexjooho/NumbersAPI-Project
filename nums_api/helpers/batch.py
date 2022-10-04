@@ -1,6 +1,6 @@
 import math
 
-BATCH_LIMIT = 2
+BATCH_LIMIT = 50
 
 def get_batch_nums(num_ranges:str):
     """Parses a batch request string into a list of individual numbers
