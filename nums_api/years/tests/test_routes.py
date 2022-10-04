@@ -1,3 +1,7 @@
+""" Tests for years routes.
+    To run tests in venv: python3 -m unittest test_routes.py -v
+"""
+
 from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
@@ -58,42 +62,116 @@ class YearRouteTestCase(TestCase):
             resp = c.get("/api/years/1")
             self.assertEqual(
                 resp.json,
-                {'fact': {
-                    'year': 1,
-                    'fragment': 'the year for the first test entry',
-                    'statement': '1 is the year for this test fact statement.',
-                    'type': 'year',
+                {"fact": {
+                    "year": 1,
+                    "fragment": "the year for the first test entry",
+                    "statement": "1 is the year for this test fact statement.",
+                    "type": "year",
                 }})
-
             self.assertEqual(resp.status_code, 200)
 
-    def test_error_for_year_without_fact(self):
-        """Tests for getting an error for a year without a fact.
-        """
+    def test_get_year_fact_with_notfound_query_floor(self):
+        """Test GET route for years/year with no year fact and
+        notfound = "floor" query parameter, finds the previous existing year
+        fact and returns correct JSON response"""
+        with self.client as c:
+
+            resp = c.get("/api/years/5?notfound=floor")
+            self.assertEqual(
+                resp.json,
+                {"fact": {
+                    "year": 3,
+                    "fragment": "the year for the third test entry",
+                    "statement": "3 is the year for this test fact statement.",
+                    "type": "year",
+                }})
+            self.assertEqual(resp.status_code, 200)
+
+    def test_get_year_fact_with_notfound_query_ceil(self):
+        """Test GET route for years/year with no year fact and
+        notfound = "ceil" query parameter, finds the next existing year
+        fact and returns correct JSON response"""
+        with self.client as c:
+
+            resp = c.get("/api/years/0?notfound=ceil")
+            self.assertEqual(
+                resp.json,
+                {"fact": {
+                    "year": 1,
+                    "fragment": "the year for the first test entry",
+                    "statement": "1 is the year for this test fact statement.",
+                    "type": "year",
+                }})
+            self.assertEqual(resp.status_code, 200)
+
+    def test_error_for_year_without_fact_and_notfound_floor_doesnotexist(self):
+        """Test GET route for years/year returns 404 if year not found and no
+        existing year fact for previous year"""
+        with self.client as c:
+
+            resp = c.get("api/years/0?notfound=floor")
+            self.assertEqual(
+                resp.json,
+                {"error": {
+                    "status": 404,
+                    "message": "A fact for 0 not found",
+                }})
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_year_without_fact_and_notfound_ceil_doesnotexist(self):
+        """Test GET route for years/year returns 404 if year not found and no
+        existing year fact for next year"""
+        with self.client as c:
+
+            resp = c.get("api/years/10?notfound=ceil")
+            self.assertEqual(
+                resp.json,
+                {"error": {
+                    "status": 404,
+                    "message": "A fact for 10 not found",
+                }})
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_year_without_fact_and_invalid_notfound_query(self):
+        """Test GET route for years/year returns 404 if year not found and
+        notfound query parameter is invalid (not "ceil" or "floor")"""
+        with self.client as c:
+
+            resp = c.get("api/years/0?notfound=true")
+            self.assertEqual(
+                resp.json,
+                {"error": {
+                    "status": 404,
+                    "message": "A fact for 0 not found",
+                }})
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_year_without_fact_and_no_notfound_query(self):
+        """Tests for getting an error for a year without a fact and no
+        notfound query parameter supplied in request"""
         with self.client as c:
 
             resp = c.get("api/years/100000")
             self.assertEqual(
                 resp.json,
-                {'error': {
-                    'status': 404,
-                    'message': 'A fact for 100000 not found',
+                {"error": {
+                    "status": 404,
+                    "message": "A fact for 100000 not found",
                 }})
-            
             self.assertEqual(resp.status_code, 404)
 
     def test_get_year_fact_random(self):
         """Test for getting a single fact on a random year."""
         with self.client as c:
-            
+
             y1_resp = c.get("api/years/1")
             y2_resp = c.get("api/years/2")
             y3_resp = c.get("api/years/3")
-            
+
             resp_list = [y1_resp.json, y2_resp.json, y3_resp.json]
 
             random_resp = c.get("api/years/random")
-            
+
             self.assertIn(random_resp.json, resp_list)
             self.assertEqual(random_resp.status_code, 200)
 
