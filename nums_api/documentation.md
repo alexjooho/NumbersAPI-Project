@@ -27,7 +27,7 @@ URL for Trivia fact about a number:
 an integer, or you can instead use
 the keyword <code><strong>random</code></strong>, for which we will try to return a random available fact.
 
-If a valid keyword is provided requests should return JSON:
+If a valid keyword is provided, requests should return JSON:
 ```
 http://numbersapi.com/api/trivia/11
 
@@ -50,13 +50,13 @@ URL for Dates fact about a number:
 integers, or you can instead use
 the keyword <code><strong>random</code></strong>, for which we will try to return a random available fact.
 
-If a valid keyword combination is provided requests should return JSON:
+If a valid keyword combination is provided, requests should return JSON:
 ```
 http://numbersapi.com/api/dates/11
 
 ⇒ {
     "fact": {
-        "number":113
+        "number": 113
         "year":1970
         "fragment": "the day in 1970 that the first Earth Day is celebrated"
         "statement": "April 22nd is the day in 1970 that the first Earth Day is celebrated."
@@ -65,30 +65,49 @@ http://numbersapi.com/api/dates/11
 }
 ```
 
+### Years
+URL for Years fact about a number:
 
+<code>http://numbersapi.com/api/years/<strong>year</strong></code>
 
+<code><strong>year</code></strong> is
+an integer for a year, or you can instead use
+the keyword <code><strong>random</code></strong>, for which we will try to return a random available fact.
 
-
-Just hit http://numbersapi.com/number/type to get a plain text response, where
-
-type is one of **trivia, math, date, or year**. Defaults to trivia if omitted.
-number is
-an integer, or
-the keyword random, for which we will try to return a random available fact, or
-a day of year in the form month/day (eg. 2/29, 1/09, 04/1), if type is date
-ranges of numbers
-
-## Query Parameter Options
-
-### JSON
-
-            http://numbersapi.com/1..3,10
+If a valid keyword is provided, requests should return JSON:
 ```
+http://numbersapi.com/api/years/2011
+
 ⇒ {
-    "1": "1 is the number of dimensions of a line.",
-    "2": "2 is the number of polynucleotide strands in a DNA double helix.",
-    "3": "3 is the number of sets needed to be won to win the whole match in volleyball.",
-    "10": "10 is the highest score possible in Olympics gymnastics competitions."
+    "fact": {
+        "year": 2011
+        "fragment": "the year that a magnitude 9 earthquake hit Japan"
+        "statement": "2011 is the year that a magnitude 9 earthquake hit Japan."
+        "type": "years"
+        }
+}
+```
+
+### Math
+URL for Math fact about a number:
+
+<code>http://numbersapi.com/api/math/<strong>number</strong></code>
+
+<code><strong>number</code></strong> is
+an integer for a number, or you can instead use
+the keyword <code><strong>random</code></strong>, for which we will try to return a random available fact.
+
+If a valid keyword is provided, requests should return JSON:
+```
+http://numbersapi.com/api/math/49
+
+⇒ {
+    "fact": {
+        "number": 49
+        "fragment": "the smallest number with the property that it and its neighbors are squareful"
+        "statement": "49 is the smallest number with the property that it and its neighbors are squareful."
+        "type": "math"
+        }
 }
 ```
 
