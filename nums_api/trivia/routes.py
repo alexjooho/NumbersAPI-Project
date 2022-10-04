@@ -23,28 +23,28 @@ def get_trivia_fact(number):
 
     - Otherwise, if url parameter is invalid and notfound query is not provided,
     returns an error:
-        { 'error': {
-            'message': f"A trivia fact for { number } not found",
-            'status': 404 } }
+        { "error": {
+            "message": f"A trivia fact for { number } not found",
+            "status": 404 } }
     """
     trivia = Trivia.query.filter_by(number=number).all()
-    notfound_query = request.args.get('notfound')
+    notfound_query = request.args.get("notfound")
 
     if notfound_query == "floor" and not trivia:
         num_query = (
             Trivia.query
-                .filter(Trivia.number < number)
-                .order_by(Trivia.number.desc())
-                .first())
+            .filter(Trivia.number < number)
+            .order_by(Trivia.number.desc())
+            .first())
         if num_query:
             trivia = Trivia.query.filter_by(number=num_query.number).all()
 
     if notfound_query == "ceil" and not trivia:
         num_query = (
             Trivia.query
-                .filter(Trivia.number > number)
-                .order_by(Trivia.number.asc())
-                .first())
+            .filter(Trivia.number > number)
+            .order_by(Trivia.number.asc())
+            .first())
         if num_query:
             trivia = Trivia.query.filter_by(number=num_query.number).all()
 

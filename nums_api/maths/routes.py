@@ -23,12 +23,12 @@ def get_math_fact(number):
 
     - If math fact is not found and notfound query is not provided,
     returns JSON response:
-        { 'error': {
-            'message': f"A math fact for { number } not found",
-            'status': 404 } }
+        { "error": {
+            "message": f"A math fact for { number } not found",
+            "status": 404 } }
     """
     num_facts = Math.query.filter_by(number=number).all()
-    notfound_query = request.args.get('notfound')
+    notfound_query = request.args.get("notfound")
 
     if notfound_query == "floor" and not num_facts:
         num_query = (
@@ -50,17 +50,17 @@ def get_math_fact(number):
 
     if num_facts:
         num_fact = random.choice(num_facts)
-        fact = {'fact': {
-            'number': num_fact.number,
-            'fragment': num_fact.fact_fragment,
-            'statement': num_fact.fact_statement,
-            'type': 'math'
+        fact = {"fact": {
+            "number": num_fact.number,
+            "fragment": num_fact.fact_fragment,
+            "statement": num_fact.fact_statement,
+            "type": "math"
         }}
         return jsonify(fact)
     else:
-        error = {'error': {
-            'message': f"A math fact for { number } not found",
-            'status': 404}}
+        error = {"error": {
+            "message": f"A math fact for { number } not found",
+            "status": 404}}
         return (jsonify(error), 404)
 
 
@@ -79,10 +79,10 @@ def get_math_fact_random():
 
     num_fact = random.choice(Math.query.all())
 
-    fact = {'fact': {
-        'number': num_fact.number,
-        'fragment': num_fact.fact_fragment,
-            'statement': num_fact.fact_statement,
-            'type': 'math'
+    fact = {"fact": {
+        "number": num_fact.number,
+        "fragment": num_fact.fact_fragment,
+            "statement": num_fact.fact_statement,
+            "type": "math"
             }}
     return jsonify(fact)
