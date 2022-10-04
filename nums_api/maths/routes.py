@@ -9,7 +9,6 @@ math = Blueprint("math", __name__)
 def get_math_fact(number):
     """Returns a random math fact in JSON about a number passed as a
     URL parameter.
-
         - If fact is found, returns JSON response:
         { "fact": {
             "number": number
@@ -17,7 +16,6 @@ def get_math_fact(number):
             "statement": fact_statement
             "type": "math"
         }}
-
         - If fact is not found, returns JSON response:
             { 'error': {
                 'message': f"A math fact for { number } not found",
@@ -43,7 +41,6 @@ def get_math_fact(number):
 @math.get("/random")
 def get_math_fact_random():
     """Returns a random math fact in JSON about a random number.
-
         - Returns JSON response:
         { "fact": {
             "number": random number

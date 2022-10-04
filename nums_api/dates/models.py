@@ -1,5 +1,6 @@
 from datetime import datetime
 from nums_api.database import db
+from nums_api.config import DATABASE_URL_TEST
 
 
 class Date (db.Model):
@@ -86,7 +87,7 @@ class Date (db.Model):
         MONTHS_TO_DAYS = [0,31,29,31,30,31,30,31,31,30,31,30,31]
         MONTHS_IN_YEAR = 12
 
-        if not 0 < month <= MONTHS_IN_YEAR: 
+        if not 0 < month <= MONTHS_IN_YEAR:
             raise ValueError("Invalid value for month")
         if not 0 < day <= MONTHS_TO_DAYS[month]:
             raise ValueError("Invalid value for day")
