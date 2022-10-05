@@ -13,19 +13,24 @@ $(".example-box-address").on("click", async function (evt) {
 
 });
 
-/**
- * On submission of search form performs search of
- * facts in sandbox, displaying the fact on page.
+/** Async function for replacing result-temporary-text box with text based
+ * on URL text given.
  */
-$("#search-form").on("submit", async function () {
-
+async function updateResultText() {
     const text = $("#search-text").text();
     const fact = await getFacts(text);
 
-    const number = text.replace(/\D/g, "");
-
-
     $("#result-temporary-text").text(fact);
+}
+
+/**
+ * On submission of search form performs search of
+ * facts in sandbox, displaying the fact on page and updating counter.
+ */
+$("#search-form").on("submit", async function () {
+    const urlNum = $("#search-text").text().replace(/\D/g, "")
+    updateCounter(urlNum);
+    updateResultText();
 });
 
 
@@ -41,27 +46,59 @@ $(".random-fact").on("click", function (evt) {
 });
 
 
+$("#add-number").on("click", async function () { updateCounter(1, "add") });
 
-$("#add-number").on("click", () => {updateCounter(1,"add")});
+/** Converts date of year to month and day and uses it to update search text URL */
+function updateSandboxForDates(text, dateOfYear) {
+    const date = new Date(2004, 0, dateOfYear)
+    
+    const day = date.getDate();
+    const month = date.getMonth();
+    
+    const MonthAndDay = `${month}/${day}`;
+    
+    const newText = text.replace(/(\d+)\/(\d+)/g, MonthAndDay);
+    $("#search-text").text(newText);
+}
 
-
-
-function updateCounter(num,action="replace"){
+/** Updates counter and updates text in result text box */
+async function updateCounter(num, action = "replace") {
     const currentTick = $(".tick").data("value");
     let numTick = parseInt(currentTick);
 
+    let newNum;
 
-    if(action === "add"){
-        let newNum = (numTick + num).toString();
-        $(".tick").attr("data-value",newNum);
-    } else if (action === "subtract" && currentTick !== "0000"){
-        let newNum = toString(numTick - num);
-        $(".tick").attr("data-value",newNum);
-    } else if (action === "replace"){
-        $(".tick").attr("data-value",num.toString());
+    if (action === "add") {
+        newNum = (numTick + num).toString();
+        if (newNum.length < 4) newNum = String(newNum).padStart(4, "0");
+
+        $(".tick").attr("data-value", newNum);
+
+    } else if (action === "subtract" && currentTick !== "0000") {
+        newNum = (numTick - num).toString();
+        if (newNum.length < 4) newNum = String(newNum).padStart(4, "0");
+
+        $(".tick").attr("data-value", newNum);
+
+    } else if (action === "replace") {
+        newNum = String(num).padStart(4, "0");
+        $(".tick").attr("data-value", newNum);
+        return;
+    }
+
+    const text = $("#search-text").text();
+    if (text.includes("date")) {
+        updateSandboxForDates(text, newNum);
+        updateResultText();
+    }
+    
+    else {
+        const newText = text.replace(/\d/g, "").concat(newNum);
+        $("#search-text").text(newText);
+        
+        updateResultText();
     }
 }
-
 
 /**
  * Takes a partial URL or full URL address stringfor API
@@ -94,13 +131,10 @@ async function getFacts(address) {
 //         // used instead of the actual
 //         // tick content
 //         tick.root.setAttribute(
-//             'aria-label',
+//             "aria-label",
 //             tick.value
 //         );
 
 //     }, 1000);
 
 // }
-
-
-
