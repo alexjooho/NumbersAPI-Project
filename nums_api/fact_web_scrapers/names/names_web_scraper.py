@@ -47,9 +47,9 @@ def parse_multiple_pages(base_url=URL):
         
     return
 
-def write_to_file(data=name_fact_dict):
+def write_to_file(source='scraped_names_facts.txt', data=name_fact_dict):
     """Writes completed dictionary to text file:"""
-    with open('scraped_names_facts.txt', 'w') as file:
+    with open(source, 'w') as file:
         file.write(str(data))
 
 def main():
@@ -57,4 +57,6 @@ def main():
     parse_multiple_pages()
     write_to_file()
     
-main()
+    
+if __name__ == '__main__':
+    main()
