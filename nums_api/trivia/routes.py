@@ -55,17 +55,14 @@ def get_trivia_fact_random():
 
     facts = []
 
-    count = request.args["count"]
-
-    if not count:
-        count = 1
+    count = int(request.args.get("count") or 1)
 
     if count > 50:
         count = 50
 
     while count > 0:
 
-        random_trivia = choice(Trivia.query.all())
+        random_trivia = random.choice(Trivia.query.all())
 
         fact = {"fact": {
             "number": random_trivia.number,
@@ -75,6 +72,11 @@ def get_trivia_fact_random():
         }}
 
         facts.append(fact)
+
+        count -= 1
+
+    if len(facts) == 1:
+        return jsonify(facts[0])
 
     return jsonify(facts)
 

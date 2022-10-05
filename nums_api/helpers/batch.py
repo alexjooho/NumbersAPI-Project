@@ -50,31 +50,4 @@ def int_or_float(num_string):
     except ValueError:
         return float(num_string)
 
-#--------------------------------------------------
-# Need to move this somwehre
-def get_math_facts(single_fact, type):
-    """ Get a fact for a single number
-    Takes in a number, num and a string, type
-    Returns a fact like:
-    {
-        "number" : 1,
-        "fragment": fragment,
-        "statement": statement,
-        "type": "math"
-    }
-    """
-
-
-    random_fact = random.choice(single_fact)
-
-    fact = {
-        "number": random_fact.number,
-        "fragment": random_fact.fact_fragment,
-        "statement": random_fact.fact_statement,
-        "type": type
-    }
-
-    print("FACT" , fact)
-
-    return fact
 

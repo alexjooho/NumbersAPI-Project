@@ -6,7 +6,6 @@ import re
 
 math = Blueprint("math", __name__)
 
-
 @math.get("/<int:number>")
 def get_math_fact(number):
     """Returns a random math fact in JSON about a number passed as a
@@ -56,16 +55,11 @@ def get_math_fact_random():
             "statement": fact_statement
             "type": "math"
         }}
-
-
     """
 
     facts = []
 
-    count = int(request.args.get("count"))
-
-    if not count:
-        count = 1
+    count = int(request.args.get("count") or 1)
 
     if count > 50:
         count = 50
@@ -130,8 +124,6 @@ def get_batch_math_fact(num):
         fact = Math.query.filter_by(number=num).all()
 
         random_fact = random.choice(fact)
-
-        # factInfo = get_math_facts(fact)
 
         factInfo = {
             "number": random_fact.number,

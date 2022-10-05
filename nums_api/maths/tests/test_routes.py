@@ -124,7 +124,9 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
             resp_random = client.get(f"/api/math/random?count=2")
 
             data = resp_random.json
-            self.assertIn(data, resp_list)
+            self.assertIn(data[0], resp_list)
+            self.assertIn(data[1], resp_list)
+
             self.assertEqual(resp_random.status_code, 200)
 
 
@@ -136,23 +138,23 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
             resp = client.get(f"/api/math/1..2")
 
             self.assertEqual(resp.json,
-                             {
-                                 "facts":
-                                 [
-                                     {
-                                         "number": "1",
-                                         "fragment": "the number for this m1 test fact fragment",
-                                         "statement": "1 is the number for m1 this test fact statement.",
-                                         "type": "math"
-                                     },
-                                     {
-                                         "number": "2",
-                                         "fragment": "the number for this m2 test fact fragment",
-                                         "statement": "2 is the number for m2 this test fact statement.",
-                                         "type": "math"
-                                     }
-                                 ]
-                             })
+            {
+                "facts":
+                [
+                    {
+                        "number": "1",
+                        "fragment": "the number for this m1 test fact fragment",
+                        "statement": "1 is the number for m1 this test fact statement.",
+                        "type": "math"
+                    },
+                    {
+                        "number": "2",
+                        "fragment": "the number for this m2 test fact fragment",
+                        "statement": "2 is the number for m2 this test fact statement.",
+                        "type": "math"
+                    }
+                ]
+            })
 
             self.assertEqual(resp.status_code, 200)
 
@@ -168,3 +170,4 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
                     "status": 400}
             })
             self.assertEqual(resp.status_code, 400)
+

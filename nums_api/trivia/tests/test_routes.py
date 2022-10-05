@@ -106,6 +106,24 @@ class TriviaRouteTestCase(TestCase):
             self.assertIn(data, [t1_fact_data, t2_fact_data, t3_fact_data])
             self.assertEqual(resp.status_code, 200)
 
+    def test_get_random_trivia_fact_with_count(self):
+        """Test GET route for trivia/random returns correct JSON response
+        with param count"""
+        with app.test_client() as client:
+
+            resp1 = client.get(f"/api/trivia/{self.t1.number}")
+            resp2 = client.get(f"/api/trivia/{self.t2.number}")
+            resp3 = client.get(f"/api/trivia/3")
+
+            resp_list = [resp1.json, resp2.json, resp3.json]
+
+            resp_random = client.get(f"/api/trivia/random?count=2")
+
+            data = resp_random.json
+            self.assertIn(data[0], resp_list)
+            self.assertIn(data[1], resp_list)
+
+            self.assertEqual(resp_random.status_code, 200)
 
     def test_get_batch_Trivia_fact(self):
         """Test GET route for batch trivia facts returns correct JSON response"""
