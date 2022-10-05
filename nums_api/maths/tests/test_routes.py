@@ -119,7 +119,7 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
             resp2 = client.get(f"/api/math/{self.m2.number}")
             resp3 = client.get(f"/api/math/3")
 
-            resp_list = [resp2.json, resp1.json, resp3.json]
+            resp_list = [resp1.json, resp2.json, resp3.json]
 
             resp_random = client.get(f"/api/math/random?count=2")
 
