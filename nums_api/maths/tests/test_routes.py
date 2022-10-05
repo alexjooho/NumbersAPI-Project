@@ -94,42 +94,47 @@ class MathRouteNumberTestCase(MathRouteBaseTestCase):
             self.assertEqual(resp.status_code, 400)
 
 
-# class MathRouteRandomTestCase(MathRouteBaseTestCase):
-#     def test_get_random_math_fact(self):
-#         """Test GET route for math/random returns correct JSON response"""
-#         with app.test_client() as client:
+class MathRouteRandomTestCase(MathRouteBaseTestCase):
+    def test_get_random_math_fact(self):
+        """Test GET route for math/random returns correct JSON response"""
+        with app.test_client() as client:
 
-#             resp1 = client.get(f"/api/math/{self.m1.number}")
-#             resp2 = client.get(f"/api/math/{self.m2.number}")
-#             resp3 = client.get(f"/api/math/{self.m3.number}")
-#             resp_list = [resp1.json, resp2.json, resp3.json]
+            resp1 = client.get(f"/api/math/{self.m1.number}")
+            resp2 = client.get(f"/api/math/{self.m2.number}")
+            resp3 = client.get(f"/api/math/3")
+            resp_list = [resp1.json, resp2.json, resp3.json]
 
-#             resp_random = client.get("/api/math/random")
+            resp_random = client.get("/api/math/random")
 
-#             data = resp_random.json
-#             self.assertIn(data, resp_list)
-#             self.assertEqual(resp_random.status_code, 200)
+            data = resp_random.json
+            self.assertIn(data, resp_list)
+            self.assertEqual(resp_random.status_code, 200)
 
 
 class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
     def test_get_batch_math_fact(self):
         """Test GET route for batch math/ returns correct JSON response"""
         with app.test_client() as client:
-
-            resp = client.get(f"/api/math/{self.m1.number}..{self.m2.number}")
-
-            self.assertEqual(resp.json, {"facts": [{
-                "number": "1",
-                "fragment": "the number for this m1 test fact fragment",
-                "statement": "1 is the number for m1 this test fact statement.",
-                "type": "math"
-            },
+            self.maxDiff = None
+            resp = client.get(f"/api/math/1..2")
+            breakpoint()
+            self.assertEqual(resp.json,
             {
-                "number": "2",
-                "fragment": "the number for this m3 test fact fragment",
-                "statement": "2 is the number for m3 this test fact statement.",
-                "type": "math"
-            }]
+                "facts":
+                [
+                    {
+                        "number": "1",
+                        "fragment": "the number for this m1 test fact fragment",
+                        "statement": "1 is the number for m1 this test fact statement.",
+                        "type": "math"
+                    },
+                    {
+                        "number": "2",
+                        "fragment": "the number for this m2 test fact fragment",
+                        "statement": "2 is the number for m2 this test fact statement.",
+                        "type": "math"
+                    }
+                ]
             })
 
             self.assertEqual(resp.status_code, 200)

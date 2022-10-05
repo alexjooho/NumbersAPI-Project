@@ -1,10 +1,35 @@
 from flask import Blueprint, jsonify
-from nums_api.helpers.batch import get_batch_nums, get_math_facts
+from nums_api.helpers.batch import get_batch_nums
 from nums_api.maths.models import Math
 import random
 import re
 
 math = Blueprint("math", __name__)
+
+def get_math_facts(single_fact):
+    """ Get a fact for a single number
+    Takes in a number, num and a string, type
+    Returns a fact like:
+    {
+        "number" : 1,
+        "fragment": fragment,
+        "statement": statement,
+        "type": "math"
+    }
+    """
+
+
+    random_fact = random.choice(single_fact)
+
+    fact = {
+        "number": random_fact.number,
+        "fragment": random_fact.fact_fragment,
+        "statement": random_fact.fact_statement,
+        "type": "math"
+    }
+
+    return fact
+
 
 
 @math.get("/<int:number>")
@@ -26,7 +51,7 @@ def get_math_fact(number):
     facts = Math.query.filter_by(number=number).all()
 
     if(facts):
-        fact = get_math_facts(facts, "math")
+        fact = get_math_facts(facts)
         return jsonify(fact = fact)
     else:
         error = {'error': {
@@ -95,7 +120,20 @@ def get_batch_math_fact(num):
 
     for num in nums:
         fact = Math.query.filter_by(number=num).all()
-        facts.append(get_math_facts(fact, "math"))
+
+        # random_fact = random.choice(fact)
+
+
+        factInfo = get_math_facts(fact)
+
+        # factInfo = {
+        #     "number": random_fact.number,
+        #     "fragment": random_fact.fact_fragment,
+        #     "statement": random_fact.fact_statement,
+        #     "type": "math"
+        # }
+
+        facts.append(factInfo)
 
     return jsonify(facts = facts)
 

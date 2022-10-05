@@ -73,5 +73,8 @@ def get_math_facts(single_fact, type):
         "statement": random_fact.fact_statement,
         "type": type
     }
+
+    print("FACT" , fact)
+
     return fact
 
