@@ -102,9 +102,26 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
             resp1 = client.get(f"/api/math/{self.m1.number}")
             resp2 = client.get(f"/api/math/{self.m2.number}")
             resp3 = client.get(f"/api/math/3")
+
             resp_list = [resp1.json, resp2.json, resp3.json]
 
             resp_random = client.get("/api/math/random")
+
+            data = resp_random.json
+            self.assertIn(data, resp_list)
+            self.assertEqual(resp_random.status_code, 200)
+
+    def test_get_random_math_fact_with_count(self):
+        """Test GET route for math/random returns correct JSON response"""
+        with app.test_client() as client:
+
+            resp1 = client.get(f"/api/math/{self.m1.number}")
+            resp2 = client.get(f"/api/math/{self.m2.number}")
+            resp3 = client.get(f"/api/math/3")
+
+            resp_list = [resp2.json, resp1.json, resp3.json]
+
+            resp_random = client.get(f"/api/math/random?count=2")
 
             data = resp_random.json
             self.assertIn(data, resp_list)
@@ -118,29 +135,26 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
 
             resp = client.get(f"/api/math/1..2")
 
-            breakpoint()
-
             self.assertEqual(resp.json,
-            {
-                "facts":
-                [
-                    {
-                        "number": "1",
-                        "fragment": "the number for this m1 test fact fragment",
-                        "statement": "1 is the number for m1 this test fact statement.",
-                        "type": "math"
-                    },
-                    {
-                        "number": "2",
-                        "fragment": "the number for this m2 test fact fragment",
-                        "statement": "2 is the number for m2 this test fact statement.",
-                        "type": "math"
-                    }
-                ]
-            })
+                             {
+                                 "facts":
+                                 [
+                                     {
+                                         "number": "1",
+                                         "fragment": "the number for this m1 test fact fragment",
+                                         "statement": "1 is the number for m1 this test fact statement.",
+                                         "type": "math"
+                                     },
+                                     {
+                                         "number": "2",
+                                         "fragment": "the number for this m2 test fact fragment",
+                                         "statement": "2 is the number for m2 this test fact statement.",
+                                         "type": "math"
+                                     }
+                                 ]
+                             })
 
             self.assertEqual(resp.status_code, 200)
-
 
     def test_get_batch_math_fact_error(self):
         """Test error handling for batch math facts"""
@@ -150,7 +164,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
 
             self.assertEqual(resp.json, {
                 "error": {
-                "message": "Invalid URL",
-                "status": 400}
+                    "message": "Invalid URL",
+                    "status": 400}
             })
             self.assertEqual(resp.status_code, 400)

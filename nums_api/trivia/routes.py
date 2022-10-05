@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from nums_api.trivia.models import Trivia
 from random import choice
 import random
@@ -41,25 +41,43 @@ def get_trivia_fact(number):
 
     return jsonify(fact=fact)
 
+
 @trivia.get("/random")
 def get_trivia_fact_random():
     """
+    Accepts a parameter "count" for number of random facts requested.
+
     Route for getting random trivia fact.
     Queries all rows in trivia table and randomly picks one
     Returns json:
     { fact: { number, fragment, statement, type } }
     """
 
-    random_trivia = choice(Trivia.query.all())
+    facts = []
 
-    fact = {
-        "number": random_trivia.number,
-        "fragment": random_trivia.fact_fragment,
-        "statement": random_trivia.fact_statement,
-        "type": "trivia"
-    }
+    count = request.args["count"]
 
-    return jsonify(fact=fact)
+    if not count:
+        count = 1
+
+    if count > 50:
+        count = 50
+
+    while count > 0:
+
+        random_trivia = choice(Trivia.query.all())
+
+        fact = {"fact": {
+            "number": random_trivia.number,
+            "fragment": random_trivia.fact_fragment,
+            "statement": random_trivia.fact_statement,
+            "type": "trivia"
+        }}
+
+        facts.append(fact)
+
+    return jsonify(facts)
+
 
 @trivia.get("/<num>")
 def get_batch_trivia_fact(num):
@@ -110,4 +128,4 @@ def get_batch_trivia_fact(num):
 
         facts.append(factInfo)
 
-    return jsonify(facts = facts)
+    return jsonify(facts=facts)
