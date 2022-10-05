@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 from datetime import date
-import requests
+# import requests
 import markdown
 
 root = Blueprint("root", __name__, template_folder='templates',
@@ -11,7 +11,7 @@ def homepage():
     """Show homepage:
         - Renders API docs from a markdown file to Jinja Templates.
     """
-    
+
     # currDate = date.today()
     # resp = requests.get(f"http://localhost:5001/api/date/{currDate.month}/{currDate.day}")
     # date_data = resp.json()
@@ -23,5 +23,5 @@ def homepage():
     html = markdown.markdown(text, output_format="xhtml",
                              extensions=["fenced_code"])
 
-    return render_template('index.html', 
+    return render_template('index.html',
                             documentation=html)
