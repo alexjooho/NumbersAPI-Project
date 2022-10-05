@@ -42,45 +42,6 @@ def get_trivia_fact(number):
     return jsonify(fact=fact)
 
 
-@trivia.get("/random")
-def get_trivia_fact_random():
-    """
-    Accepts a parameter "count" for number of random facts requested.
-
-    Route for getting random trivia fact.
-    Queries all rows in trivia table and randomly picks one
-    Returns json:
-    { fact: { number, fragment, statement, type } }
-    """
-
-    facts = []
-
-    count = int(request.args.get("count") or 1)
-
-    if count > 50:
-        count = 50
-
-    while count > 0:
-
-        random_trivia = random.choice(Trivia.query.all())
-
-        fact = {"fact": {
-            "number": random_trivia.number,
-            "fragment": random_trivia.fact_fragment,
-            "statement": random_trivia.fact_statement,
-            "type": "trivia"
-        }}
-
-        facts.append(fact)
-
-        count -= 1
-
-    if len(facts) == 1:
-        return jsonify(facts[0])
-
-    return jsonify(facts)
-
-
 @trivia.get("/<num>")
 def get_batch_trivia_fact(num):
     """Returns a random trivia fact in JSON about a a batch of numbers passed as a
@@ -131,3 +92,42 @@ def get_batch_trivia_fact(num):
         facts.append(factInfo)
 
     return jsonify(facts=facts)
+
+
+@trivia.get("/random")
+def get_trivia_fact_random():
+    """
+    Accepts a parameter "count" for number of random facts requested.
+
+    Route for getting random trivia fact.
+    Queries all rows in trivia table and randomly picks one
+    Returns json:
+    { fact: { number, fragment, statement, type } }
+    """
+
+    facts = []
+
+    count = int(request.args.get("count") or 1)
+
+    if count > 50:
+        count = 50
+
+    while count > 0:
+
+        random_trivia = random.choice(Trivia.query.all())
+
+        fact = {"fact": {
+            "number": random_trivia.number,
+            "fragment": random_trivia.fact_fragment,
+            "statement": random_trivia.fact_statement,
+            "type": "trivia"
+        }}
+
+        facts.append(fact)
+
+        count -= 1
+
+    if len(facts) == 1:
+        return jsonify(facts[0])
+
+    return jsonify(facts)
