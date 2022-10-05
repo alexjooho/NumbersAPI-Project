@@ -115,9 +115,11 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
     def test_get_batch_math_fact(self):
         """Test GET route for batch math/ returns correct JSON response"""
         with app.test_client() as client:
-            self.maxDiff = None
+
             resp = client.get(f"/api/math/1..2")
+
             breakpoint()
+
             self.assertEqual(resp.json,
             {
                 "facts":
@@ -138,3 +140,17 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
             })
 
             self.assertEqual(resp.status_code, 200)
+
+
+    def test_get_batch_math_fact_error(self):
+        """Test error handling for batch math facts"""
+
+        with self.client as c:
+            resp = c.get("/api/math/BLAH")
+
+            self.assertEqual(resp.json, {
+                "error": {
+                "message": "Invalid URL",
+                "status": 400}
+            })
+            self.assertEqual(resp.status_code, 400)

@@ -1,6 +1,9 @@
 from flask import Blueprint, jsonify
 from nums_api.trivia.models import Trivia
 from random import choice
+import random
+import re
+from nums_api.helpers.batch import get_batch_nums
 
 trivia = Blueprint("trivia", __name__)
 
@@ -57,3 +60,54 @@ def get_trivia_fact_random():
     }
 
     return jsonify(fact=fact)
+
+@trivia.get("/<num>")
+def get_batch_trivia_fact(num):
+    """Returns a random trivia fact in JSON about a a batch of numbers passed as a
+    URL parameter.
+        - If facts are found, returns JSON response:
+        { "facts": [
+            {
+                "number": 1
+                "fragment": fact_fragment
+                "statement": fact_statement
+                "type": "trivia"
+            },
+            {
+                "number": 2
+                "fragment": fact_fragment
+                "statement": fact_statement
+                "type": "trivia"
+            }, ...]
+        }
+        - If fact is not found, returns JSON response:
+            { "error": {
+                "message": "Invalid URL",
+                "status": 400 } }
+    """
+
+    decimal_regex = r"^-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?(,-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?)*$"
+    if not re.match(decimal_regex, num):
+        error = {"error": {
+            "message": "Invalid URL",
+            "status": 400}}
+        return (jsonify(error), 400)
+
+    nums = get_batch_nums(num)
+    facts = []
+
+    for num in nums:
+        fact = Trivia.query.filter_by(number=num).all()
+
+        random_fact = random.choice(fact)
+
+        factInfo = {
+            "number": str(random_fact.number),
+            "fragment": random_fact.fact_fragment,
+            "statement": random_fact.fact_statement,
+            "type": "trivia"
+        }
+
+        facts.append(factInfo)
+
+    return jsonify(facts = facts)

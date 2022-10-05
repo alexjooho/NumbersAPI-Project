@@ -6,32 +6,6 @@ import re
 
 math = Blueprint("math", __name__)
 
-def get_math_facts(single_fact):
-    """ Get a fact for a single number
-    Takes in a number, num and a string, type
-    Returns a fact like:
-    {
-        "number" : 1,
-        "fragment": fragment,
-        "statement": statement,
-        "type": "math"
-    }
-    """
-
-
-    random_fact = random.choice(single_fact)
-
-    fact = {
-        "number": random_fact.number,
-        "fragment": random_fact.fact_fragment,
-        "statement": random_fact.fact_statement,
-        "type": "math"
-    }
-
-    return fact
-
-
-
 @math.get("/<int:number>")
 def get_math_fact(number):
     """Returns a random math fact in JSON about a number passed as a
@@ -51,8 +25,16 @@ def get_math_fact(number):
     facts = Math.query.filter_by(number=number).all()
 
     if(facts):
-        fact = get_math_facts(facts)
-        return jsonify(fact = fact)
+        random_fact = random.choice(facts)
+
+        factInfo = {
+            "number": random_fact.number,
+            "fragment": random_fact.fact_fragment,
+            "statement": random_fact.fact_statement,
+            "type": "math"
+        }
+
+        return jsonify(fact=factInfo)
     else:
         error = {'error': {
             'message': f"A math fact for { number } not found",
@@ -90,15 +72,15 @@ def get_batch_math_fact(num):
         - If facts are found, returns JSON response:
         { "facts": [
             {
-                "number": 1
-                "fragment": fact_fragment
-                "statement": fact_statement
+                "number": "1"
+                "fragment": "fact_fragment"
+                "statement": "fact_statement"
                 "type": "math"
             },
             {
-                "number": 2
-                "fragment": fact_fragment
-                "statement": fact_statement
+                "number": "2"
+                "fragment": "fact_fragment"
+                "statement": "fact_statement"
                 "type": "math"
             }, ...]
         }
@@ -121,19 +103,17 @@ def get_batch_math_fact(num):
     for num in nums:
         fact = Math.query.filter_by(number=num).all()
 
-        # random_fact = random.choice(fact)
+        random_fact = random.choice(fact)
 
+        # factInfo = get_math_facts(fact)
 
-        factInfo = get_math_facts(fact)
-
-        # factInfo = {
-        #     "number": random_fact.number,
-        #     "fragment": random_fact.fact_fragment,
-        #     "statement": random_fact.fact_statement,
-        #     "type": "math"
-        # }
+        factInfo = {
+            "number": random_fact.number,
+            "fragment": random_fact.fact_fragment,
+            "statement": random_fact.fact_statement,
+            "type": "math"
+        }
 
         facts.append(factInfo)
 
-    return jsonify(facts = facts)
-
+    return jsonify(facts=facts)

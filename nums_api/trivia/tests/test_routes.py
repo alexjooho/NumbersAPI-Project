@@ -12,7 +12,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.drop_all()
 db.create_all()
 
-
 class TriviaRouteTestCase(TestCase):
     def setUp(self):
         """Set up test data here"""
@@ -88,7 +87,7 @@ class TriviaRouteTestCase(TestCase):
         with self.client as c:
             resp = c.get("/api/trivia/test")
 
-            self.assertEqual(resp.status_code, 404)
+            self.assertEqual(resp.status_code, 400)
 
     def test_get_random_trivia_fact(self):
         """ Tests getting a random fact """
@@ -106,3 +105,51 @@ class TriviaRouteTestCase(TestCase):
 
             self.assertIn(data, [t1_fact_data, t2_fact_data, t3_fact_data])
             self.assertEqual(resp.status_code, 200)
+
+
+    def test_get_batch_Trivia_fact(self):
+        """Test GET route for batch trivia facts returns correct JSON response"""
+        with self.client as client:
+            self.maxDiff = None
+            resp = client.get(f"/api/trivia/1..3")
+
+            breakpoint()
+            self.assertEqual(resp.json,
+            {
+                "facts":
+                [
+                    {
+                        "number":"1",
+                        "fragment":"test 1",
+                        "statement":"1 is the number for this test fact statement.",
+                        "type":"trivia"
+                    },
+                    {
+                        "number":"2",
+                        "fragment":"test 2",
+                        "statement":"2 is the number for this test fact statement.",
+                        "type":"trivia"
+                    },
+                    {
+                        "number":"3",
+                        "fragment":"test 3",
+                        "statement":"3 is the number for this test fact statement.",
+                        "type":"trivia"
+                    }
+                ]
+            })
+
+            self.assertEqual(resp.status_code, 200)
+
+    def test_get_batch_trivia_fact_error(self):
+        """Test error handling for batch trivia facts"""
+
+        with self.client as c:
+            resp = c.get("/api/trivia/BLAH")
+
+            self.assertEqual(resp.status_code, 400)
+            self.assertEqual(resp.json, {
+                "error": {
+                "message": "Invalid URL",
+                "status": 400}
+            })
