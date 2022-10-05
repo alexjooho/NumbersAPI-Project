@@ -35,15 +35,26 @@ def parse_a_page(url):
 
     return True
 
+def parse_multiple_pages(base_url=URL):
+    """Loops over all pages in source website until reaching an empty page:"""
+    pagenumber = 1
+    
+    while True:
+        results = parse_a_page(f"{base_url}/{pagenumber}")
+        if results == False:
+            break
+        pagenumber += 1
+        
+    return
 
-# Loops over all pages in source website until reaching an empty page:
-pagenumber = 1
-while True:
-    results = parse_a_page(f"{URL}/{pagenumber}")
-    if results == False:
-        break
-    pagenumber += 1
+def write_to_file(data=name_fact_dict):
+    """Writes completed dictionary to text file:"""
+    with open('scraped_names_facts.txt', 'w') as file:
+        file.write(str(data))
 
-# Writes completed dictionary to text file:
-with open('scraped_names_facts.txt', 'w') as data:
-    data.write(str(name_fact_dict))
+def main():
+    """Conductor function"""
+    parse_multiple_pages()
+    write_to_file()
+    
+main()
