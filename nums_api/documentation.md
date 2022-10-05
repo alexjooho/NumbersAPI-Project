@@ -113,4 +113,4 @@ http://numbersapi.com/api/math/49
 
 ## Table Schema
 
-![db Table Schema](../nums_api/static/numbers-api-table-schema.png)
+![db Table Schema](static/numbers-api-table-schema.png)
