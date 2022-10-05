@@ -1,4 +1,4 @@
-const BASE_URL = "numbersapi.com/api/"
+const BASE_URL = "numbersapi.com/api/";
 
 /**
  * Listens for click on data type cards and performs a
@@ -11,7 +11,7 @@ $(".example-box-address").on("click", async function (evt) {
     $("search-text").text(shortAddress);
     $("search-form").submit();
 
-})
+});
 
 /**
  * On submission of search form performs search of
@@ -19,11 +19,14 @@ $(".example-box-address").on("click", async function (evt) {
  */
 $("#search-form").on("submit", async function () {
 
-    let text = $("#search-text").text();
-    let fact = await getFacts(text);
+    const text = $("#search-text").text();
+    const fact = await getFacts(text);
+
+    const number = text.replace(/\D/g, "");
+
 
     $("#result-temporary-text").text(fact);
-})
+});
 
 
 /**
@@ -35,7 +38,29 @@ $(".random-fact").on("click", function (evt) {
 
     $("search-text").text(text);
     $("search-form").submit();
-})
+});
+
+
+
+$("#add-number").on("click", () => {updateCounter(1,"add")});
+
+
+
+function updateCounter(num,action="replace"){
+    const currentTick = $(".tick").data("value");
+    let numTick = parseInt(currentTick);
+
+
+    if(action === "add"){
+        let newNum = (numTick + num).toString();
+        $(".tick").attr("data-value",newNum);
+    } else if (action === "subtract" && currentTick !== "0000"){
+        let newNum = toString(numTick - num);
+        $(".tick").attr("data-value",newNum);
+    } else if (action === "replace"){
+        $(".tick").attr("data-value",num.toString());
+    }
+}
 
 
 /**
@@ -55,7 +80,27 @@ async function getFacts(address) {
 
     if (resp.error) return resp.error.message;
 
-    return resp.data.fact.statement
+    return resp.data.fact.statement;
 }
+
+
+// function handleTickInit(tick) {
+
+//     Tick.helper.interval(function() {
+
+//         tick.value++;
+
+//         // The aria-label attribute is
+//         // used instead of the actual
+//         // tick content
+//         tick.root.setAttribute(
+//             'aria-label',
+//             tick.value
+//         );
+
+//     }, 1000);
+
+// }
+
 
 

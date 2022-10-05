@@ -10,7 +10,7 @@
   <title>Numbers API</title>
 
   <!-- Le styles -->
-  <!-- <link href="css/screen.css" rel="stylesheet" type="text/css" /> -->
+  <link href="static/homepage.css" rel="stylesheet" type="text/css" />
 
   <!-- Le fav and touch icons -->
   <link rel="shortcut icon" href="img/favicon.ico" />
@@ -108,12 +108,12 @@
           <div id="outer-search">
             <div id="search">
               <div id="search-box">
-              <form id="search-form">
-                <label>
-                  <button id="search-link">numbersapi.com/api/</button>
-                </label>
-                <span><input id="search-text" type="text" /></span>
-              </form>
+                <form id="search-form">
+                  <label>
+                    <button id="search-link">numbersapi.com/api/</button>
+                  </label>
+                  <span><input id="search-text" type="text" /></span>
+                </form>
               </div>
               <!-- TODO: fix scroll for sandbox. shouldn't be too much of an issue yet, since facts generally should not be long enough to overflow the container -->
               <div id="search-result" class="api-result">
@@ -135,6 +135,22 @@
           </div>
         </div>
       </section>
+
+
+
+    <button id="add-number">+</button>
+      <div class="tick" data-value="0001">
+        <span data-layout="vertical fit">
+          <span data-repeat="true">
+            <span data-view="flip"></span>
+          </span>
+        </span>
+      </div>
+
+
+
+
+
 
       <section id="visitors">
         <div class="gradient-fill"></div>
@@ -189,7 +205,7 @@
     <script src="static/script.js"></script>
     <script src="https://unpkg.com/@pqina/flip/dist/flip.min.js"></script>
   </div>
-  
+
 </body>
 
 </html>
