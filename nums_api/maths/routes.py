@@ -62,10 +62,19 @@ def get_batch_math_fact(num):
                 "type": "math"
             }, ...]
         }
+
         - If fact is not found, returns JSON response:
             { "error": {
                 "message": "Invalid URL",
                 "status": 400 } }
+
+        - If one decimal number is passed, returns JSON response:
+            { "fact": {
+                "number": number,
+                "fragment": "fact_fragment",
+                "statement": "fact_statement",
+                "type": "math"
+            }}
     """
 
     decimal_regex = r"^-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?(,-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?)*$"
@@ -109,7 +118,6 @@ def get_batch_math_fact(num):
         }
         return (jsonify(error=error), 404)
 
-    # TODO: only returning one fact. Handles case for decimals.
     if len(facts) == 1:
         return jsonify(fact=facts[0])
 
@@ -146,7 +154,6 @@ def get_math_fact_random():
                     },
                 ...]
         }
-
 
     If count > MAX_BATCH, count defaults to 50.
     """
