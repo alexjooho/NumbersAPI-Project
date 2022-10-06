@@ -9,6 +9,7 @@ from nums_api.dates.routes import dates
 from nums_api.years.routes import years
 from nums_api.root.routes import root
 from nums_api.tracking.models import Tracking
+from nums_api.dates.models import Date
 
 # create app and add configuration
 app = Flask(__name__)
@@ -19,20 +20,38 @@ app.config['SQLALCHEMY_ECHO'] = True
 
 # request tracking
 
-# @app.before_request
-# def track_request():
-#     """Track request item and category, update total number of requests in DB."""
-#     #intercept request
-#     #ignore random
-#     #check route for category
-#     #check the endpoint for req_item
-#     #write both to DB and increment num_reqs
+@app.before_request
+def track_request():
+    """Track request item and category, update total number of requests in DB."""
+    #intercept request
+    #ignore random
+    #check route for category
+    #check the endpoint for req_item
+    #write both to DB and increment num_reqs
     
-#     #if in DB, increment
-#     #if not in DB, create
-#     print("request path:", request.path)
-#     print("request method:", request.method)
-#     print("HERE IS BEFORE REQUEST")
+    #if in DB, increment
+    #if not in DB, create
+    PATH_SPLIT_INDEX = 5
+    VALID_CATEGORIES = ["dates", "trivia", "years", "names", "math"]
+    
+    [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
+    
+    print("category:", category, "req_item:", req_item)
+    
+    if req_item == "random":
+        return
+    
+    if category not in VALID_CATEGORIES:
+        return
+    
+    if category == "date":
+        [month, day] = req_item.split("/")
+        req_item = Date.date_to_day_of_year(int(month), int(day))
+        
+    print("POST PASS:","category:", category, "req_item:", req_item)
+    
+    print("request method:", request.method)
+    print("HERE IS BEFORE REQUEST")
 
 
 # register blueprints
