@@ -6,17 +6,18 @@ const BASE_URL = "numbersapi.com/api/";
  */
 $(".example-box-address").on("click", async function (evt) {
     let numAddress = $(evt.target).text();
+
     let shortAddress = numAddress.replace("numbersapi.com/api/", "");
 
-    $("search-text").text(shortAddress);
-    $("search-form").submit();
+    $("#search-text").val(shortAddress);
+    $("#search-form").submit();
 
 });
 
 /** Async function for replacing result-temporary-text box with text based
  * on URL text given.
  */
-async function updateResultText() {
+async function updateResultTextAndCounter() {
     const text = $("#search-text").text();
     const fact = await getFacts(text);
 
@@ -29,10 +30,16 @@ async function updateResultText() {
  */
 $("#search-form").on("submit", async function (evt) {
     evt.preventDefault();
+    // Shouldn't need the logic below, setting the number
+    //should be handled correctly in getFacts
 
-    const urlNum = $("#search-text").text().replace(/\D/g, "");
+    // let text = $("#search-text").text();
 
-    updateCounter(urlNum);
+    // if (!text.includes("random")) {
+
+    //     const urlNum = text.replace(/(trivia|years|math)\//g, "");
+    //     updateCounter(urlNum);
+    // }
     updateResultText();
 });
 
@@ -41,11 +48,11 @@ $("#search-form").on("submit", async function (evt) {
  * When clicking datatype for random, performs
  * a random search of that data type in the sandbox.
  */
-$(".random-fact").on("click", function (evt) {
-    let text = $(evt.target).text();
+$(".random-fact").on("click", function(evt) {
 
-    $("search-text").text(text);
-    $("search-form").submit();
+    let text = $(evt.target).text();
+    $("#search-text").val(text);
+    $("#search-form").submit();
 });
 
 
@@ -69,7 +76,7 @@ function updateSandboxForDates(text, dateOfYear) {
         newText = text.replace(/(\d+)\/(\d+)/g, MonthAndDay);
     };
 
-    $("#search-text").text(newText);
+    $("#search-text").val(newText);
 }
 
 /** Updates counter and updates text in result text box */
@@ -108,8 +115,11 @@ async function updateCounter(num, action = "replace") {
 
     else {
         let newText = text.replace(/\d/g, "").concat(newNum);
+        debugger;
         newText = newText.replace(/^0+/, "");
-        $("#search-text").text(newText);
+        debugger;
+        $("#search-text").val(newText);
+        debugger;
         updateResultText();
     }
 }
