@@ -86,8 +86,8 @@ def get_batch_math_fact(num):
 
     facts = []
 
-    for num in nums_range:
-        fact = Math.query.filter_by(number=num).all()
+    for number in nums_range:
+        fact = Math.query.filter_by(number=number).all()
 
         if fact:
             random_fact = random.choice(fact)
@@ -104,7 +104,7 @@ def get_batch_math_fact(num):
     if not len(facts):
         error = {
             "status": 404,
-            "message": f"No facts for { num } were found",
+            "message": f"No facts for { nums_range } were found",
         }
         return (jsonify(error=error), 404)
 

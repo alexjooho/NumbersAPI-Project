@@ -9,7 +9,7 @@ import nums_api.maths.routes
 import nums_api.config
 
 
-
+app.config.from_object('nums_api.config.TestingConfig')
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
 app.config["SQLALCHEMY_ECHO"] = False
@@ -175,19 +175,19 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
 
             self.assertEqual(resp.status_code, 200)
 
-    # def test_range_math_with_no_facts(self):
-    #         """Tests for getting a facts of multiple math seperated by comma, '..'
-    #         and/or '-' works.
-    #         """
-    #         with self.client as c:
+    def test_range_math_with_no_facts(self):
+            """Tests for getting a facts of multiple math seperated by comma, '..'
+            and/or '-' works.
+            """
+            with self.client as c:
 
-    #             resp = c.get("api/math/5,6..10")
+                resp = c.get("api/math/5,6,7")
 
-    #             self.assertEqual(resp.json, {"error": {
-    #                     "status": 404,
-    #                     "message": "No facts for 5,6..10 were found",
-    #                 }})
-    #             self.assertEqual(resp.status_code, 404)
+                self.assertEqual(resp.json, {"error": {
+                        "status": 404,
+                        "message": "No facts for [5, 6, 7] were found",
+                    }})
+                self.assertEqual(resp.status_code, 404)
 
 
 class MathRouteRandomTestCase(MathRouteBaseTestCase):
@@ -294,14 +294,14 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
 
 #                 self.assertEqual(resp.status_code, 200)
 
+
 class test_max_batch(MathRouteBaseTestCase):
     @patch('nums_api.config.MAX_BATCH')
     def test_max_batch_math(self, mock_MAX_BATCH):
         mock_MAX_BATCH = 1
         # nums_api.config.MAX_BATCH = 2
 
-
-        # self.maxDiff = None
+        self.maxDiff = None
 
         with app.test_client() as client:
             # nums_api.maths.routes.MAX_BATCH = 1
@@ -317,15 +317,15 @@ class test_max_batch(MathRouteBaseTestCase):
                 "facts":
                 [
                     {
-                        "number": "3",
-                        "fragment": "the number for this m3 test fact fragment",
-                        "statement": "3 is the number for m3 this test fact statement.",
+                        "number": "1",
+                        "fragment": "the number for this m1 test fact fragment",
+                        "statement": "1 is the number for m1 this test fact statement.",
                         "type": "math"
                     },
                     {
-                        "number": "3.14",
-                        "fragment": "Ah pizza pai",
-                        "statement": "3.14 is the number of pi",
+                        "number": "2",
+                        "fragment": "the number for this m2 test fact fragment",
+                        "statement": "2 is the number for m2 this test fact statement.",
                         "type": "math"
                     }
                 ]
