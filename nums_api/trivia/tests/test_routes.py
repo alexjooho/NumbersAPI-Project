@@ -12,6 +12,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.drop_all()
 db.create_all()
 
+
 class TriviaRouteTestCase(TestCase):
     def setUp(self):
         """Set up test data here"""
@@ -94,33 +95,33 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
     def test_get_batch_Trivia_fact(self):
         """Test GET route for batch trivia facts with ".." returns correct JSON response"""
         with self.client as client:
-
-            resp = client.get(f"/api/trivia/1..3")
+            self.maxDiff = None
+            resp = client.get("/api/trivia/1..3")
 
             self.assertEqual(resp.json,
-            {
-                "facts":
-                [
-                    {
-                        "number":"1",
-                        "fragment":"test 1",
-                        "statement":"1 is the number for this test fact statement.",
-                        "type":"trivia"
-                    },
-                    {
-                        "number":"2",
-                        "fragment":"test 2",
-                        "statement":"2 is the number for this test fact statement.",
-                        "type":"trivia"
-                    },
-                    {
-                        "number":"3",
-                        "fragment":"test 3",
-                        "statement":"3 is the number for this test fact statement.",
-                        "type":"trivia"
-                    }
-                ]
-            })
+                             {
+                                 "facts":
+                                 [
+                                     {
+                                         "number": "1",
+                                         "fragment": "test 1",
+                                         "statement": "1 is the number for this test fact statement.",
+                                         "type": "trivia"
+                                     },
+                                     {
+                                         "number": "2",
+                                         "fragment": "test 2",
+                                         "statement": "2 is the number for this test fact statement.",
+                                         "type": "trivia"
+                                     },
+                                     {
+                                         "number": "3",
+                                         "fragment": "test 3",
+                                         "statement": "3 is the number for this test fact statement.",
+                                         "type": "trivia"
+                                     }
+                                 ]
+                             })
 
             self.assertEqual(resp.status_code, 200)
 
@@ -128,13 +129,13 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
         """Test error handling for batch trivia facts"""
 
         with self.client as c:
-            resp = c.get("/api/trivia/BLAH")
+            resp = c.get("/api/trivia/BLAH..BLAH")
 
             self.assertEqual(resp.status_code, 400)
             self.assertEqual(resp.json, {
                 "error": {
-                "message": "Invalid URL",
-                "status": 400}
+                    "message": "Invalid URL",
+                    "status": 400}
             })
 
     def test_get_batch_trivia_multiple_numbers(self):
@@ -199,13 +200,14 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
         with param count"""
         with app.test_client() as client:
 
-            resp1 = client.get(f"/api/trivia/{self.t1.number}")
-            resp2 = client.get(f"/api/trivia/{self.t2.number}")
-            resp3 = client.get(f"/api/trivia/3")
+            resp1 = client.get("/api/trivia/1")
+            resp2 = client.get("/api/trivia/2")
+            resp3 = client.get("/api/trivia/3")
 
-            resp_list = [resp1.json["fact"], resp2.json["fact"], resp3.json["fact"]]
+            resp_list = [resp1.json["fact"],
+                         resp2.json["fact"], resp3.json["fact"]]
 
-            resp_random = client.get(f"/api/trivia/random?count=2")
+            resp_random = client.get("/api/trivia/random?count=2")
 
             data = resp_random.json
 
@@ -213,17 +215,3 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
             self.assertIn(data[1], resp_list)
 
             self.assertEqual(resp_random.status_code, 200)
-
-    def test_error_get_trivia_fact_random_count_is_negative(self):
-        """Test error if count param is negative for random trivia facts."""
-        with self.client as c:
-
-            resp = c.get("api/trivia/random?count=-100")
-            self.assertEqual(
-                resp.json,
-                {"error": {
-                    "status": 400,
-                    "message": "-100 is an invalid count number",
-                }})
-
-            self.assertEqual(resp.status_code, 400)
