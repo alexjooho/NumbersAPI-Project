@@ -1,11 +1,11 @@
 from flask import Blueprint, jsonify, request
+from nums_api.config import MAX_BATCH
 from nums_api.helpers.batch import get_batch_nums
 from nums_api.maths.models import Math
 import random
 import re
 
 math = Blueprint("math", __name__)
-
 
 @math.get("/<int:number>")
 def get_math_fact(number):
@@ -27,20 +27,19 @@ def get_math_fact(number):
 
     if (facts):
         random_fact = random.choice(facts)
-
         factInfo = {
             "number": random_fact.number,
             "fragment": random_fact.fact_fragment,
             "statement": random_fact.fact_statement,
             "type": "math"
         }
-
         return jsonify(fact=factInfo)
     else:
-        error = {"error": {
+        error =  {
+            "status": 404,
             "message": f"A math fact for { number } not found",
-            "status": 404}}
-        return (jsonify(error), 404)
+            }
+        return (jsonify(error = error), 404)
 
 
 @math.get("/<num>")
@@ -69,28 +68,45 @@ def get_batch_math_fact(num):
     """
 
     decimal_regex = r"^-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?(,-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?)*$"
-    if not re.match(decimal_regex, num):
-        error = {"error": {
-            "message": "Invalid URL",
-            "status": 400}}
-        return (jsonify(error), 400)
 
-    nums = get_batch_nums(num)
+    if not re.match(decimal_regex, num):
+        error = {
+            "message": "Invalid URL",
+            "status": 400}
+        return (jsonify(error = error), 400)
+
+    try:
+        nums_range = get_batch_nums(num)
+    except Exception:
+        return (jsonify(
+            error={
+                "message": str(Exception),
+                "status": 400
+            }), 400)
+
     facts = []
 
-    for num in nums:
+    for num in nums_range:
         fact = Math.query.filter_by(number=num).all()
 
-        random_fact = random.choice(fact)
+        if fact:
+            random_fact = random.choice(fact)
 
-        factInfo = {
-            "number": random_fact.number,
-            "fragment": random_fact.fact_fragment,
-            "statement": random_fact.fact_statement,
-            "type": "math"
+            factInfo = {
+                "number": random_fact.number,
+                "fragment": random_fact.fact_fragment,
+                "statement": random_fact.fact_statement,
+                "type": "math"
+            }
+
+            facts.append(factInfo)
+
+    if not len(facts):
+        error = {
+            "status": 404,
+            "message": f"No facts for { num } were found",
         }
-
-        facts.append(factInfo)
+        return (jsonify(error=error), 404)
 
     return jsonify(facts=facts)
 
@@ -109,30 +125,53 @@ def get_math_fact_random():
             "type": "math"
         }}
     """
+    count = request.args.get("count")
+    numbers_facts = Math.query.all()
+
+    if not count:
+        number_fact = random.choice(numbers_facts)
+
+        fact =  {
+            "number": number_fact.year,
+            "fragment": number_fact.fact_fragment,
+            "statement": number_fact.fact_statement,
+            "type": "math",
+        }
+
+        return jsonify(fact = fact)
+
+    try:
+        count = int(count)
+    except ValueError:
+        return (jsonify(
+            error={
+                "message": f"{ count } is an invalid count number",
+                "status": 400
+            }), 400)
+
+    if count < 1:
+        return (jsonify(
+            error={
+                "message": f"{ count } is an invalid count number",
+                "status": 400
+            }), 400)
+
+    if count > MAX_BATCH:
+        count = MAX_BATCH
+    if count_query > len(numbers_facts):
+        count_query = len(numbers_facts)
 
     facts = []
 
-    count = int(request.args.get("count") or 1)
+    random_numbers_facts = random.sample(numbers_facts, count_query)
 
-    if count > 50:
-        count = 50
-
-    while count > 0:
-
-        num_fact = random.choice(Math.query.all())
-
-        fact = {"fact": {
-            "number": num_fact.number,
-                "fragment": num_fact.fact_fragment,
-                "statement": num_fact.fact_statement,
-                "type": "math"
-                }}
-
+    for year_fact in random_numbers_facts:
+        fact = {
+            "year": year_fact.year,
+            "fragment": year_fact.fact_fragment,
+            "statement": year_fact.fact_statement,
+            "type": "year",
+        }
         facts.append(fact)
 
-        count -= 1
-
-    if len(facts) == 1:
-        return jsonify(facts[0])
-
-    return jsonify(facts)
+    return jsonify(facts=facts)
