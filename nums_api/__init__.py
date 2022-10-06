@@ -23,36 +23,34 @@ app.config['SQLALCHEMY_ECHO'] = True
 @app.before_request
 def track_request():
     """Track request item and category, update total number of requests in DB."""
-    #intercept request
-    #ignore random
-    #check route for category
-    #check the endpoint for req_item
-    #write both to DB and increment num_reqs
     
-    #if in DB, increment
-    #if not in DB, create
     PATH_SPLIT_INDEX = 5
     VALID_CATEGORIES = ["dates", "trivia", "years", "names", "math"]
+
+    #ensure route is parsable, otherwise return:
+    try:
+        [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
+    except ValueError:
+        return
     
-    [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
-    
-    print("category:", category, "req_item:", req_item)
-    
+    #ignore random
     if req_item == "random":
         return
     
+    #ignore requests to non-valid category routes
     if category not in VALID_CATEGORIES:
         return
     
-    if category == "date":
+    if category == "dates":
         [month, day] = req_item.split("/")
         req_item = Date.date_to_day_of_year(int(month), int(day))
         
-    print("POST PASS:","category:", category, "req_item:", req_item)
+    Tracking.update_request_count(req_item, category)
     
-    print("request method:", request.method)
-    print("HERE IS BEFORE REQUEST")
-
+    #EDGE CASES NOT CURRENTLY HANDLED:
+        # no URL authentication: /api/math/banana
+        # batch requests not excluded
+    
 
 # register blueprints
 app.register_blueprint(root)
