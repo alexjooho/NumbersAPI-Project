@@ -1,19 +1,13 @@
-from unittest import TestCase, mock
-from unittest.mock import patch
+from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
 from nums_api.maths.models import Math
-import nums_api.maths.routes
-# from nums_api.config import MAX_BATCH
-import nums_api.config
-
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config.from_object('nums_api.config.TestingConfig')
 
 db.drop_all()
 db.create_all()
@@ -175,9 +169,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
             self.assertEqual(resp.status_code, 200)
 
     def test_range_math_with_no_facts(self):
-        """Tests for getting a facts of multiple math seperated by comma, '..'
-        and/or '-' works.
-        """
+        """Tests for getting a facts of multiple math seperated by comma."""
         with self.client as c:
 
             resp = c.get("api/math/5,6,7")
@@ -188,8 +180,20 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
             }})
             self.assertEqual(resp.status_code, 404)
 
+    def test_invalid_math_url_input(self):
+        """Test for invalid URL input for a number."""
+        with self.client as c:
 
-# TODO: Math Years Routes Tests MultipleYearsRangeRouteTestCase
+            resp = c.get("api/math/BLAH")
+            self.assertEqual(
+                resp.json,
+                {"error": {
+                    "status": 400,
+                    "message": "Invalid URL",
+                }})
+
+            self.assertEqual(resp.status_code, 400)
+
 
 class MathRouteRandomTestCase(MathRouteBaseTestCase):
     def test_get_random_math_fact(self):
@@ -210,8 +214,7 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
             self.assertEqual(resp_random.status_code, 200)
 
     def test_get_random_math_fact_with_count(self):
-        """Test GET route for math/random returns correct JSON response
-        with a param count"""
+        """Test GET route for math/random returns correct JSON response"""
         with app.test_client() as client:
 
             resp1 = client.get(f"/api/math/1")
