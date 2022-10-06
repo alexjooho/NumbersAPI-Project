@@ -16,6 +16,14 @@ $(".example-box-address").on("click", async function (evt) {
 
 });
 
+$("#search-link").on("click", function (evt) {
+    const searchText = $("#search-text").val();
+    
+    const urlToVisit = `${BASE_URL}${searchText}`;
+    
+    window.location.href = urlToVisit;
+})
+
 /** Async function for replacing result-temporary-text box with text based
  * on URL text given, and updates counter.
  */
