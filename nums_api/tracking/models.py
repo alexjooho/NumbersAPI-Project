@@ -22,11 +22,24 @@ class Tracking(db.Model):
     
     @classmethod
     def update_request_count(cls, req_item, category):
-        """Queries database and creates or updates table with item request total."""
-        #if in DB, increment
+        """Queries database and creates/updates table with item request total."""
         
-        if Tracking.query.get((req_item, category)):
+        req_item = str(req_item)
+        
+        request = Tracking.query.get((req_item, category))
+        
+        if request:
             ###increment num_reqs
+            request.num_reqs = Tracking.num_reqs + 1
+            db.session.commit()
         else:
-            ###write to DB
+            ###write new entry to DB
+            new_request_item = Tracking(
+                req_item = req_item,
+                category = category,
+                num_reqs = 1
+            )
+            
+            db.session.add(new_request_item)
+            db.session.commit()
         
