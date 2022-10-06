@@ -1,13 +1,15 @@
-const BASE_URL = "numbersapi.com/api/";
+"use strict";
+
+const BASE_URL = "http://numbersapi.com/api/";
 
 /**
  * Listens for click on data type cards and performs a
  *  fact search in Sandbox.
  */
 $(".example-box-address").on("click", async function (evt) {
-    let numAddress = $(evt.target).text();
+    const numAddress = $(evt.target).text();
 
-    let shortAddress = numAddress.replace("numbersapi.com/api/", "");
+    const shortAddress = numAddress.replace("numbersapi.com/api/", "");
 
     $("#search-text").val(shortAddress);
     $("#search-form").submit();
@@ -15,7 +17,7 @@ $(".example-box-address").on("click", async function (evt) {
 });
 
 /** Async function for replacing result-temporary-text box with text based
- * on URL text given.
+ * on URL text given, and updates counter.
  */
 async function updateResultTextAndCounter() {
     const text = $("#search-text").val();
@@ -44,7 +46,7 @@ $("#search-form").on("submit", async function (evt) {
     // Shouldn't need the logic below, setting the number
     //should be handled correctly in getFacts
 
-    // let text = $("#search-text").val();
+    // const text = $("#search-text").val();
 
     // if (!text.includes("random")) {
 
@@ -61,7 +63,7 @@ $("#search-form").on("submit", async function (evt) {
  */
 $(".random-fact").on("click", function (evt) {
 
-    let text = $(evt.target).text();
+    const text = $(evt.target).text();
     $("#search-text").val(text);
     $("#search-form").submit();
 });
@@ -69,9 +71,9 @@ $(".random-fact").on("click", function (evt) {
 
 $("#add-number").on("click", async function () {
     const currentTick = $(".tick").attr("data-value");
-    let numTick = parseInt(currentTick);
+    const numTick = parseInt(currentTick);
 
-    newNum = (numTick + 1).toString();
+    const newNum = (numTick + 1).toString();
 
     const text = $("#search-text").val();
     if (text.includes("date")) {
@@ -79,8 +81,14 @@ $("#add-number").on("click", async function () {
     }
 
     else {
-        let newText = text.replace(/\d/g, "").concat(newNum);
-        $("#search-text").val(newText);
+        if (text.includes("random")) {
+            const newText = text.replace("random", newNum);
+            $("#search-text").val(newText);
+        }
+        else {
+            const newText = text.replace(/\d/g, "").concat(newNum);
+            $("#search-text").val(newText);
+        }
     }
 
     updateResultTextAndCounter();
@@ -88,11 +96,11 @@ $("#add-number").on("click", async function () {
 
 $("#subtract-number").on("click", async function () {
     const currentTick = $(".tick").attr("data-value");
-    let numTick = parseInt(currentTick);
+    const numTick = parseInt(currentTick);
 
     if (numTick <= 0) return;
 
-    newNum = (numTick - 1).toString();
+    const newNum = (numTick - 1).toString();
 
     const text = $("#search-text").val();
     if (text.includes("date")) {
@@ -100,7 +108,7 @@ $("#subtract-number").on("click", async function () {
     }
 
     else {
-        let newText = text.replace(/\d/g, "").concat(newNum);
+        const newText = text.replace(/\d/g, "").concat(newNum);
         $("#search-text").val(newText);
     }
 
@@ -112,7 +120,7 @@ function updateSandboxForDates(text, dateOfYear) {
     const date = new Date(2004, 0, dateOfYear);
 
     const day = date.getDate();
-    const month = date.getMonth();
+    const month = date.getMonth() + 1;
 
     const MonthAndDay = `${month}/${day}`;
 
@@ -130,7 +138,7 @@ function updateSandboxForDates(text, dateOfYear) {
 /** Updates counter and updates text in result text box */
 async function updateCounter(num) {
 
-    let paddedNum = String(num).padStart(4, "0");
+    const paddedNum = String(num).padStart(4, "0");
     $(".tick").attr("data-value", paddedNum);
     return;
 
@@ -143,13 +151,13 @@ async function updateCounter(num) {
  */
 
 async function getFacts(address) {
-    let resp;
+    // if (address.includes("api")) {
+    //     resp = await axios.get(address);
+    // } else {
+    //     resp = await axios.get(BASE_URL + address);
+    // }
+    const resp = await axios.get(BASE_URL + address);
 
-    if (address.includes("api")) {
-        resp = await axios.get(address);
-    } else {
-        resp = await axios.get(BASE_URL + address);
-    }
     return resp.data;
 }
 
