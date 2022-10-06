@@ -25,3 +25,4 @@ app.register_blueprint(years, url_prefix='/api/years')
 # allow CORS and connect app to database
 CORS(app)
 connect_db(app)
+

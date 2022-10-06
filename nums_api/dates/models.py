@@ -1,6 +1,5 @@
 from datetime import datetime
 from nums_api.database import db
-from nums_api.config import DATABASE_URL_TEST
 
 
 class Date (db.Model):

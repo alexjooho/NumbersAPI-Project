@@ -8,6 +8,7 @@ from nums_api.config import MAX_BATCH
 
 years = Blueprint("years", __name__)
 
+
 @years.get("/<int:year>")
 def get_year_fact(year):
     """ Route for getting a random fact about year.
@@ -49,16 +50,21 @@ def get_year_fact(year):
 @years.get("/<years>")
 def get_years_range_facts(years):
     """ Route for getting a random fact about multiple years.
+    Example years input:
+      - 2000..2005  (min..max inclusive of both)
+      - 1979,45,1800 (individual years separated by comma)
+      - 1990..1992,1800,1805 (both and in either order)
+
     If facts found, returns JSON:
         {facts: [
                     {
-                    "year" : 1,
+                    "year" : 2000,
                     "fragment": "text",
                     "statement": "text",
                     "type": year,
                     },
                     {
-                    "year" : 3,
+                    "year" : 2001,
                     "fragment": "text3",
                     "statement": "text3",
                     "type": year,
@@ -80,7 +86,7 @@ def get_years_range_facts(years):
             }
         }
     """
-    years_regex = r"^([0-9]{1,4})(\.\.[0-9]{1,4})?(-[0-9]{1,4})?((,[0-9]{1,4})?)*(\.\.[0-9]{1,4})?(-[0-9]{1,4})?$"
+    years_regex = r"^([0-9]{1,4})(\.\.[0-9]{1,4})?((,[0-9]{1,4})?)*(\.\.[0-9]{1,4})?$"
 
     if not re.match(years_regex, years):
         error = {
@@ -88,8 +94,6 @@ def get_years_range_facts(years):
             "message": "Invalid URL",
         }
         return (jsonify(error=error), 400)
-
-    years = re.sub(r"-", "..", years, flags=re.DOTALL)
 
     try:
         years_range = get_batch_nums(years)
@@ -154,7 +158,8 @@ def get_year_fact_random():
                 ...]
         }
 
-    If count > MAX_BATCH, return MAX_BATCH count.
+    If count > MAX_BATCH, return MAX_BATCH count of facts.
+    If count > total number of year facts, return total number of facts.
     """
     count_query = request.args.get("count")
 
