@@ -51,6 +51,7 @@ class TriviaRouteTestCase(TestCase):
         test_setup_correct = True
         self.assertEqual(test_setup_correct, True)
 
+class TriviaRouteTestCase(TriviaRouteTestCase):
     def test_get_trivia_fact(self):
         """ Tests for getting a fact for number 1 """
         with self.client as c:
@@ -89,10 +90,11 @@ class TriviaRouteTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 400)
 
+class TriviaBatchRouteTestCase(TriviaRouteTestCase):
     def test_get_batch_Trivia_fact(self):
-        """Test GET route for batch trivia facts returns correct JSON response"""
+        """Test GET route for batch trivia facts with ".." returns correct JSON response"""
         with self.client as client:
-            self.maxDiff = None
+
             resp = client.get(f"/api/trivia/1..3")
 
             self.assertEqual(resp.json,
@@ -135,6 +137,46 @@ class TriviaRouteTestCase(TestCase):
                 "status": 400}
             })
 
+    def test_get_batch_trivia_multiple_numbers(self):
+        """Test route returns multiple facts with comma"""
+        with self.client as c:
+            resp = c.get("/api/trivia/1,2")
+
+            self.assertEqual(resp.json,
+            {
+                "facts":
+                [
+                    {
+                        "number":"1",
+                        "fragment":"test 1",
+                        "statement":"1 is the number for this test fact statement.",
+                        "type":"trivia"
+                    },
+                    {
+                        "number":"2",
+                        "fragment":"test 2",
+                        "statement":"2 is the number for this test fact statement.",
+                        "type":"trivia"
+                    },
+                ]
+            })
+
+            self.assertEqual(resp.status_code, 200)
+
+    def test_batch_trivia_with_no_facts(self):
+        """Test that trivia without facts throws an error"""
+        with self.client as c:
+
+            resp = c.get("api/years/5,6..10")
+
+            self.assertEqual(resp.json, {"error": {
+                    "status": 404,
+                    "message": "No facts for 5,6..10 were found",
+                }})
+
+            self.assertEqual(resp.status_code, 404)
+
+class TriviaRandomRouteTestCase(TriviaRouteTestCase):
     def test_get_random_trivia_fact(self):
         """ Tests getting a random fact """
         with self.client as c:
@@ -171,3 +213,17 @@ class TriviaRouteTestCase(TestCase):
             self.assertIn(data[1], resp_list)
 
             self.assertEqual(resp_random.status_code, 200)
+
+    def test_error_get_trivia_fact_random_count_is_negative(self):
+        """Test error if count param is negative for random trivia facts."""
+        with self.client as c:
+
+            resp = c.get("api/trivia/random?count=-100")
+            self.assertEqual(
+                resp.json,
+                {"error": {
+                    "status": 400,
+                    "message": "-100 is an invalid count number",
+                }})
+
+            self.assertEqual(resp.status_code, 400)

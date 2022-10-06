@@ -1,8 +1,14 @@
-from unittest import TestCase
+from unittest import TestCase, mock
+from unittest.mock import patch
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
 from nums_api.maths.models import Math
+import nums_api.maths.routes
+# from nums_api.config import MAX_BATCH
+import nums_api.config
+
+
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
@@ -203,7 +209,8 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
             self.assertEqual(resp_random.status_code, 200)
 
     def test_get_random_math_fact_with_count(self):
-        """Test GET route for math/random returns correct JSON response"""
+        """Test GET route for math/random returns correct JSON response
+        with a param count"""
         with app.test_client() as client:
 
             resp1 = client.get(f"/api/math/{self.m1.number}")
@@ -221,13 +228,107 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
             resp_random = client.get(f"/api/math/random?count=2")
 
             data = resp_random.json
-            breakpoint()
+
             self.assertIn(data["facts"][0], resp_list)
             self.assertIn(data["facts"][1], resp_list)
 
             self.assertEqual(resp_random.status_code, 200)
 
+    def test_get_random_math_fact_with_count_negative_error(self):
+        """Test error if count param is negative for random math facts."""
+        with self.client as c:
 
-{'fact': {'fragment': 'Ah pizza pai', 'number': '3.14', 'statement': '3.14 is the number of pi', 'type': 'math'}}
-[{'fact': {'fragment': 'the number for this m1 test fact fragment', 'number': '1', 'statement': '1 is the number for m1 this test fact statement.', 'type': 'math'}},
-{'fact': {'fragment': 'the number for this m2 test fact fragment', 'number': '2', 'statement': '2 is the number for m2 this test fact statement.', 'type': 'math'}}, {'fact': {'fragment': 'the number for this m3 test fact fragment', 'number': '3', 'statement': '3 is the number for m3 this test fact statement.', 'type': 'math'}}, {'facts': [{'fragment': 'Ah pizza pai', 'number': '3.14', 'statement': '3.14 is the number of pi', 'type': 'math'}]}]
+            resp = c.get("api/math/random?count=-100")
+            self.assertEqual(
+                resp.json,
+                {"error": {
+                    "status": 400,
+                    "message": "-100 is an invalid count number",
+                }})
+
+            self.assertEqual(resp.status_code, 400)
+
+    def test_error_get_year_fact_random_count_is_not_an_integer(self):
+        """Test error if count param is not an integer for random math facts."""
+        with self.client as c:
+
+            resp = c.get("api/math/random?count=applepie")
+            self.assertEqual(
+                resp.json,
+                {"error": {
+                    "status": 400,
+                    "message": "applepie is an invalid count number",
+                }})
+
+            self.assertEqual(resp.status_code, 400)
+
+# class test_max_batch(MathRouteBaseTestCase):
+#     @mock.patch('nums_api.config.MAX_BATCH', 2)
+#     def test_max_batch_math(self):
+#             # breakpoint()
+#             MAX_BATCH = 2
+#             assert 2 == MAX_BATCH
+#             self.maxDiff = None
+#             with app.test_client() as client:
+
+#                 resp = client.get(f"/api/math/1..3")
+
+#                 self.assertEqual(resp.json,
+#                 {
+#                     "facts":
+#                     [
+#                         {
+#                             "number": "3",
+#                             "fragment": "the number for this m3 test fact fragment",
+#                             "statement": "3 is the number for m3 this test fact statement.",
+#                             "type": "math"
+#                         },
+#                         {
+#                             "number": "3.14",
+#                             "fragment": "Ah pizza pai",
+#                             "statement": "3.14 is the number of pi",
+#                             "type": "math"
+#                         }
+#                     ]
+#                 })
+
+#                 self.assertEqual(resp.status_code, 200)
+
+class test_max_batch(MathRouteBaseTestCase):
+    @patch('nums_api.config.MAX_BATCH')
+    def test_max_batch_math(self, mock_MAX_BATCH):
+        mock_MAX_BATCH = 1
+        # nums_api.config.MAX_BATCH = 2
+
+
+        # self.maxDiff = None
+
+        with app.test_client() as client:
+            # nums_api.maths.routes.MAX_BATCH = 1
+            # nums_api.maths.routes.MAX_BATCH
+            # nums_api.config.MAX_BATCH = 1
+
+            resp = client.get(f"/api/math/1..3")
+            breakpoint()
+
+
+            self.assertEqual(resp.json,
+            {
+                "facts":
+                [
+                    {
+                        "number": "3",
+                        "fragment": "the number for this m3 test fact fragment",
+                        "statement": "3 is the number for m3 this test fact statement.",
+                        "type": "math"
+                    },
+                    {
+                        "number": "3.14",
+                        "fragment": "Ah pizza pai",
+                        "statement": "3.14 is the number of pi",
+                        "type": "math"
+                    }
+                ]
+            })
+
+            self.assertEqual(resp.status_code, 200)

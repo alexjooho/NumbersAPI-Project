@@ -77,6 +77,7 @@ def get_batch_trivia_fact(num):
 
     decimal_regex = r"^-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?(,-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?)*$"
 
+    print(MAX_BATCH)
     if not re.match(decimal_regex, num):
         error = {
             "status": 400,
