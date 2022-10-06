@@ -20,36 +20,39 @@ app.config['SQLALCHEMY_ECHO'] = True
 
 # request tracking
 
-@app.before_request
-def track_request():
-    """Track request item and category, update total number of requests in DB."""
+# @app.before_request
+# def track_request():
+#     """Track request item and category, update total number of requests in DB."""
     
-    PATH_SPLIT_INDEX = 5
-    VALID_CATEGORIES = ["dates", "trivia", "years", "names", "math"]
+#     PATH_SPLIT_INDEX = 5
+#     VALID_CATEGORIES = ["dates", "trivia", "years", "names", "math"]
 
-    #ensure route is parsable, otherwise return:
-    try:
-        [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
-    except ValueError:
-        return
+#     #ensure route is parsable, otherwise return:
+#     try:
+#         [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
+#     except ValueError:
+#         return
     
-    #ignore random
-    if req_item == "random":
-        return
+#     #ignore random
+#     if req_item == "random":
+#         return
     
-    #ignore requests to non-valid category routes
-    if category not in VALID_CATEGORIES:
-        return
+#     #ignore requests to non-valid category routes
+#     if category not in VALID_CATEGORIES:
+#         return
     
-    if category == "dates":
-        [month, day] = req_item.split("/")
-        req_item = Date.date_to_day_of_year(int(month), int(day))
+#     if category == "dates":
+#         [month, day] = req_item.split("/")
+#         req_item = Date.date_to_day_of_year(int(month), int(day))
+    
+#     if category == "math":
+#         #check that value is integer
         
-    Tracking.update_request_count(req_item, category)
+#     Tracking.update_request_count(req_item, category)
     
-    #EDGE CASES NOT CURRENTLY HANDLED:
-        # no URL authentication: /api/math/banana
-        # batch requests not excluded
+#     #EDGE CASES NOT CURRENTLY HANDLED:
+#         # no URL authentication: /api/math/banana
+#         # batch requests not excluded
     
 
 # register blueprints
@@ -58,6 +61,41 @@ app.register_blueprint(trivia, url_prefix='/api/trivia')
 app.register_blueprint(math, url_prefix='/api/math')
 app.register_blueprint(dates, url_prefix='/api/dates')
 app.register_blueprint(years, url_prefix='/api/years')
+
+@app.after_request
+def track_request(response):
+    """Track request item and category, update total number of requests in DB."""
+    
+    #TODO: Either add logic to handle batch requests or explicitly exclude (once batch requests PRs are complete).
+    
+    PATH_SPLIT_INDEX = 5
+    
+    #if route was invalid, return response and do not write to DB:
+    response_value = response.get_data()
+    if not response.json:
+        return response
+
+    #ensure route is parsable, otherwise return:
+    try:
+        [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
+    except ValueError:
+        return response
+    
+    #ignore responses for random:
+    if req_item == "random":
+        return response
+
+    #convert dates to whole numbers:
+    if category == "dates":
+        [month, day] = req_item.split("/")
+        req_item = Date.date_to_day_of_year(int(month), int(day))
+
+    #write to DB:
+    Tracking.update_request_count(req_item, category)
+
+    return response
+    
+
 
 # allow CORS and connect app to database
 CORS(app)
