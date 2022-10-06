@@ -7,6 +7,7 @@ import re
 
 math = Blueprint("math", __name__)
 
+
 @math.get("/<int:number>")
 def get_math_fact(number):
     """Returns a random math fact in JSON about a number passed as a
@@ -25,21 +26,21 @@ def get_math_fact(number):
     """
     facts = Math.query.filter_by(number=number).all()
 
-    if (facts):
-        random_fact = random.choice(facts)
+    if facts:
+        fact = random.choice(facts)
         factInfo = {
-            "number": random_fact.number,
-            "fragment": random_fact.fact_fragment,
-            "statement": random_fact.fact_statement,
+            "number": fact.number,
+            "fragment": fact.fact_fragment,
+            "statement": fact.fact_statement,
             "type": "math"
         }
         return jsonify(fact=factInfo)
     else:
-        error =  {
+        error = {
             "status": 404,
             "message": f"A math fact for { number } not found",
-            }
-        return (jsonify(error = error), 404)
+        }
+        return (jsonify(error=error), 404)
 
 
 @math.get("/<num>")
@@ -49,15 +50,15 @@ def get_batch_math_fact(num):
         - If facts are found, returns JSON response:
         { "facts": [
             {
-                "number": "1"
-                "fragment": "fact_fragment"
-                "statement": "fact_statement"
+                "number": "1",
+                "fragment": "fact_fragment",
+                "statement": "fact_statement",
                 "type": "math"
             },
             {
-                "number": "2"
-                "fragment": "fact_fragment"
-                "statement": "fact_statement"
+                "number": "2",
+                "fragment": "fact_fragment",
+                "statement": "fact_statement",
                 "type": "math"
             }, ...]
         }
@@ -73,7 +74,7 @@ def get_batch_math_fact(num):
         error = {
             "message": "Invalid URL",
             "status": 400}
-        return (jsonify(error = error), 400)
+        return (jsonify(error=error), 400)
 
     try:
         nums_range = get_batch_nums(num)
@@ -87,15 +88,15 @@ def get_batch_math_fact(num):
     facts = []
 
     for num in nums_range:
-        fact = Math.query.filter_by(number=num).all()
+        math_facts = Math.query.filter_by(number=num).all()
 
-        if fact:
-            random_fact = random.choice(fact)
+        if math_facts:
+            fact = random.choice(math_facts)
 
             factInfo = {
-                "number": random_fact.number,
-                "fragment": random_fact.fact_fragment,
-                "statement": random_fact.fact_statement,
+                "number": fact.number,
+                "fragment": fact.fact_fragment,
+                "statement": fact.fact_statement,
                 "type": "math"
             }
 
@@ -104,10 +105,11 @@ def get_batch_math_fact(num):
     if not len(facts):
         error = {
             "status": 404,
-            "message": f"No facts for { num } were found",
+            "message": f"No facts for { nums_range } were found",
         }
         return (jsonify(error=error), 404)
 
+    # TODO: only returning one fact. Handles case for decimals.
     if len(facts) == 1:
         return jsonify(fact=facts[0])
 
@@ -122,9 +124,9 @@ def get_math_fact_random():
     Returns a random math fact in JSON about a random number.
         - Returns JSON response:
         { "fact": {
-            "number": random number
-            "fragment": fact_fragment
-            "statement": fact_statement
+            "number": number,
+            "fragment": "fact_fragment",
+            "statement": "fact_statement",
             "type": "math"
         }}
 
@@ -144,6 +146,9 @@ def get_math_fact_random():
                     },
                 ...]
         }
+
+
+    If count > MAX_BATCH, count defaults to 50.
     """
     count = request.args.get("count")
     numbers_facts = Math.query.all()
@@ -151,14 +156,14 @@ def get_math_fact_random():
     if not count:
         number_fact = random.choice(numbers_facts)
 
-        fact =  {
+        fact = {
             "number": number_fact.number,
             "fragment": number_fact.fact_fragment,
             "statement": number_fact.fact_statement,
             "type": "math",
         }
 
-        return jsonify(fact = fact)
+        return jsonify(fact=fact)
 
     try:
         count = int(count)
