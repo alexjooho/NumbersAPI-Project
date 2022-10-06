@@ -108,6 +108,9 @@ def get_batch_math_fact(num):
         }
         return (jsonify(error=error), 404)
 
+    if len(facts) == 1:
+        return jsonify(fact=facts[0])
+
     return jsonify(facts=facts)
 
 
@@ -124,6 +127,23 @@ def get_math_fact_random():
             "statement": fact_statement
             "type": "math"
         }}
+
+    If count param specified, returns JSON:
+        {facts: [
+                    {
+                    "number" : number,
+                    "fragment": "fragment",
+                    "statement": "statement",
+                    "type": "math",
+                    },
+                    {
+                    "number" : number,
+                    "fragment": "fragment",
+                    "statement": "statement",
+                    "type": "math",
+                    },
+                ...]
+        }
     """
     count = request.args.get("count")
     numbers_facts = Math.query.all()
@@ -132,7 +152,7 @@ def get_math_fact_random():
         number_fact = random.choice(numbers_facts)
 
         fact =  {
-            "number": number_fact.year,
+            "number": number_fact.number,
             "fragment": number_fact.fact_fragment,
             "statement": number_fact.fact_statement,
             "type": "math",
@@ -158,19 +178,19 @@ def get_math_fact_random():
 
     if count > MAX_BATCH:
         count = MAX_BATCH
-    if count_query > len(numbers_facts):
-        count_query = len(numbers_facts)
+    if count > len(numbers_facts):
+        count = len(numbers_facts)
 
     facts = []
 
-    random_numbers_facts = random.sample(numbers_facts, count_query)
+    random_numbers_facts = random.sample(numbers_facts, count)
 
-    for year_fact in random_numbers_facts:
+    for number_fact in random_numbers_facts:
         fact = {
-            "year": year_fact.year,
-            "fragment": year_fact.fact_fragment,
-            "statement": year_fact.fact_statement,
-            "type": "year",
+            "number": number_fact.number,
+            "fragment": number_fact.fact_fragment,
+            "statement": number_fact.fact_statement,
+            "type": "math",
         }
         facts.append(fact)
 

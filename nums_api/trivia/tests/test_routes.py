@@ -89,49 +89,12 @@ class TriviaRouteTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 400)
 
-    def test_get_random_trivia_fact(self):
-        """ Tests getting a random fact """
-        with self.client as c:
-            resp = c.get("/api/trivia/random")
-            data = resp.json
-
-            t1resp = c.get("/api/trivia/1")
-            t2resp = c.get("/api/trivia/2")
-            t3resp = c.get("/api/trivia/3")
-
-            t1_fact_data = t1resp.json
-            t2_fact_data = t2resp.json
-            t3_fact_data = t3resp.json
-
-            self.assertIn(data, [t1_fact_data, t2_fact_data, t3_fact_data])
-            self.assertEqual(resp.status_code, 200)
-
-    def test_get_random_trivia_fact_with_count(self):
-        """Test GET route for trivia/random returns correct JSON response
-        with param count"""
-        with app.test_client() as client:
-
-            resp1 = client.get(f"/api/trivia/{self.t1.number}")
-            resp2 = client.get(f"/api/trivia/{self.t2.number}")
-            resp3 = client.get(f"/api/trivia/3")
-
-            resp_list = [resp1.json, resp2.json, resp3.json]
-
-            resp_random = client.get(f"/api/trivia/random?count=2")
-
-            data = resp_random.json
-            self.assertIn(data[0], resp_list)
-            self.assertIn(data[1], resp_list)
-
-            self.assertEqual(resp_random.status_code, 200)
-
     def test_get_batch_Trivia_fact(self):
         """Test GET route for batch trivia facts returns correct JSON response"""
         with self.client as client:
             self.maxDiff = None
             resp = client.get(f"/api/trivia/1..3")
 
-            breakpoint()
             self.assertEqual(resp.json,
             {
                 "facts":
@@ -171,3 +134,40 @@ class TriviaRouteTestCase(TestCase):
                 "message": "Invalid URL",
                 "status": 400}
             })
+
+    def test_get_random_trivia_fact(self):
+        """ Tests getting a random fact """
+        with self.client as c:
+            resp = c.get("/api/trivia/random")
+            data = resp.json
+
+            t1resp = c.get("/api/trivia/1")
+            t2resp = c.get("/api/trivia/2")
+            t3resp = c.get("/api/trivia/3")
+
+            t1_fact_data = t1resp.json
+            t2_fact_data = t2resp.json
+            t3_fact_data = t3resp.json
+
+            self.assertIn(data, [t1_fact_data, t2_fact_data, t3_fact_data])
+            self.assertEqual(resp.status_code, 200)
+
+    def test_get_random_trivia_fact_with_count(self):
+        """Test GET route for trivia/random returns correct JSON response
+        with param count"""
+        with app.test_client() as client:
+
+            resp1 = client.get(f"/api/trivia/{self.t1.number}")
+            resp2 = client.get(f"/api/trivia/{self.t2.number}")
+            resp3 = client.get(f"/api/trivia/3")
+
+            resp_list = [resp1.json["fact"], resp2.json["fact"], resp3.json["fact"]]
+
+            resp_random = client.get(f"/api/trivia/random?count=2")
+
+            data = resp_random.json
+
+            self.assertIn(data[0], resp_list)
+            self.assertIn(data[1], resp_list)
+
+            self.assertEqual(resp_random.status_code, 200)

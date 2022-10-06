@@ -1,13 +1,8 @@
 import math
 from nums_api.maths.models import Math
 import random
-<<<<<<< HEAD
-
-BATCH_LIMIT = 50
-=======
 from nums_api.config import MAX_BATCH as BATCH_LIMIT
 
->>>>>>> 9f45e0deec7280ccc50d3cacaa685578aef08f71
 
 def get_batch_nums(num_ranges:str):
     """Parses a batch request string into a list of individual numbers
@@ -54,24 +49,3 @@ def int_or_float(num_string):
         return int(num_string)
     except ValueError:
         return float(num_string)
-
-<<<<<<< HEAD
-
-=======
-#--------------------------------------------------
-# Need to move this somwehre
-def get_facts(num, type):
-    """ Get a fact for a single number """
-
-    facts = Math.query.filter_by(number=num).all()
-
-    if facts:
-        random_fact = random.choice(facts)
-        fact = {'fact': {
-            f"{type}": random_fact.number,
-            'fragment': random_fact.fact_fragment,
-            'statement': random_fact.fact_statement,
-            'type': type
-        }}
-        return fact
->>>>>>> 9f45e0deec7280ccc50d3cacaa685578aef08f71

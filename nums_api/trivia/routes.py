@@ -4,9 +4,9 @@ from random import choice
 import random
 import re
 from nums_api.helpers.batch import get_batch_nums
+from nums_api.config import MAX_BATCH
 
 trivia = Blueprint("trivia", __name__)
-
 
 @trivia.get("/<int:number>")
 def get_trivia_fact(number):
@@ -61,35 +61,60 @@ def get_batch_trivia_fact(num):
                 "type": "trivia"
             }, ...]
         }
-        - If fact is not found, returns JSON response:
+
+        If no facts found for trivia range, returns JSON:
+        {error:
+            { "message": "No facts for { trivia } were found",
+            "status": 404
+            }
+        }
+
+        -     If invalid URL syntax for trivia range, returns JSON:
             { "error": {
                 "message": "Invalid URL",
                 "status": 400 } }
     """
 
     decimal_regex = r"^-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?(,-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?)*$"
-    if not re.match(decimal_regex, num):
-        error = {"error": {
-            "message": "Invalid URL",
-            "status": 400}}
-        return (jsonify(error), 400)
 
-    nums = get_batch_nums(num)
+    if not re.match(decimal_regex, num):
+        error = {
+            "status": 400,
+            "message": "Invalid URL"}
+        return (jsonify(error=error), 400)
+
+    try:
+        nums = get_batch_nums(num)
+    except Exception:
+        return (jsonify(
+            error={
+                "message": str(Exception),
+                "status": 400
+            }), 400)
+
     facts = []
 
     for num in nums:
-        fact = Trivia.query.filter_by(number=num).all()
+        trivia_fact = Trivia.query.filter_by(number=num).all()
 
-        random_fact = random.choice(fact)
+        if(trivia_fact):
+            random_fact = random.choice(trivia_fact)
 
-        factInfo = {
-            "number": str(random_fact.number),
-            "fragment": random_fact.fact_fragment,
-            "statement": random_fact.fact_statement,
-            "type": "trivia"
+            factInfo = {
+                "number": str(random_fact.number),
+                "fragment": random_fact.fact_fragment,
+                "statement": random_fact.fact_statement,
+                "type": "trivia"
+            }
+
+            facts.append(factInfo)
+
+    if not len(facts):
+        error = {
+            "status": 404,
+            "message": f"No facts for { nums } were found",
         }
-
-        facts.append(factInfo)
+        return (jsonify(error=error), 404)
 
     return jsonify(facts=facts)
 
@@ -102,32 +127,80 @@ def get_trivia_fact_random():
     Route for getting random trivia fact.
     Queries all rows in trivia table and randomly picks one
     Returns json:
-    { fact: { number, fragment, statement, type } }
+            { fact:{
+                "number" : number,
+                "fragment" : "fragment",
+                "statement" : "statement",
+                "type" : "type"
+            }}
+
+     If count param specified, returns JSON:
+        {facts: [
+                    {
+                    "number" : number,
+                    "fragment": "fragment",
+                    "statement": "statement",
+                    "type": "trivia",
+                    },
+                    {
+                    "number" : number,
+                    "fragment": "fragment",
+                    "statement": "statement",
+                    "type": "trivia",
+                    },
+                ...]
+        }
+
+        If count > MAX_BATCH, return MAX_BATCH count.
     """
+    count = request.args.get("count")
+
+    trivia_facts = Trivia.query.all()
+
+    if not count:
+        trivia_fact = random.choice(trivia_facts)
+
+        fact = {
+            "number": trivia_fact.number,
+            "fragment": trivia_fact.fact_fragment,
+            "statement": trivia_fact.fact_statement,
+            "type": "trivia",
+        }
+
+        return jsonify(fact=fact)
+
+    try:
+        count = int(count)
+    except ValueError:
+        return (jsonify(
+            error={
+                "message": f"{ count } is an invalid count number",
+                "status": 400
+            }), 400)
+
+    if count < 1:
+        return (jsonify(
+            error={
+                "message": f"{ count } is an invalid count number",
+                "status": 400
+            }), 400)
+
+    if count > MAX_BATCH:
+        count = MAX_BATCH
+    if count > len(trivia_facts):
+        count = len(trivia_facts)
 
     facts = []
 
-    count = int(request.args.get("count") or 1)
+    random_trivia_facts = random.sample(trivia_facts, count)
 
-    if count > 50:
-        count = 50
-
-    while count > 0:
-
-        random_trivia = random.choice(Trivia.query.all())
-
-        fact = {"fact": {
-            "number": random_trivia.number,
-            "fragment": random_trivia.fact_fragment,
-            "statement": random_trivia.fact_statement,
-            "type": "trivia"
-        }}
-
+    for trivia_fact in random_trivia_facts:
+        fact = {
+            "number": trivia_fact.number,
+            "fragment": trivia_fact.fact_fragment,
+            "statement": trivia_fact.fact_statement,
+            "type": "trivia",
+        }
         facts.append(fact)
-
-        count -= 1
-
-    if len(facts) == 1:
-        return jsonify(facts[0])
 
     return jsonify(facts)
