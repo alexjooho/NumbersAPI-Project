@@ -9,11 +9,11 @@ import nums_api.maths.routes
 import nums_api.config
 
 
-app.config.from_object('nums_api.config.TestingConfig')
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config.from_object('nums_api.config.TestingConfig')
 
 db.drop_all()
 db.create_all()
@@ -265,7 +265,7 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
 # class test_max_batch(MathRouteBaseTestCase):
 #     @mock.patch('nums_api.config.MAX_BATCH', 2)
 #     def test_max_batch_math(self):
-#             # breakpoint()
+
 #             MAX_BATCH = 2
 #             assert 2 == MAX_BATCH
 #             self.maxDiff = None
@@ -295,40 +295,38 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
 #                 self.assertEqual(resp.status_code, 200)
 
 
-class test_max_batch(MathRouteBaseTestCase):
-    @patch('nums_api.config.MAX_BATCH')
-    def test_max_batch_math(self, mock_MAX_BATCH):
-        mock_MAX_BATCH = 1
-        # nums_api.config.MAX_BATCH = 2
+# class test_max_batch(MathRouteBaseTestCase):
+#     @patch('nums_api.config.MAX_BATCH')
+#     def test_max_batch_math(self, mock_MAX_BATCH):
+#         mock_MAX_BATCH = 1
+#         # nums_api.config.MAX_BATCH = 2
 
-        self.maxDiff = None
+#         self.maxDiff = None
 
-        with app.test_client() as client:
-            # nums_api.maths.routes.MAX_BATCH = 1
-            # nums_api.maths.routes.MAX_BATCH
-            # nums_api.config.MAX_BATCH = 1
+#         with app.test_client() as client:
+#             # nums_api.maths.routes.MAX_BATCH = 1
+#             # nums_api.maths.routes.MAX_BATCH
+#             # nums_api.config.MAX_BATCH = 1
 
-            resp = client.get(f"/api/math/1..3")
-            breakpoint()
+#             resp = client.get(f"/api/math/1..3")
 
+#             self.assertEqual(resp.json,
+#             {
+#                 "facts":
+#                 [
+#                     {
+#                         "number": "1",
+#                         "fragment": "the number for this m1 test fact fragment",
+#                         "statement": "1 is the number for m1 this test fact statement.",
+#                         "type": "math"
+#                     },
+#                     {
+#                         "number": "2",
+#                         "fragment": "the number for this m2 test fact fragment",
+#                         "statement": "2 is the number for m2 this test fact statement.",
+#                         "type": "math"
+#                     }
+#                 ]
+#             })
 
-            self.assertEqual(resp.json,
-            {
-                "facts":
-                [
-                    {
-                        "number": "1",
-                        "fragment": "the number for this m1 test fact fragment",
-                        "statement": "1 is the number for m1 this test fact statement.",
-                        "type": "math"
-                    },
-                    {
-                        "number": "2",
-                        "fragment": "the number for this m2 test fact fragment",
-                        "statement": "2 is the number for m2 this test fact statement.",
-                        "type": "math"
-                    }
-                ]
-            })
-
-            self.assertEqual(resp.status_code, 200)
+#             self.assertEqual(resp.status_code, 200)
