@@ -18,10 +18,21 @@ $(".example-box-address").on("click", async function (evt) {
  * on URL text given.
  */
 async function updateResultTextAndCounter() {
-    const text = $("#search-text").text();
-    const fact = await getFacts(text);
+    const text = $("#search-text").val();
+    const respData = await getFacts(text);
 
-    $("#result-temporary-text").text(fact);
+    if (respData.error) {
+        $("#result-temporary-text").text(respData.error.message);
+        return;
+    }
+
+    if (!respData.fact.number) {
+        updateCounter(respData.fact.year);
+    } else {
+        updateCounter(respData.fact.number);
+    }
+
+    $("#result-temporary-text").text(respData.fact);
 }
 
 /**
@@ -33,14 +44,14 @@ $("#search-form").on("submit", async function (evt) {
     // Shouldn't need the logic below, setting the number
     //should be handled correctly in getFacts
 
-    // let text = $("#search-text").text();
+    // let text = $("#search-text").val();
 
     // if (!text.includes("random")) {
 
     //     const urlNum = text.replace(/(trivia|years|math)\//g, "");
     //     updateCounter(urlNum);
     // }
-    updateResultText();
+    updateResultTextAndCounter();
 });
 
 
@@ -48,7 +59,7 @@ $("#search-form").on("submit", async function (evt) {
  * When clicking datatype for random, performs
  * a random search of that data type in the sandbox.
  */
-$(".random-fact").on("click", function(evt) {
+$(".random-fact").on("click", function (evt) {
 
     let text = $(evt.target).text();
     $("#search-text").val(text);
@@ -56,8 +67,45 @@ $(".random-fact").on("click", function(evt) {
 });
 
 
-$("#add-number").on("click", async function () { updateCounter(1, "add"); });
-$("#subtract-number").on("click", async function () { updateCounter(1, "subtract"); });
+$("#add-number").on("click", async function () {
+    const currentTick = $(".tick").attr("data-value");
+    let numTick = parseInt(currentTick);
+
+    newNum = (numTick + 1).toString();
+
+    const text = $("#search-text").val();
+    if (text.includes("date")) {
+        updateSandboxForDates(text, newNum);
+    }
+
+    else {
+        let newText = text.replace(/\d/g, "").concat(newNum);
+        $("#search-text").val(newText);
+    }
+
+    updateResultTextAndCounter();
+});
+
+$("#subtract-number").on("click", async function () {
+    const currentTick = $(".tick").attr("data-value");
+    let numTick = parseInt(currentTick);
+
+    if (numTick <= 0) return;
+
+    newNum = (numTick - 1).toString();
+
+    const text = $("#search-text").val();
+    if (text.includes("date")) {
+        updateSandboxForDates(text, newNum);
+    }
+
+    else {
+        let newText = text.replace(/\d/g, "").concat(newNum);
+        $("#search-text").val(newText);
+    }
+
+    updateResultTextAndCounter();
+});
 
 /** Converts date of year to month and day and uses it to update search text URL */
 function updateSandboxForDates(text, dateOfYear) {
@@ -80,48 +128,12 @@ function updateSandboxForDates(text, dateOfYear) {
 }
 
 /** Updates counter and updates text in result text box */
-async function updateCounter(num, action = "replace") {
+async function updateCounter(num) {
 
-    const currentTick = $(".tick").attr("data-value");
-    let numTick = parseInt(currentTick);
+    let paddedNum = String(num).padStart(4, "0");
+    $(".tick").attr("data-value", paddedNum);
+    return;
 
-    let newNum;
-
-    if (action === "add") {
-        newNum = (numTick + num).toString();
-
-        if (newNum.length < 4) newNum = String(newNum).padStart(4, "0");
-
-        $(".tick").attr("data-value", newNum);
-
-    } else if (action === "subtract" && currentTick !== "0000") {
-        newNum = (numTick - num).toString();
-        if (newNum.length < 4) newNum = String(newNum).padStart(4, "0");
-
-        $(".tick").attr("data-value", newNum);
-
-    } else if (action === "replace") {
-        newNum = String(num).padStart(4, "0");
-        $(".tick").attr("data-value", newNum);
-        return;
-    }
-
-    const text = $("#search-text").text();
-    if (text.includes("date")) {
-        updateSandboxForDates(text, newNum);
-        updateResultText();
-    }
-
-
-    else {
-        let newText = text.replace(/\d/g, "").concat(newNum);
-        debugger;
-        newText = newText.replace(/^0+/, "");
-        debugger;
-        $("#search-text").val(newText);
-        debugger;
-        updateResultText();
-    }
 }
 
 /**
@@ -138,16 +150,7 @@ async function getFacts(address) {
     } else {
         resp = await axios.get(BASE_URL + address);
     }
-
-    if (resp.error) return resp.error.message;
-
-    if (!resp.data.fact.number) {
-        updateCounter(resp.data.fact.year);
-    } else {
-        updateCounter(resp.data.fact.number);
-    }
-
-    return resp.data.fact.statement;
+    return resp.data;
 }
 
 
