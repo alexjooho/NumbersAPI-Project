@@ -1,6 +1,6 @@
 "use strict";
 
-const BASE_URL = "http://numbersapi.com/api/";
+const BASE_URL = "http://localhost:5001/api/";
 
 /**
  * Listens for click on data type cards and performs a
@@ -42,7 +42,7 @@ async function updateResultTextAndCounter() {
         updateCounter(respData.fact.number);
     }
 
-    $("#result-temporary-text").text(respData.fact);
+    $("#result-temporary-text").text(respData.fact.statement);
 }
 
 /**
@@ -76,7 +76,7 @@ $(".random-fact").on("click", function (evt) {
     $("#search-form").submit();
 });
 
-
+/** Clicking the "+" button will update counter and fact */
 $("#add-number").on("click", async function () {
     const currentTick = $(".tick").attr("data-value");
     const numTick = parseInt(currentTick);
@@ -102,6 +102,7 @@ $("#add-number").on("click", async function () {
     updateResultTextAndCounter();
 });
 
+/** Clicking the "-" button will update counter and fact */
 $("#subtract-number").on("click", async function () {
     const currentTick = $(".tick").attr("data-value");
     const numTick = parseInt(currentTick);
@@ -154,7 +155,7 @@ async function updateCounter(num) {
 
 /**
  * Takes a partial URL or full URL address stringfor API
- * "math/5" or "numbersapi.com/api/math/5"
+ * "math/5" or "localhost:5001/api/math/5"
  * returns a fact Statement string
  */
 
@@ -168,22 +169,3 @@ async function getFacts(address) {
 
     return resp.data;
 }
-
-
-// function handleTickInit(tick) {
-
-//     Tick.helper.interval(function() {
-
-//         tick.value++;
-
-//         // The aria-label attribute is
-//         // used instead of the actual
-//         // tick content
-//         tick.root.setAttribute(
-//             "aria-label",
-//             tick.value
-//         );
-
-//     }, 1000);
-
-// }
