@@ -200,8 +200,8 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
         """Test GET route for math/random returns correct JSON response"""
         with app.test_client() as client:
 
-            resp1 = client.get(f"/api/math/1")
-            resp2 = client.get(f"/api/math/2")
+            resp1 = client.get("/api/math/1")
+            resp2 = client.get("/api/math/2")
             resp3 = client.get("/api/math/3")
             resp4 = client.get("/api/math/3.14")
 
@@ -217,8 +217,8 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
         """Test GET route for math/random returns correct JSON response"""
         with app.test_client() as client:
 
-            resp1 = client.get(f"/api/math/1")
-            resp2 = client.get(f"/api/math/2")
+            resp1 = client.get("/api/math/1")
+            resp2 = client.get("/api/math/2")
             resp3 = client.get("/api/math/3")
             resp4 = client.get("/api/math/3.14")
 
