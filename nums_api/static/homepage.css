@@ -576,7 +576,7 @@ section h1 {
 }
 
 #usage .example {
-  width: 260px;
+  width: 350px;
   margin: 0 20px 0 20px;
   padding-bottom: 10px;
   display: inline-block;
@@ -585,7 +585,7 @@ section h1 {
   margin-bottom: 10px;
 }
 #usage .example .example-box {
-  width: 250px;
+  width: 315px;
   height: 125px;
   display: inline-block;
   vertical-align: top;
@@ -593,7 +593,6 @@ section h1 {
 #usage .example .example-box .example-box-address {
   border-radius: 5px 5px 0 0;
   background-color: #02273f;
-  background: url(/img/grainy-opacity-80.png);
   display: block;
   margin-top: 0;
   margin-bottom: 0;
@@ -659,7 +658,6 @@ section h1 {
 #sandbox #outer-search #search #search-box {
   border-radius: 5px 5px 0 0;
   background-color: #02273f;
-  background: url(/img/grainy-opacity-80.png);
   display: table;
   padding: 0px;
   padding-right: 3px;
@@ -755,7 +753,6 @@ section h1 {
 #sandbox #outer-search #search-examples h3 {
   border-radius: 5px 5px 0 0;
   background-color: #02273f;
-  background: url(/img/grainy-opacity-80.png);
   margin-top: 0px;
   margin-bottom: 0px;
   padding: 5px;

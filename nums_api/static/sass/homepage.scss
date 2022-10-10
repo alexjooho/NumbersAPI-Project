@@ -60,7 +60,7 @@ $main-margin: 20%;
     //@include box-shadow(2px 2px 10px 2px $color-five);
     background-color: $color-five;
     //background: url(/img/grainy-color-five.png);
-    background: url(/img/grainy-opacity-80.png);
+    // background: ;
     //border-bottom: rgba($color-one, 0.5) 1px solid;
 }
 
@@ -239,7 +239,7 @@ section {
 
 #usage {
     .example {
-        width: 260px;
+        width: 350px;
         margin: 0 20px 0 20px;
         padding-bottom: 10px;
         display: inline-block;
@@ -249,7 +249,7 @@ section {
         }
 
         .example-box {
-            width: 250px;
+            width: 315px;
             height: 125px;
             display: inline-block;
             vertical-align: top;
