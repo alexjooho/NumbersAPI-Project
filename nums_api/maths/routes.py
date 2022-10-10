@@ -67,7 +67,6 @@ def get_math_fact(number):
 @ math.get("/random")
 def get_math_fact_random():
     """Returns a random math fact in JSON about a random number.
-
         - Returns JSON response:
         { "fact": {
             "number": random number
@@ -80,8 +79,8 @@ def get_math_fact_random():
     num_fact = random.choice(Math.query.all())
 
     fact = {"fact": {
-        "number": num_fact.number,
-        "fragment": num_fact.fact_fragment,
+            "number": num_fact.number,
+            "fragment": num_fact.fact_fragment,
             "statement": num_fact.fact_statement,
             "type": "math"
             }}

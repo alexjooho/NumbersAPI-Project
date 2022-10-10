@@ -30,13 +30,13 @@ class Date (db.Model):
 
     # fact with no prefix, first word lowercase, no punctuation at the end
     fact_fragment = db.Column(
-        db.String(200),
+        db.String(400),
         nullable=False,
     )
 
     # fact with prefix, first word is number, has punctuation at the end
     fact_statement = db.Column(
-        db.String(250),
+        db.String(450),
         nullable=False,
     )
 
@@ -86,7 +86,7 @@ class Date (db.Model):
         MONTHS_TO_DAYS = [0,31,29,31,30,31,30,31,31,30,31,30,31]
         MONTHS_IN_YEAR = 12
 
-        if not 0 < month <= MONTHS_IN_YEAR: 
+        if not 0 < month <= MONTHS_IN_YEAR:
             raise ValueError("Invalid value for month")
         if not 0 < day <= MONTHS_TO_DAYS[month]:
             raise ValueError("Invalid value for day")
