@@ -1,6 +1,4 @@
-""" Tests for years routes.
-    To run tests in venv: python3 -m unittest test_routes.py -v
-"""
+
 
 from unittest import TestCase
 from nums_api import app

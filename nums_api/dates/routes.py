@@ -10,30 +10,36 @@ dates = Blueprint("dates", __name__)
 
 @dates.get("/<int:month>/<int:day>")
 def get_date_fact(month, day):
-    """Route to retrieve a random date fact on specified month/day.
-        Returns JSON
-        {fact: {
-            "number": 120,
-            "year": 1783,
-            "fragment": "Some fact fragment",
-            "statement": "Some fact statement",
-            "type": "date"
-            }
-        }
-        Returns JSON 400 error if month/day not in range:
-        {"error": {
-                "message": "Invalid value for month/day",
-                "status": 400
-        }}
-        Returns JSON 404 error if no fact for specified month/day:
-        {"error": {
-                "message": "A date fact for 1/30 not found",
-                "status": 404
-        }}
-        """
+    """Returns a random date fact in JSON about a specified month/day passed as
+        a URL parameter.
+        Accepts optional query parameter: notfound = "floor" or "ceil",
+        returns the previous or next found date if date not found.
 
+        - If date fact is found and/or notfound query is provided,
+        returns JSON response:
+            { "fact": {
+                "number": 120,
+                "year": 1783,
+                "fragment": fact fragment,
+                "statement": fact statement,
+                "type": "date"
+            }}
+
+        - If specified month/day not in range, returns JSON 400 error:
+            {"error": {
+                    "message": "Invalid value for month/day",
+                    "status": 400
+            }}
+
+        - If no date fact for specified month/day and notfound query is not
+            provided, returns JSON 404 response:
+            { "error": {
+                    "message": "A date fact for 1/30 not found",
+                    "status": 404
+            }}
+        """
     try:
-        day = Date.date_to_day_of_year(month, day)
+        day_of_year = Date.date_to_day_of_year(month, day)
     except ValueError as e:
         return (jsonify(
             error={
@@ -41,25 +47,51 @@ def get_date_fact(month, day):
                 "status": 400
             }), 400)
 
-    try:
-        res = Date.query.filter_by(day_of_year=day).all()
-        date_fact_res = random.choice(res)
-    except (IndexError):
+    day_of_year_facts = Date.query.filter_by(day_of_year=day_of_year).all()
+    notfound_query = request.args.get("notfound")
+
+    if notfound_query == "floor" and not day_of_year_facts:
+        day_query = (
+            Date.query
+            .filter(Date.day_of_year < day_of_year)
+            .order_by(Date.day_of_year.desc())
+            .first())
+        if day_query:
+            day_of_year_facts = (
+                        Date.query
+                            .filter_by(day_of_year=day_query.day_of_year)
+                            .all())
+
+    if notfound_query == "ceil" and not day_of_year_facts:
+        day_query = (
+            Date.query
+            .filter(Date.day_of_year > day_of_year)
+            .order_by(Date.day_of_year.asc())
+            .first())
+        if day_query:
+            day_of_year_facts = (
+                        Date.query
+                            .filter_by(day_of_year=day_query.day_of_year)
+                            .all())
+
+    if not day_of_year_facts:
         return (jsonify(
             error={
                 "message": f"A date fact for { month }/{ day } not found",
                 "status": 404
             }), 404)
 
+    date_fact = random.choice(day_of_year_facts)
     date_fact = {
-        "number": date_fact_res.day_of_year,
-        "year": date_fact_res.year,
-        "fragment": date_fact_res.fact_fragment,
-        "statement": date_fact_res.fact_statement,
+        "number": date_fact.day_of_year,
+        "year": date_fact.year,
+        "fragment": date_fact.fact_fragment,
+        "statement": date_fact.fact_statement,
         "type": "date"
     }
 
     return jsonify(fact=date_fact)
+
 
 @dates.get("/<path:dates>")
 def get_dates_range_facts(dates):

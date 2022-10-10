@@ -85,6 +85,94 @@ class DateRouteSpecificDateTestCase(DateRouteBaseTestCase):
 
             self.assertEqual(resp.status_code, 200)
 
+    def test_get_date_fact_with_notfound_query_floor(self):
+        """Test GET route for dates/month/day with no date fact and
+        notfound = 'floor' query parameter, finds the previous existing date
+        fact and returns correct JSON response"""
+        with app.test_client() as client:
+            url = "/api/dates/1/15?notfound=floor"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(
+                data,
+                {'fact': {
+                    'number': 10,
+                    'year': 1900,
+                    'fragment': 't1 fragment',
+                    'statement': 't1 statement',
+                    'type': 'date'
+                }})
+            self.assertEqual(resp.status_code, 200)
+
+    def test_get_date_fact_with_notfound_query_ceil(self):
+        """Test GET route for dates/month/day with no date fact and
+        notfound = 'ceil' query parameter, finds the next existing date
+        fact and returns correct JSON response"""
+        with app.test_client() as client:
+            url = "/api/dates/1/5?notfound=ceil"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(
+                data,
+                {'fact': {
+                    'number': 10,
+                    'year': 1900,
+                    'fragment': 't1 fragment',
+                    'statement': 't1 statement',
+                    'type': 'date'
+                }})
+            self.assertEqual(resp.status_code, 200)
+
+    def test_error_for_date_with_no_fact_and_notfound_floor_doesnotexist(self):
+        """Test GET route for dates/month/day returns 404 if date not found and
+        no existing math fact for previous date"""
+        with app.test_client() as client:
+            url = "/api/dates/1/5?notfound=floor"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(
+                data,
+                {'error': {
+                    'message': 'A date fact for 1/5 not found',
+                    'status': 404
+                }})
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_date_with_no_fact_and_notfound_ceil_doesnotexist(self):
+        """Test GET route for dates/month/day returns 404 if date not found and
+        no existing math fact for next date"""
+        with app.test_client() as client:
+            url = "/api/dates/12/30?notfound=ceil"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(
+                data,
+                {'error': {
+                    'message': 'A date fact for 12/30 not found',
+                    'status': 404
+                }})
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_for_date_with_no_fact_and_invalid_notfound_query(self):
+        """Test GET route for dates/month/day returns 404 if number not found and
+        notfound query parameter is invalid (not "ceil" or "floor")"""
+        with app.test_client() as client:
+            url = "/api/dates/12/30?notfound=true"
+            resp = client.get(url)
+
+            data = resp.json
+            self.assertEqual(
+                data,
+                {'error': {
+                    'message': 'A date fact for 12/30 not found',
+                    'status': 404
+                }})
+            self.assertEqual(resp.status_code, 404)
+
     def test_error_invalid_day(self):
         """Test GET route for dates/month/day returns 400 if invalid day"""
         with app.test_client() as c:
@@ -117,8 +205,9 @@ class DateRouteSpecificDateTestCase(DateRouteBaseTestCase):
 
             self.assertEqual(resp.status_code, 400)
 
-    def test_error_date_without_fact(self):
-        """Test GET route for dates/month/day returns 404 if date does not have fact"""
+    def test_error_date_without_fact_and_no_notfound_query(self):
+        """Test GET route for dates/month/day returns 404 if date does not
+        have fact and no notfound query parameter supplied in request"""
         with app.test_client() as c:
             resp = c.get('/api/dates/1/30')
 

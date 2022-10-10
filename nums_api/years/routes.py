@@ -29,7 +29,7 @@ def get_year_fact(year):
     - If year fact is not found and notfound query is not provided,
     returns JSON response:
         { "error": {
-            "message": f"A year fact for { number } not found",
+            "message": f"A year fact for { year } not found",
             "status": 404 } }
     """
     year_data = Year.query.filter_by(year = year).all()
