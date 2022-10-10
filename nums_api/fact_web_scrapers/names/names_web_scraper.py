@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 URL = "https://www.behindthename.com/names/sort/alpha/display/details"
 name_fact_dict = {}
 
-
 def parse_a_page(url):
     """Scrapes a page and creates key/value pairs in dictionary:
     {'Name':'This is a fact', 'Name2':'Another fact.', ...}
