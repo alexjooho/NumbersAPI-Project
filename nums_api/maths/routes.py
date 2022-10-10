@@ -43,8 +43,8 @@ def get_math_fact(number):
         return (jsonify(error=error), 404)
 
 
-@math.get("/<num>")
-def get_batch_math_fact(num):
+@math.get("/<batch>")
+def get_batch_math_fact(batch):
     """Returns a random math fact in JSON about a a batch of numbers passed as a
     URL parameter.
         - If facts are found, returns JSON response:
@@ -79,14 +79,14 @@ def get_batch_math_fact(num):
 
     decimal_regex = r"^-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?(,-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?)*$"
 
-    if not re.match(decimal_regex, num):
+    if not re.match(decimal_regex, batch):
         error = {
             "message": "Invalid URL",
             "status": 400}
         return (jsonify(error=error), 400)
 
     try:
-        nums_range = get_batch_nums(num)
+        nums_range = get_batch_nums(batch)
     except Exception:
         return (jsonify(
             error={
@@ -114,7 +114,7 @@ def get_batch_math_fact(num):
     if not len(facts):
         error = {
             "status": 404,
-            "message": f"No facts for { nums_range } were found",
+            "message": f"No facts for { batch } were found",
         }
         return (jsonify(error=error), 404)
 

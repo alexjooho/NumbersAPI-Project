@@ -62,7 +62,7 @@ class MathRouteBaseTestCase(TestCase):
         self.assertEqual(test_setup_correct, True)
 
 
-class MathRouteNumberTestCase(MathRouteBaseTestCase):
+class SingleMathRouteTestCase(MathRouteBaseTestCase):
     def test_get_math_fact(self):
         """Test GET route for math/number returns correct JSON response"""
         with app.test_client() as client:
@@ -103,7 +103,6 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
     def test_get_batch_math_fact(self):
         """Test GET route for batch math with '..' returns correct JSON response"""
         with app.test_client() as client:
-
             resp = client.get("/api/math/1..2")
 
             self.assertEqual(resp.json,
@@ -127,18 +126,65 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
 
             self.assertEqual(resp.status_code, 200)
 
-    def test_get_batch_math_fact_error(self):
-        """Test error handling for batch math facts"""
-
+    def test_get_batch_math_separated_by_commas(self):
+        """Tests for getting math facts for numbers seperated
+        by comma works.
+        """
         with self.client as c:
-            resp = c.get("/api/math/BLAH..BLAH")
+            resp = c.get("/api/math/1,2")
+
+            self.assertEqual(resp.json,
+                             {
+                                 "facts":
+                                 [
+                                     {
+                                         "number": "1",
+                                         "fragment": "the number for this m1 test fact fragment",
+                                         "statement": "1 is the number for m1 test fact statement.",
+                                         "type": "math"
+                                     },
+                                     {
+                                         "number": "2",
+                                         "fragment": "the number for this m2 test fact fragment",
+                                         "statement": "2 is the number for m2 test fact statement.",
+                                         "type": "math"
+                                     },
+                                 ]
+                             })
+
+            self.assertEqual(resp.status_code, 200)
+
+    def test_multiple_numbers_with_all_syntax_combo(self):
+        """Tests for getting a facts for multiple numbers seperated by comma, '..'
+        """
+        with self.client as c:
+
+            resp = c.get("api/math/1..2,3.14")
 
             self.assertEqual(resp.json, {
-                "error": {
-                    "message": "Invalid URL",
-                    "status": 400}
+                "facts":
+                [
+                    {
+                        "number": "1",
+                        "fragment": "the number for this m1 test fact fragment",
+                        "statement": "1 is the number for m1 test fact statement.",
+                        "type": "math"
+                    },
+                    {
+                        "number": "2",
+                        "fragment": "the number for this m2 test fact fragment",
+                        "statement": "2 is the number for m2 test fact statement.",
+                        "type": "math"
+                    },
+                    {
+                        "number": "3.14",
+                        "fragment": "the number for this m4 test fact fragment",
+                        "statement": "3.14 is the number for m4 test fact statement.",
+                        "type": "math"
+                    }
+                ]
             })
-            self.assertEqual(resp.status_code, 400)
+            self.assertEqual(resp.status_code, 200)
 
     def test_get_batch_math_fact_with_decimal(self):
         """Test getting a math fact with decimal"""
@@ -168,6 +214,19 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
 
             self.assertEqual(resp.status_code, 200)
 
+    def test_get_batch_math_fact_error(self):
+        """Test error handling for batch math facts"""
+
+        with self.client as c:
+            resp = c.get("/api/math/TEST..TEST")
+
+            self.assertEqual(resp.json, {
+                "error": {
+                    "message": "Invalid URL",
+                    "status": 400}
+            })
+            self.assertEqual(resp.status_code, 400)
+
     def test_range_math_with_no_facts(self):
         """Tests for getting a facts of multiple math seperated by comma."""
         with self.client as c:
@@ -176,7 +235,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
 
             self.assertEqual(resp.json, {"error": {
                 "status": 404,
-                "message": "No facts for [5, 6, 7] were found",
+                "message": "No facts for 5,6,7 were found",
             }})
             self.assertEqual(resp.status_code, 404)
 
@@ -184,7 +243,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
         """Test for invalid URL input for a number."""
         with self.client as c:
 
-            resp = c.get("api/math/BLAH")
+            resp = c.get("api/math/TEST")
             self.assertEqual(
                 resp.json,
                 {"error": {
@@ -236,3 +295,63 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
             self.assertIs(len(data["facts"]), 2)
 
             self.assertEqual(resp_random.status_code, 200)
+
+    def test_get_math_fact_random_count_exceeds_max(self):
+        """Test for getting a count number that exceeds total number of random
+        number facts."""
+        with self.client as c:
+
+            t1_resp = c.get("api/math/1")
+            t2_resp = c.get("api/math/2")
+            t3_resp = c.get("api/math/3")
+            t4_resp = c.get("api/math/3.14")
+
+
+            resp_list = [
+                t1_resp.json["fact"],
+                t2_resp.json["fact"],
+                t3_resp.json["fact"],
+                t4_resp.json["fact"],
+            ]
+
+            random_resp = c.get("api/math/random?count=100")
+            resp = random_resp.json
+
+
+            self.assertIn(resp["facts"][0], resp_list)
+            self.assertIn(resp["facts"][1], resp_list)
+            self.assertIn(resp["facts"][2], resp_list)
+            self.assertIn(resp["facts"][3], resp_list)
+
+            with self.assertRaises(IndexError) as exc:
+                resp["facts"][4]
+                self.assertEqual(str(exc.exception), "list index out of range")
+            self.assertEqual(random_resp.status_code, 200)
+
+    def test_error_get_math_fact_random_count_is_negative(self):
+        """Test error if count param is negative for random math facts."""
+        with self.client as c:
+
+            resp = c.get("api/math/random?count=-100")
+            self.assertEqual(
+                resp.json,
+                {"error": {
+                    "status": 400,
+                    "message": "-100 is an invalid count number",
+                }})
+
+            self.assertEqual(resp.status_code, 400)
+
+    def test_error_get_math_fact_random_count_is_not_an_integer(self):
+        """Test error if count param is not an integer for random math facts."""
+        with self.client as c:
+
+            resp = c.get("api/math/random?count=TEST")
+            self.assertEqual(
+                resp.json,
+                {"error": {
+                    "status": 400,
+                    "message": "TEST is an invalid count number",
+                }})
+
+            self.assertEqual(resp.status_code, 400)

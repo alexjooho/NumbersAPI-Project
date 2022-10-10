@@ -127,21 +127,8 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
 
             self.assertEqual(resp.status_code, 200)
 
-    def test_get_batch_trivia_fact_error(self):
-        """Test error handling for batch trivia facts"""
-
-        with self.client as c:
-            resp = c.get("/api/trivia/BLAH..BLAH")
-
-            self.assertEqual(resp.status_code, 400)
-            self.assertEqual(resp.json, {
-                "error": {
-                    "message": "Invalid URL",
-                    "status": 400}
-            })
-
     def test_get_batch_trivia_separated_by_commas(self):
-        """Tests for getting trivia facts for multiple numbers seperated 
+        """Tests for getting trivia facts for multiple numbers seperated
         by comma works.
         """
         with self.client as c:
@@ -170,7 +157,6 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
 
     def test_multiple_numbers_with_all_syntax_combo(self):
         """Tests for getting a facts for multiple numbers seperated by comma, '..'
-        and/or '-' works.
         """
         with self.client as c:
 
@@ -200,6 +186,19 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
                 ]
             })
             self.assertEqual(resp.status_code, 200)
+
+    def test_get_batch_trivia_fact_error(self):
+        """Test error handling for batch trivia facts"""
+
+        with self.client as c:
+            resp = c.get("/api/trivia/TEST..TEST")
+
+            self.assertEqual(resp.status_code, 400)
+            self.assertEqual(resp.json, {
+                "error": {
+                    "message": "Invalid URL",
+                    "status": 400}
+            })
 
     def test_batch_trivia_with_no_facts(self):
         """Tests for getting a facts of multiple numbers seperated by comma,
@@ -252,7 +251,7 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
             self.assertEqual(resp.status_code, 200)
 
     def test_get_random_trivia_fact_with_count(self):
-        """Test for getting a count number of random year facts if count param
+        """Test for getting a count number of random trivia facts if count param
         is specified."""
         with app.test_client() as client:
 
