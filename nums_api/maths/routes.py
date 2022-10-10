@@ -118,6 +118,8 @@ def get_batch_math_fact(num):
         }
         return (jsonify(error=error), 404)
 
+    # Returns a single fact for requests with single numbers with decimal points
+    # that did not go through the get_math_fact() route function.
     if len(facts) == 1:
         return jsonify(fact=facts[0])
 
@@ -155,7 +157,7 @@ def get_math_fact_random():
                 ...]
         }
 
-    If count > MAX_BATCH, count defaults to 50.
+    If count > MAX_BATCH, returns MAX_BATCH number of requests.
     """
     count = request.args.get("count")
     numbers_facts = Math.query.all()

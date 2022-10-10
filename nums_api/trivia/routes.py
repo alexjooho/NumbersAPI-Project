@@ -8,6 +8,7 @@ from nums_api.config import MAX_BATCH
 
 trivia = Blueprint("trivia", __name__)
 
+
 @trivia.get("/<int:number>")
 def get_trivia_fact(number):
     """
@@ -42,8 +43,8 @@ def get_trivia_fact(number):
     return jsonify(fact=fact)
 
 
-@trivia.get("/<num>")
-def get_batch_trivia_fact(num):
+@trivia.get("/<batch>")
+def get_batch_trivia_fact(batch):
     """Returns a random trivia fact in JSON about a a batch of numbers passed as a
     URL parameter.
         - If facts are found, returns JSON response:
@@ -78,14 +79,14 @@ def get_batch_trivia_fact(num):
     decimal_regex = r"^-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?(,-?\d+(?:\.\d+)?(\.\.-?\d+(?:\.\d+)?)?)*$"
 
     print(MAX_BATCH)
-    if not re.match(decimal_regex, num):
+    if not re.match(decimal_regex, batch):
         error = {
             "status": 400,
             "message": "Invalid URL"}
         return (jsonify(error=error), 400)
 
     try:
-        nums = get_batch_nums(num)
+        nums = get_batch_nums(batch)
     except Exception:
         return (jsonify(
             error={
@@ -98,7 +99,7 @@ def get_batch_trivia_fact(num):
     for num in nums:
         trivia_fact = Trivia.query.filter_by(number=num).all()
 
-        if(trivia_fact):
+        if (trivia_fact):
             random_fact = random.choice(trivia_fact)
 
             factInfo = {
@@ -113,7 +114,7 @@ def get_batch_trivia_fact(num):
     if not len(facts):
         error = {
             "status": 404,
-            "message": f"No facts for { nums } were found",
+            "message": f"No facts for { batch } were found",
         }
         return (jsonify(error=error), 404)
 
