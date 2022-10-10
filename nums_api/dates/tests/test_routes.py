@@ -23,20 +23,36 @@ class DateRouteBaseTestCase(TestCase):
         self.d1 = Date(
             day_of_year=10,
             year=1900,
-            fact_fragment='test1 fragment',
-            fact_statement='test1 statement',
+            fact_fragment='t1 fragment',
+            fact_statement='t1 statement',
             was_submitted=False
         )
 
         self.d2 = Date(
             day_of_year=50,
             year=1900,
-            fact_fragment='test2 fragment',
-            fact_statement='test2 statement',
+            fact_fragment='t2 fragment',
+            fact_statement='t2 statement',
             was_submitted=False
         )
 
-        db.session.add_all([self.d1, self.d2])
+        self.d3 = Date(
+            day_of_year=51,
+            year=1901,
+            fact_fragment='t3 fragment',
+            fact_statement='t3 statement',
+            was_submitted=False
+        )
+
+        self.d4 = Date(
+            day_of_year=20,
+            year=1902,
+            fact_fragment='t4 fragment',
+            fact_statement='t4 statement',
+            was_submitted=False
+        )
+
+        db.session.add_all([self.d1, self.d2, self.d3, self.d4])
         db.session.commit()
 
     def tearDown(self):
@@ -62,8 +78,8 @@ class DateRouteSpecificDateTestCase(DateRouteBaseTestCase):
                 {'fact': {
                     'number': 10,
                     'year': 1900,
-                    'fragment': 'test1 fragment',
-                    'statement': 'test1 statement',
+                    'fragment': 't1 fragment',
+                    'statement': 't1 statement',
                     'type': 'date'
                 }})
 
@@ -118,6 +134,102 @@ class DateRouteSpecificDateTestCase(DateRouteBaseTestCase):
             self.assertEqual(resp.status_code, 404)
 
 
+class DatesRangeRouteSpecificDateTestCase(DateRouteBaseTestCase):
+    def test_get_dates_range_facts(self):
+        """Test GET route for range of dates/month/day separated by ".." works
+        and returns correct JSON response"""
+        with app.test_client() as c:
+            resp = c.get('/api/dates/1/10..2/19')
+
+            self.assertEqual(resp.json,
+                             {"facts": [{
+                                 "number": 10,
+                                 "year": 1900,
+                                 "fragment": "t1 fragment",
+                                 "statement": "t1 statement",
+                                 "type": "date"
+                             },
+                                 {
+                                 "number": 20,
+                                 "year": 1902,
+                                 "fragment": "t4 fragment",
+                                 "statement": "t4 statement",
+                                 "type": "date"
+                             },
+                                 {
+                                 "number": 50,
+                                 "year": 1900,
+                                 "fragment": "t2 fragment",
+                                 "statement": "t2 statement",
+                                 "type": "date"
+                             }]
+                             })
+
+            self.assertEqual(resp.status_code, 200)
+
+    def test_get_dates_range_facts_with_commas(self):
+        """Test GET route for range of dates/month/day separated by commas works
+        and returns correct JSON response"""
+        with app.test_client() as c:
+            resp = c.get('/api/dates/1/10,1/20')
+
+            self.assertEqual(resp.json,
+                             {"facts": [{
+                                 "number": 10,
+                                 "year": 1900,
+                                 "fragment": "t1 fragment",
+                                 "statement": "t1 statement",
+                                 "type": "date"
+                             },
+                                 {
+                                 "number": 20,
+                                 "year": 1902,
+                                 "fragment": "t4 fragment",
+                                 "statement": "t4 statement",
+                                 "type": "date"
+                             }
+                             ]})
+
+            self.assertEqual(resp.status_code, 200)
+
+    def test_error_range_dates_with_no_facts(self):
+        """Test GET route error msg if no facts were found for range of dates"""
+        with app.test_client() as c:
+
+            resp = c.get("api/dates/3/1..4/15")
+
+            self.assertEqual(resp.json, {"error": {
+                "status": 404,
+                "message": "No facts for 3/1..4/15 were found",
+            }})
+            self.assertEqual(resp.status_code, 404)
+
+    def test_error_range_dates_regex_doesnt_match(self):
+        """Test for getting a facts of multiple dates with invalid regex."""
+        with app.test_client() as c:
+
+            resp = c.get("api/dates/applepie")
+
+            self.assertEqual(resp.json, {"error": {
+                "status": 400,
+                "message": 'Invalid URL',
+            }})
+            self.assertEqual(resp.status_code, 400)
+
+    def test_error_range_dates_out_of_bound(self):
+        """Test for getting facts of multiple dates with out of bound dates.
+        """
+        with app.test_client() as c:
+
+            resp = c.get("api/dates/13/31,1/10")
+
+            self.assertEqual(resp.json, {"error": {
+                "status": 400,
+                "message": 'Invalid date: 13/31',
+            }})
+            self.assertEqual(resp.status_code, 400)
+
+
 class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
     def test_get_random_date_fact(self):
         """Test GET route for dates/random returns correct JSON response"""
@@ -125,7 +237,9 @@ class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
 
             resp1 = c.get('/api/dates/1/10')  # this is test1 input month/day
             resp2 = c.get('/api/dates/2/19')  # this is test2 input month/day
-            resp_list = [resp1.json, resp2.json]
+            resp3 = c.get('/api/dates/2/20')  # this is test3 input month/day
+            resp4 = c.get('/api/dates/1/20')  # this is test4 input month/day
+            resp_list = [resp1.json, resp2.json, resp3.json, resp4.json]
 
             resp_random = c.get('/api/dates/random')
 
@@ -134,3 +248,113 @@ class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
             self.assertIn(data, resp_list)
 
             self.assertEqual(resp_random.status_code, 200)
+
+    def test_get_random_date_facts_count_is_defined(self):
+        """Test GET route for dates/random if count param is specified,
+        and returns correct JSON response"""
+        with app.test_client() as c:
+
+            resp1 = c.get('/api/dates/1/10')  # this is test1 input month/day
+            resp2 = c.get('/api/dates/2/19')  # this is test2 input month/day
+            resp3 = c.get('/api/dates/2/20')  # this is test3 input month/day
+            resp4 = c.get('/api/dates/1/20')  # this is test4 input month/day
+            resp_list = [resp1.json["fact"], resp2.json["fact"],
+                        resp3.json["fact"], resp4.json["fact"]]
+
+            resp_random = c.get('/api/dates/random?count=2')
+            resp = resp_random.json
+
+            self.assertIn(resp["facts"][0], resp_list)
+            self.assertIn(resp["facts"][1], resp_list)
+            with self.assertRaises(IndexError) as exc:
+                resp["facts"][2]
+                self.assertEqual(str(exc.exception), "list index out of range")
+
+            self.assertEqual(resp_random.status_code, 200)
+
+    def test_get_random_date_facts_count_exceeds_max_total_facts(self):
+        """Test GET route for dates/random if count param exceeds total number
+        of dates facts"""
+        with app.test_client() as c:
+
+            resp1 = c.get('/api/dates/1/10')  # this is test1 input month/day
+            resp2 = c.get('/api/dates/2/19')  # this is test2 input month/day
+            resp3 = c.get('/api/dates/2/20')  # this is test3 input month/day
+            resp4 = c.get('/api/dates/1/20')  # this is test4 input month/day
+            resp_list = [resp1.json["fact"], resp2.json["fact"],
+                        resp3.json["fact"], resp4.json["fact"]]
+
+            resp_random = c.get('/api/dates/random?count=60')
+            resp = resp_random.json
+
+            self.assertIn(resp["facts"][0], resp_list)
+            self.assertIn(resp["facts"][1], resp_list)
+            self.assertIn(resp["facts"][2], resp_list)
+            self.assertIn(resp["facts"][3], resp_list)
+            with self.assertRaises(IndexError) as exc:
+                resp["facts"][4]
+                self.assertEqual(str(exc.exception), "list index out of range")
+
+            self.assertEqual(resp_random.status_code, 200)
+
+    # tests route if count param exceeds max number:
+    # unsuccesful in setting MAX_BATCH in testing environment to lower number (2)
+    #
+    # def test_get_random_date_facts_count_exceeds_max_batch(self):
+    #     """Test GET route for dates/random if count param exceeds MAX_BATCH."""
+    #     with app.test_client() as c:
+
+    #         resp1 = c.get('/api/dates/1/10')  # this is test1 input month/day
+    #         resp2 = c.get('/api/dates/2/19')  # this is test2 input month/day
+    #         resp3 = c.get('/api/dates/2/20')  # this is test3 input month/day
+    #         resp4 = c.get('/api/dates/1/20')  # this is test4 input month/day
+    #         resp_list = [resp1.json["fact"], resp2.json["fact"],
+    #                     resp3.json["fact"], resp4.json["fact"]]
+
+    #         resp_random = c.get('/api/dates/random?count=60')
+    #         resp = resp_random.json
+
+    #         self.assertIn(resp["facts"][0], resp_list)
+    #         self.assertIn(resp["facts"][1], resp_list)
+    #         self.assertIn(resp["facts"][2], resp_list)
+    #         self.assertIn(resp["facts"][3], resp_list)
+    #         with self.assertRaises(IndexError) as exc:
+    #             resp["facts"][4]
+    #             self.assertEqual(str(exc.exception), "list index out of range")
+
+    #         self.assertEqual(resp_random.status_code, 200)
+
+    def test_get_random_date_facts_count_is_negative(self):
+        """Test GET route for dates/random if count param is a negative number"""
+        with app.test_client() as c:
+
+            resp_random = c.get('/api/dates/random?count=-60')
+            resp = resp_random.json
+
+            self.assertEqual(
+                resp,
+                {"error": {
+                    "status": 400,
+                    "message": "-60 is an invalid count number",
+                }})
+
+            self.assertEqual(resp_random.status_code, 400)
+
+    def test_get_random_date_facts_count_is_not_an_integer(self):
+        """Test GET route for dates/random if count param is a not an integer"""
+        with app.test_client() as c:
+
+            resp_random = c.get('/api/dates/random?count=applepie')
+            resp = resp_random.json
+
+            self.assertEqual(
+                resp,
+                {"error": {
+                    "status": 400,
+                    "message": "applepie is an invalid count number",
+                }})
+
+            self.assertEqual(resp_random.status_code, 400)
+
+
+

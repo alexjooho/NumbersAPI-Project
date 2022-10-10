@@ -1,6 +1,5 @@
 from datetime import datetime
 from nums_api.database import db
-from nums_api.config import DATABASE_URL_TEST
 
 
 class Date (db.Model):
@@ -31,13 +30,13 @@ class Date (db.Model):
 
     # fact with no prefix, first word lowercase, no punctuation at the end
     fact_fragment = db.Column(
-        db.String(200),
+        db.String(400),
         nullable=False,
     )
 
     # fact with prefix, first word is number, has punctuation at the end
     fact_statement = db.Column(
-        db.String(250),
+        db.String(450),
         nullable=False,
     )
 
