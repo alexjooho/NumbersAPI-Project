@@ -26,43 +26,43 @@ app.register_blueprint(dates, url_prefix='/api/dates')
 app.register_blueprint(years, url_prefix='/api/years')
 
 # request tracking
-@app.after_request
-def track_request(response):
-    """Track request item and category, update total number of requests in DB."""
-    
-    #TODO: Either add logic to handle batch requests or explicitly exclude (once batch requests PRs are complete).
-    
-    PATH_SPLIT_INDEX = 5
-    
-    #if route was invalid, return response and do not write to DB:
-    try:
-        response_value = response.get_data()
-        if not response.json:
-            return response
-    except:
-        print("css error")
+# @app.after_request
+# def track_request(response):
+#     """Track request item and category, update total number of requests in DB."""
 
-    #ensure route is parsable, otherwise return:
-    try:
-        [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
-    except ValueError:
-        print('enter')
-        return response
-    
-    #ignore responses for random:
-    if req_item == "random":
-        return response
+#     #TODO: Either add logic to handle batch requests or explicitly exclude (once batch requests PRs are complete).
 
-    #convert dates to whole numbers:
-    if category == "dates":
-        [month, day] = req_item.split("/")
-        req_item = Date.date_to_day_of_year(int(month), int(day))
+#     PATH_SPLIT_INDEX = 5
 
-    #write to DB:
-    Tracking.update_request_count(req_item, category)
+#     #if route was invalid, return response and do not write to DB:
+#     try:
+#         response_value = response.get_data()
+#         if not response.json:
+#             return response
+#     except:
+#         print("css error")
 
-    return response
-    
+#     #ensure route is parsable, otherwise return:
+#     try:
+#         [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
+#     except ValueError:
+#         print('enter')
+#         return response
+
+#     #ignore responses for random:
+#     if req_item == "random":
+#         return response
+
+#     #convert dates to whole numbers:
+#     if category == "dates":
+#         [month, day] = req_item.split("/")
+#         req_item = Date.date_to_day_of_year(int(month), int(day))
+
+#     #write to DB:
+#     Tracking.update_request_count(req_item, category)
+
+#     return response
+
 
 # allow CORS and connect app to database
 CORS(app)

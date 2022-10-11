@@ -1,9 +1,19 @@
 version: '2'
 
 services:
+  app:
+    build: ./app/
+    
+  db:
+    build: ./database/
+
   website:
     build: .
     env_file:
       - '.env'
     ports:
       - '8000:5001'
+    depends_on:
+      - postgresql
+  postgresql:
+    image:
