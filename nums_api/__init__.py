@@ -52,14 +52,18 @@ def track_request(response):
     PATH_SPLIT_INDEX = 5
 
     #if route was invalid, return response and do not write to DB:
-    response_value = response.get_data()
-    if not response.json:
-        return response
+    try:
+        response_value = response.get_data()
+        if not response.json:
+            return response
+    except:
+        print("css error")
 
     #ensure route is parsable, otherwise return:
     try:
         [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
     except ValueError:
+        print('enter')
         return response
 
     #ignore responses for random:

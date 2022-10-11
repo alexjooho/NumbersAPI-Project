@@ -1,0 +1,529 @@
+@import "partials/tick";
+
+@import "partials/normalize";
+
+// Layout ------------------------------------
+$body-width: 960px;
+$section-margin: 20px;
+$section-border-radius: 8px;
+$element-border-radius: 5px;
+$example-height: 5em;
+$page-top-padding: 0px;
+$url-height: 1.5em;
+$body-font: Palatino, Georgia, serif;
+$heading-font: museo_sans, "Lucida Grande", "Lucida Sans", "Helvetica",
+    sans-serif;
+
+// Colors -----------------------------------------
+
+// Light to dark
+
+//$color-one: #c8e4f0;
+//$color-two: #83cff0;
+//$color-three: #165b78;
+//$color-four: #253a44;
+//$color-five: #01212f;
+
+$color-one: #cce4f4;
+$color-two: #86c9f4;
+$color-three: #1e6da0;
+$color-four: #314a5b;
+$color-five: #02273f;
+
+$section-opacity: 0.5;
+$background-opacity: 0.9;
+$main-margin: 20%;
+
+// Mixins ------------------------------------------
+
+@mixin user-select($select) {
+    -moz-user-select: -moz-#{$select};
+    -khtml-user-select: $select;
+    -webkit-user-select: $select;
+    -o-user-select: $select;
+    user-select: $select;
+}
+
+@mixin element-box {
+    border-radius: $element-border-radius;
+    //@include box-shadow(2px 2px 10px 2px $color-five);
+    box-shadow: 0 0 9px rgba(red, 1);
+}
+
+@mixin section-box {
+    border-radius: $section-border-radius;
+    //@include box-shadow(0px 0px 5px $color-five);
+}
+
+@mixin box-top {
+    border-radius: $element-border-radius $element-border-radius 0 0;
+    //@include box-shadow(2px 2px 10px 2px $color-five);
+    background-color: $color-five;
+    //background: url(/img/grainy-color-five.png);
+    // background: ;
+    //border-bottom: rgba($color-one, 0.5) 1px solid;
+}
+
+@mixin box-bottom {
+    border-radius: 0 0 $element-border-radius $element-border-radius;
+    //@include box-shadow(2px 2px 10px 2px $color-five);
+    background-color: rgba($color-three, 0.5);
+    background: radial-gradient(ellipse farthest-side,
+            rgba(lighten($color-three, 25%), 0.5) 0%,
+            rgba(lighten($color-three, 10%), 0.5) 100%);
+    box-shadow: inset 0 0 3px rgba($color-five, 0.3);
+    border: 2px solid rgba($color-five, 0.9);
+    border-top: 0px solid white;
+}
+
+@mixin code-font {
+    font-family: Monaco, "Lucida Console", monospace;
+    font-size: 15px;
+}
+
+// Custom fonts ----------------------------------
+
+// TODO: Get rid of unneeded fonts
+
+@font-face {
+    font-family: pastel_crayon;
+    src: url("/font/pastel_crayon.ttf");
+}
+
+@font-face {
+    font-family: museo_sans;
+    src: url("/font/MuseoSansRounded-300.otf");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: museo_sans;
+    src: url("/font/MuseoSansRounded-700.otf");
+    font-weight: bold;
+}
+
+// CSS ----------------------------------------
+
+body {
+    background: $color-three; // Fallback
+    background: linear-gradient(rgba($color-three, $background-opacity - 0.1) 0%,
+            rgba($color-three, 1) 20%),
+        url("/img/background.jpg");
+    overflow-x: hidden; // Won't work on IE6/7: http://stackoverflow.com/questions/2284562/absolutely-positioned-div-on-right-causing-scrollbar-when-the-left-doesnt
+
+    #body-inner {
+        background: url(/img/graph-paper-5.png);
+
+        .body-container {
+            // TODO: consider double layer of opacity for foreground/background effect
+            width: $body-width;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-shadow: $color-five 2px 2px 3px;
+    font-family: $heading-font;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: $color-one;
+    text-transform: uppercase;
+}
+
+p,
+a,
+div,
+span,
+label,
+input {
+    text-shadow: #000000 0px 1px 0px;
+    font-family: $body-font;
+    font-weight: normal;
+    font-size: 18px;
+    //letter-spacing: 1px;
+    color: $color-one;
+}
+
+a {
+    color: $color-two;
+    text-decoration: none;
+    transition: all 0.3s ease-out;
+
+    &:hover {
+        color: $color-one;
+    }
+}
+
+#logo-outer {
+    padding-top: $page-top-padding;
+}
+
+.logo {
+    text-shadow: $color-one 0px 0px 10px, $color-one 0 0 60px;
+    margin: 0px;
+    padding: 0;
+    color: $color-five;
+    text-transform: uppercase;
+    font-family: $heading-font;
+    font-weight: bold;
+    font-size: 5em;
+
+    //border-top: 1px solid $color-five;
+    #second-word {
+        //@include text-shadow($color-five 0px 0px 10px, $color-five 0px 0px 50px);
+        text-shadow: $color-five 0px 0px 10px;
+        color: $color-one;
+        font-family: inherit;
+        font-weight: normal;
+        font-size: inherit;
+        //border-top: 1px solid $color-one;
+    }
+}
+
+#tagline {
+    text-shadow: $color-five 0px 0px 5px;
+    margin: 0px;
+    font-size: 1.6em;
+    font-style: italic;
+}
+
+section {
+    @include section-box;
+    margin: $section-margin 0 $section-margin 0;
+    padding: 30px 30px 10px 20px;
+    display: inline-block;
+    clear: both;
+    background-color: rgba($color-five, $section-opacity);
+    position: relative;
+    z-index: 5;
+
+    h1 {
+        text-align: center;
+    }
+}
+
+.api-result {
+    position: relative;
+    overflow: hidden;
+
+    .result-gradient {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        border-radius: $element-border-radius;
+        background: linear-gradient(to top,
+                rgba($color-three, 0) 0%,
+                rgba($color-three, 0.5) 80%,
+                rgba($color-three, 1) 100%);
+    }
+}
+
+#usage-outer {
+    text-align: center;
+    position: relative;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 30px;
+    width: $body-width;
+}
+
+#usage {
+    .example {
+        width: 350px;
+        margin: 0 20px 0 20px;
+        padding-bottom: 10px;
+        display: inline-block;
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .example-box {
+            width: 315px;
+            height: 125px;
+            display: inline-block;
+            vertical-align: top;
+
+            .example-box-address {
+                @include box-top;
+                display: block;
+                margin-top: 0;
+                margin-bottom: 0;
+                padding: ($url-height - 1) / 2;
+            }
+
+            .api-result {
+                @include box-bottom;
+                margin-top: 0;
+                margin-bottom: 0;
+                border-top: 0;
+                padding: 8px;
+                height: $example-height;
+            }
+        }
+    }
+}
+
+// TODO: Remove hardcode
+$sandbox-result-height: 102px;
+
+#sandbox-outer {
+    position: relative;
+    float: right;
+}
+
+#sandbox {
+    .arrow {
+        background: url("/img/arrow-short.png") no-repeat;
+        transform: rotate(50deg) scale(0.5, 0.4);
+        width: 301px;
+        height: 266px;
+        position: absolute;
+        top: -47px;
+        left: -187px;
+        //display: none;
+    }
+
+    #sandbox-text {
+        transform: rotate(-9deg);
+        writing-mode: lr-tb;
+        font-size: 70px;
+        font-family: pastel_crayon, $body-font;
+        font-weight: normal;
+        top: -32px;
+        left: -215px;
+        position: absolute;
+        text-shadow: none;
+    }
+
+    #add-number,
+    #subtract-number {
+        display: inline-block;
+        margin-top: 5px;
+        margin-right: 12px;
+        padding: 3px 0px;
+        float: left;
+    }
+
+    #outer-search {
+        #search {
+            $width: 551px;
+            float: left;
+            overflow: hidden;
+            height: 100%;
+            // TODO: remove hardcode
+            width: $width;
+            margin-left: 0px;
+            margin-right: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+
+            #search-box {
+                $search-box-height: 30px;
+                @include box-top;
+                display: table;
+                padding: 0px;
+                padding-right: 3px;
+                width: $width - 3;
+                height: $search-box-height;
+                font-size: 18px;
+
+                label {
+                    overflow: auto;
+                    display: table-cell;
+                    width: 1px;
+                    height: inherit;
+                    white-space: nowrap;
+                    padding: 8px;
+                    padding-right: 0px;
+                    margin: 0px;
+                    margin-right: -5px;
+                    vertical-align: middle;
+                    line-height: $search-box-height;
+                    color: $color-two;
+
+                    &:hover {
+                        text-decoration: underline;
+
+                        a {
+                            color: $color-one;
+                        }
+                    }
+                }
+
+                label:hover+span>input {
+                    text-decoration: underline;
+                    color: $color-one;
+                    transition: all ease-out 0.3s;
+                }
+
+                span {
+                    display: table-cell;
+                    height: inherit;
+                    margin: 0px;
+                    padding: 8px;
+                    padding-left: 0px;
+                    border: 0px;
+
+                    input {
+                        border-radius: 0 $element-border-radius 0 0;
+                        width: 100%;
+                        margin: 0px;
+                        border: 0px;
+                        outline: none;
+                        line-height: $search-box-height;
+                        text-shadow: none;
+                        background-color: rgba($color-four, 0.5);
+                        color: $color-two;
+                        transition: all ease-out 0.3s;
+
+                        &:hover {
+                            background-color: rgba($color-four, 0.2);
+                            color: $color-one;
+                        }
+
+                        border: 2px solid rgba(0, 0, 0, 0);
+                        border-left: 0px;
+
+                        &:focus {
+                            background-color: rgba($color-four, 0);
+                            color: $color-one;
+                            border: 2px solid rgba($color-two, 0.8);
+                            border-left: 0px;
+                        }
+                    }
+                }
+            }
+
+            #search-result {
+                @include box-bottom;
+                position: relative;
+                margin-top: 0px;
+                margin-bottom: 5px;
+                padding: 0 0 0 10px;
+                height: $sandbox-result-height;
+
+                //&.error {
+                //	color: $color-one;
+                //}
+
+                .script {
+                    @include code-font;
+                }
+
+                #result-temporary-text {
+                    position: absolute;
+                    top: 50%;
+                    padding-right: 5px;
+                    left: 153px;
+                }
+            }
+
+        }
+
+        #search-examples {
+            float: left;
+            margin-left: 0px;
+            margin-right: 0px;
+
+            h3 {
+                @include box-top;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                padding: 5px;
+                text-align: center;
+            }
+
+            ul {
+                @include box-bottom;
+                margin-top: 0px;
+                list-style-type: none;
+                padding-left: 0;
+                text-align: center;
+
+                li {
+                    transition: all ease-out 0.3s;
+
+                    &:last-child {
+                        border-radius: 0 0 $element-border-radius $element-border-radius;
+                    }
+
+                    .random-fact {
+                        display: block;
+                        padding: 5px;
+                        text-shadow: none;
+                    }
+
+                    &:hover {
+                        background-color: rgba($color-one, 0.5);
+
+                        //@include background(radial-gradient(center, contain ellipse, $color-one 0%, rgba($color-one, 0) 100%));
+                        a {
+                            color: $color-five;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#api-outer {
+    position: relative;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    background-color: rgba($color-five, 0);
+}
+
+#api {
+
+    pre,
+    code {
+        @include code-font;
+        background-color: rgba($color-five, 0.5);
+    }
+
+    code {
+        line-height: 1.5em;
+        padding: 0 0.3em;
+        border-radius: 0.2em;
+    }
+
+    pre code {
+        background-color: transparent;
+        border: none;
+        line-height: 1em;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    pre {
+        padding: 10px 10px 10px 20px;
+        border-left: 8px solid rgba($color-five, 0.5);
+        border-radius: 0 $element-border-radius $element-border-radius 0;
+    }
+
+    h2 {
+        border-top: 2px solid rgba($color-one, 0.8);
+        padding-top: 5px;
+        margin-top: 60px;
+    }
+
+    h3 {
+        margin-top: 30px;
+    }
+}
+
+img {
+    width:90%;
+}

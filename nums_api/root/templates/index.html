@@ -6,11 +6,160 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <script src="https://unpkg.com/axios@1.0.0/dist/axios.js"></script>
   <title>Numbers API</title>
+
+  <!-- Le styles -->
+  <link href="/static/homepage.css" rel="stylesheet" type="text/css" />
+
+  <!-- Le fav and touch icons -->
+  <link rel="shortcut icon" href="img/favicon.ico" />
+
+  <!-- Le Google Analytics -->
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(["_setAccount", "UA-29155677-1"]);
+    _gaq.push(["_trackPageview"]);
+
+    (function () {
+      var ga = document.createElement("script");
+      ga.type = "text/javascript";
+      ga.async = true;
+      ga.src =
+        ("https:" == document.location.protocol
+          ? "https://ssl"
+          : "http://www") + ".google-analytics.com/ga.js";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+  <link href="https://unpkg.com/@pqina/flip/dist/flip.min.css" rel="stylesheet">
 </head>
 
 <body>
-{{documentation|safe}}
+  <div id="body-inner">
+    <div class="body-container">
+      <div id="logo-outer">
+        <h1 class="logo">
+          Numbers
+          <span id="second-word">API</span>
+        </h1>
+      </div>
+
+      <span id="tagline">
+        An API for interesting facts about numbers
+      </span>
+
+      <section id="usage-outer">
+        <div id="usage">
+          <div id="examples-1">
+            <div class="example">
+              <h2>Trivia</h2>
+              <div class="example-box">
+                <div class="example-box-address">numbersapi.com/api/trivia/42</div>
+                <div class="api-result scroll">
+                  42 is the number of little squares forming the left side
+                  trail of Microsoft's Windows 98 logo.
+                </div>
+              </div>
+            </div>
+            <div class="example">
+              <h2>Dates</h2>
+              <div class="example-box">
+                <div class="example-box-address">numbersapi.com/api/dates/10/4</div>
+                <div class="api-result scroll">
+                  October 4th is national taco day!
+                </div>
+              </div>
+            </div>
+              <!-- example-box -->
+            </div>
+            <div id="examples-2">
+            <div class="example">
+              <h2>Years</h2>
+              <div class="example-box">
+                <div class="example-box-address">numbersapi.com/api/years/1970</div>
+                <div class="api-result scroll">
+                  April 22nd is the day in 1970 that the first Earth Day is celebrated.
+                </div>
+              </div>
+            </div>
+            <div class="example">
+              <h2>Math</h2>
+              <div class="example-box">
+                <div class="example-box-address">numbersapi.com/api/math/5</div>
+                <div class="api-result scroll">
+                  5 is the number of platonic solids.
+                </div>
+              </div>
+            </div>
+            <!-- example -->
+          </div>
+          <!-- examples 2 -->
+        </div>
+        <!-- usage -->
+      </section>
+      <br />
+
+      <section id="sandbox-outer">
+        <div id="sandbox">
+          <div class="arrow"></div>
+          <div id="sandbox-text">Try it out!</div>
+          <div id="outer-search">
+            <div id="search">
+              <div id="search-box">
+                <form id="search-form">
+                  <label>
+                    <button type="button" id="search-link">numbersapi.com/api/</button>
+                  </label>
+                  <span><input id="search-text" type="text" /></span>
+                </form>
+              </div>
+              <!-- TODO: fix scroll for sandbox. shouldn't be too much of an issue yet, since facts generally should not be long enough to overflow the container -->
+              <div id="search-result" class="api-result">
+                <button id="add-number">+</button>
+                <button id="subtract-number">-</button>
+                <div class="tick" data-value="0001">
+                  <span data-layout="horizontal fit">
+                    <span data-repeat="true">
+                      <span data-view="flip"></span>
+                    </span>
+                  </span>
+                </div>
+                <span id="result-temporary-text">
+                  Try out the numbers API here!
+                </span>
+              </div>
+            </div>
+            <div id="search-examples">
+              <h3>Random</h3>
+              <ul>
+                <li id="trivia-random" class="random-fact">trivia/random</li>
+                <li id="year-random" class="random-fact">years/random</li>
+                <li id="date-random" class="random-fact">dates/random</li>
+                <li id="math-random" class="random-fact">math/random</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="api-outer">
+        <div id="api">
+          {{ documentation|safe }}
+        </div>
+      </section>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <!-- <script src="/js/jquery.mousewheel.js" type="text/javascript"></script>
+    <script src="/js/jquery.counter.js" type="text/javascript"></script> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js" type="text/javascript"></script>
+    <script src="/static/script.js"></script>
+    <script src="https://unpkg.com/@pqina/flip/dist/flip.min.js"></script>
+  </div>
+
 </body>
 
 </html>
