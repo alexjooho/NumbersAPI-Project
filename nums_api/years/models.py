@@ -20,13 +20,13 @@ class Year (db.Model):
 
     # fact with no prefix, first word lowercase, no punctuation at the end
     fact_fragment = db.Column(
-        db.String(200),
+        db.String(500),
         nullable=False,
     )
 
     # fact with prefix, first word is number, has punctuation at the end
     fact_statement = db.Column(
-        db.String(250),
+        db.String(550),
         nullable=False,
     )
 

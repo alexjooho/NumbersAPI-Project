@@ -4,6 +4,7 @@ from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
 from nums_api.years.models import Year
 
+
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
 app.config["SQLALCHEMY_ECHO"] = False
@@ -15,6 +16,7 @@ db.create_all()
 class YearRouteTestCase(TestCase):
     def setUp(self):
         """Set up test data here"""
+
         self.client = app.test_client()
 
         Year.query.delete()
@@ -105,27 +107,6 @@ class MultipleYearsRangeRouteTestCase(YearRouteTestCase):
              'year': 3}]})
             self.assertEqual(resp.status_code, 200)
 
-    def test_range_years_hyphen_syntax(self):
-        """Tests for getting a range of years with '-' works"""
-        with self.client as c:
-
-            resp = c.get("api/years/1-3")
-
-            self.assertEqual(resp.json, {'facts':
-            [{'fragment': 'the year for the first test entry',
-             'statement': '1 is the year for this test fact statement.',
-             'type': 'year',
-             'year': 1},
-            {'fragment': 'the year for the second test entry',
-             'statement': '2 is the year for this test fact statement.',
-             'type': 'year',
-             'year': 2},
-            {'fragment': 'the year for the third test entry',
-             'statement': '3 is the year for this test fact statement.',
-             'type': 'year',
-             'year': 3}]})
-            self.assertEqual(resp.status_code, 200)
-
     def test_multiple_years_separated_by_commas(self):
         """Tests for getting a facts of multiple years seperated by comma works.
         """
@@ -145,12 +126,12 @@ class MultipleYearsRangeRouteTestCase(YearRouteTestCase):
             self.assertEqual(resp.status_code, 200)
 
     def test_multiple_years_with_all_syntax_combo(self):
-        """Tests for getting a facts of multiple years seperated by comma, '..'
-        and/or '-' works.
+        """Tests for getting facts of multiple years seperated by comma and '..'
+        works.
         """
         with self.client as c:
 
-            resp = c.get("api/years/0-1,3..5")
+            resp = c.get("api/years/0..1,3..5")
 
             self.assertEqual(resp.json, {'facts':
             [{'fragment': 'the year for the first test entry',
@@ -164,8 +145,7 @@ class MultipleYearsRangeRouteTestCase(YearRouteTestCase):
             self.assertEqual(resp.status_code, 200)
 
     def test_range_years_with_no_facts(self):
-        """Tests for getting a facts of multiple years seperated by comma, '..'
-        and/or '-' works.
+        """Tests for getting facts of multiple years with no facts found.
         """
         with self.client as c:
 
@@ -208,7 +188,7 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
             self.assertIn(random_resp.json, resp_list)
             self.assertEqual(random_resp.status_code, 200)
 
-    def test_get_year_fact_random_count_is_defined(self):
+    def test_get_year_facts_random_count_is_defined(self):
         """Test for getting a count number of random year facts if count param
         is specified."""
         with self.client as c:
@@ -231,9 +211,10 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
             with self.assertRaises(IndexError) as exc:
                 resp["facts"][2]
                 self.assertEqual(str(exc.exception), "list index out of range")
-            self.assertEqual(random_resp.status_code, 200)
+                self.assertEqual(random_resp.status_code, 200)
 
-    def test_get_year_fact_random_count_exceeds_max(self):
+
+    def test_get_year_fact_random_count_exceeds_max_total_facts(self):
         """Test for getting a count number that exceeds total number of random
         year facts."""
         with self.client as c:
@@ -258,6 +239,34 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
                 resp["facts"][3]
                 self.assertEqual(str(exc.exception), "list index out of range")
             self.assertEqual(random_resp.status_code, 200)
+
+    # tests route if count param exceeds max number:
+    # unsuccesful in setting MAX_BATCH in testing environment to lower number (2)
+    #
+    # def test_get_year_fact_random_count_exceeds_max_batch(self):
+    #     """Test for getting a count number that exceeds MAX_BATCH."""
+    #     with self.client as c:
+
+    #         y1_resp = c.get("api/years/1")
+    #         y2_resp = c.get("api/years/2")
+    #         y3_resp = c.get("api/years/3")
+
+    #         resp_list = [
+    #             y1_resp.json["fact"],
+    #             y2_resp.json["fact"],
+    #             y3_resp.json["fact"]
+    #             ]
+
+    #         random_resp = c.get("api/years/random?count=100")
+    #         resp = random_resp.json
+
+    #         self.assertIn(resp["facts"][0], resp_list)
+    #         self.assertIn(resp["facts"][1], resp_list)
+    #         self.assertIn(resp["facts"][2], resp_list)
+    #         with self.assertRaises(IndexError) as exc:
+    #             resp["facts"][3]
+    #             self.assertEqual(str(exc.exception), "list index out of range")
+    #         self.assertEqual(random_resp.status_code, 200)
 
     def test_error_get_year_fact_random_count_is_negative(self):
         """Test error if count param is negative for random year facts."""

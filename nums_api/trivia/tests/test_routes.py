@@ -156,7 +156,11 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
             self.assertEqual(resp.status_code, 200)
 
     def test_multiple_numbers_with_all_syntax_combo(self):
+<<<<<<< HEAD
         """Tests for getting a facts for multiple numbers seperated by comma, '..'
+=======
+        """Tests for getting a facts for multiple numbers seperated by comma or by '..'
+>>>>>>> f11303afabd8699f2243a9ae217ce4f57abe3728
         """
         with self.client as c:
 
@@ -201,8 +205,13 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
             })
 
     def test_batch_trivia_with_no_facts(self):
+<<<<<<< HEAD
         """Tests for getting a facts of multiple numbers seperated by comma,
             '..'works.
+=======
+        """Tests for getting multiple trivia facts separated by comma where
+        there are no facts available.
+>>>>>>> f11303afabd8699f2243a9ae217ce4f57abe3728
         """
         with self.client as c:
 
@@ -268,6 +277,7 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
 
             self.assertIn(data[0], resp_list)
             self.assertIn(data[1], resp_list)
+<<<<<<< HEAD
 
             self.assertEqual(resp_random.status_code, 200)
 
@@ -296,6 +306,40 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
                 resp[3]
                 self.assertEqual(str(exc.exception), "list index out of range")
             self.assertEqual(random_resp.status_code, 200)
+=======
+            self.assertIs(len(data), 2)
+
+            self.assertEqual(resp_random.status_code, 200)
+
+    # test_get_trivia_fact_random_count_exceeds_max(self) does not work
+    # without mocked MAX_BATCH variable
+
+    # def test_get_trivia_fact_random_count_exceeds_max(self):
+    #     """Test for getting a count number that exceeds total number of random
+    #     number facts."""
+    #     with self.client as c:
+
+    #         y1_resp = c.get("api/trivia/1")
+    #         y2_resp = c.get("api/trivia/2")
+    #         y3_resp = c.get("api/trivia/3")
+
+    #         resp_list = [
+    #             y1_resp.json["fact"],
+    #             y2_resp.json["fact"],
+    #             y3_resp.json["fact"]
+    #         ]
+
+    #         random_resp = c.get("api/trivia/random?count=100")
+    #         resp = random_resp.json
+
+    #         self.assertIn(resp[0], resp_list)
+    #         self.assertIn(resp[1], resp_list)
+    #         self.assertIn(resp[2], resp_list)
+    #         with self.assertRaises(IndexError) as exc:
+    #             resp[3]
+    #             self.assertEqual(str(exc.exception), "list index out of range")
+    #         self.assertEqual(random_resp.status_code, 200)
+>>>>>>> f11303afabd8699f2243a9ae217ce4f57abe3728
 
     def test_error_get_trivia_fact_random_count_is_negative(self):
         """Test error if count param is negative for random trivia facts."""

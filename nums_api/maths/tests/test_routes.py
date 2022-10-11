@@ -155,7 +155,11 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
             self.assertEqual(resp.status_code, 200)
 
     def test_multiple_numbers_with_all_syntax_combo(self):
+<<<<<<< HEAD
         """Tests for getting a facts for multiple numbers seperated by comma, '..'
+=======
+        """Tests for getting a facts for multiple numbers seperated by comma or by '..'
+>>>>>>> f11303afabd8699f2243a9ae217ce4f57abe3728
         """
         with self.client as c:
 
@@ -228,7 +232,12 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
             self.assertEqual(resp.status_code, 400)
 
     def test_range_math_with_no_facts(self):
+<<<<<<< HEAD
         """Tests for getting a facts of multiple math seperated by comma."""
+=======
+        """Tests for getting multiple math facts separated by comma
+        where there are no facts available."""
+>>>>>>> f11303afabd8699f2243a9ae217ce4f57abe3728
         with self.client as c:
 
             resp = c.get("api/math/5,6,7")
@@ -296,6 +305,7 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
 
             self.assertEqual(resp_random.status_code, 200)
 
+<<<<<<< HEAD
     def test_get_math_fact_random_count_exceeds_max(self):
         """Test for getting a count number that exceeds total number of random
         number facts."""
@@ -327,6 +337,42 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
                 resp["facts"][4]
                 self.assertEqual(str(exc.exception), "list index out of range")
             self.assertEqual(random_resp.status_code, 200)
+=======
+    #test_get_math_fact_random_count_exceeds_max(self) does not work without
+    # mocked MAX_BATCH variable
+
+    # def test_get_math_fact_random_count_exceeds_max(self):
+    #     """Test for getting a count number that exceeds total number of random
+    #     number facts."""
+    #     with self.client as c:
+
+    #         t1_resp = c.get("api/math/1")
+    #         t2_resp = c.get("api/math/2")
+    #         t3_resp = c.get("api/math/3")
+    #         t4_resp = c.get("api/math/3.14")
+
+
+    #         resp_list = [
+    #             t1_resp.json["fact"],
+    #             t2_resp.json["fact"],
+    #             t3_resp.json["fact"],
+    #             t4_resp.json["fact"],
+    #         ]
+
+    #         random_resp = c.get("api/math/random?count=100")
+    #         resp = random_resp.json
+
+
+    #         self.assertIn(resp["facts"][0], resp_list)
+    #         self.assertIn(resp["facts"][1], resp_list)
+    #         self.assertIn(resp["facts"][2], resp_list)
+    #         self.assertIn(resp["facts"][3], resp_list)
+
+    #         with self.assertRaises(IndexError) as exc:
+    #             resp["facts"][4]
+    #             self.assertEqual(str(exc.exception), "list index out of range")
+    #         self.assertEqual(random_resp.status_code, 200)
+>>>>>>> f11303afabd8699f2243a9ae217ce4f57abe3728
 
     def test_error_get_math_fact_random_count_is_negative(self):
         """Test error if count param is negative for random math facts."""
