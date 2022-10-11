@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask_mail import Mail
 
-from nums_api.config import DATABASE_URL
+from nums_api.config import DATABASE_URL, EMAIL_PASSWORD
 from nums_api.database import connect_db
 from nums_api.trivia.routes import trivia
 from nums_api.maths.routes import math
@@ -21,18 +21,18 @@ app.config['SQLALCHEMY_ECHO'] = True
 
 
 # flask-mail config
-mail = Mail(app)
 # creating instance here (if not get key error mail) but not imported so ???
 # cant access class methods connect and send...
-app.config['MAIL_SERVER']='localhost'
-app.config['MAIL_PORT'] = 25
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = None
-app.config['MAIL_PASSWORD'] = None
-app.config['MAIL_DEFAULT_SENDER'] = None
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'r27numbersapi@gmail.com'
+app.config['MAIL_PASSWORD'] = 'ajhnmxljpktmupks'
+app.config['MAIL_DEFAULT_SENDER'] = 'r27numbersapi@gmail.com'
 app.config['MAIL_SUPPRESS_SEND'] = app.testing
 app.config['MAIL_DEBUG'] = app.debug
+mail = Mail(app)
 
 # register blueprints
 app.register_blueprint(root)
