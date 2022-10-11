@@ -30,19 +30,27 @@ $("#search-link").on("click", function (evt) {
 async function updateResultTextAndCounter() {
     const text = $("#search-text").val();
     const respData = await getFacts(text);
+    
+    console.log('resp', respData);
 
     if (respData.error) {
         $("#result-temporary-text").text(respData.error.message);
         return;
     }
 
-    if (!respData.fact.number) {
-        updateCounter(respData.fact.year);
-    } else {
-        updateCounter(respData.fact.number);
+    try {
+        if (!respData.fact.number) {
+            updateCounter(respData.fact.year);
+        } else {
+            updateCounter(respData.fact.number);
+        }
+        
+        $("#result-temporary-text").text(respData.fact.statement);
     }
-
-    $("#result-temporary-text").text(respData.fact.statement);
+    catch (error) {
+        const errorMessage = "Uh oh, we don't understand that URL. Maybe read the API docs below?"
+        $("#result-temporary-text").text(errorMessage);
+    }
 }
 
 /**
@@ -165,7 +173,14 @@ async function getFacts(address) {
     // } else {
     //     resp = await axios.get(BASE_URL + address);
     // }
-    const resp = await axios.get(BASE_URL + address);
-
-    return resp.data;
+    
+    let resp;
+    
+    try {
+        resp = await axios.get(BASE_URL + address);
+        return resp.data;
+    }
+    catch (error) {
+        return error.response.data
+    }
 }
