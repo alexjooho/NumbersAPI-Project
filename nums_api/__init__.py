@@ -11,13 +11,17 @@ from nums_api.root.routes import root
 from nums_api.tracking.models import Tracking
 from nums_api.dates.models import Date
 from nums_api.twilio.twilio import sms
+from flask_ngrok import run_with_ngrok
 
 # create app and add configuration
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
+run_with_ngrok(app)
 
+if __name__ == "__main__":
+    app.run()
 
 # register blueprints
 app.register_blueprint(root)
