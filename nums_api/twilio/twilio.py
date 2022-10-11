@@ -2,7 +2,7 @@ import os
 from twilio.rest import Client
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, Blueprint
-from twilio.twiml.messaging_response import MessagingResponse
+from twilio.twiml.messaging_response
 
 # load .env environment variables
 load_dotenv()
@@ -12,6 +12,8 @@ sms = Blueprint("sms", __name__)
 ACCOUNT_SID = os.environ['ACCOUNT_SID']
 AUTH_TOKEN = os.environ['AUTH_TOKEN']
 FROM_NUMBER = os.environ['FROM_NUMBER']
+TO_NUMBER = os.environ['TO_NUMBER']
+
 
 client = Client(ACCOUNT_SID, AUTH_TOKEN)
 
@@ -34,7 +36,7 @@ def incoming_sms():
         msg = "Please type Fact to get a random fact"
 
     message = client.messages.create(
-    to="+14088212518",
+    to=TO_NUMBER,
     from_=FROM_NUMBER,
     body=msg)
 
