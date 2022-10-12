@@ -11,7 +11,7 @@ from nums_api.root.routes import root
 from nums_api.tracking.models import Tracking
 from nums_api.dates.models import Date
 from nums_api.twilio.twilio import sms
-from flask_ngrok import run_with_ngrok
+from flask_ngrok2 import run_with_ngrok
 
 # create app and add configuration
 app = Flask(__name__)

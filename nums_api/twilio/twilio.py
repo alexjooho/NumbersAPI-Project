@@ -46,24 +46,25 @@ def incoming_sms():
     #             "type" : "type"
     #         }}
 
-    # Start our TwiML response
-    # resp = MessagingResponse()
 
-    # # Determine the right reply for this message
-    # if body == 'fact':
-    #     resp.message(f"interesting fact for {random_fact['error']['message']}")
-    #     return str(resp)
-    # else:
-    #     resp.message("Please type Fact to get a random fact")
-    #     return str(resp)
+    # Start our TwiML response
+    resp = MessagingResponse()
+
+    # Determine the right reply for this message
+    if body == 'fact':
+        resp.message(f"interesting fact for {random_fact['error']['message']}")
+        return str(resp)
+    else:
+        resp.message("Please type Fact to get a random fact")
+        return str(resp)
 
 
 # if __name__ == "__main__":
 #     sms.run()
 
-    message = client.messages.create(
-    to=TO_NUMBER,
-    from_=FROM_NUMBER,
-    body=random_fact['error']['message'])
+    # message = client.messages.create(
+    # to=TO_NUMBER,
+    # from_=FROM_NUMBER,
+    # body=random_fact['error']['message'])
 
-    return jsonify("hi")
+    # return jsonify("hi")
