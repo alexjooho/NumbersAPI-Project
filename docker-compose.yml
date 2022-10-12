@@ -2,16 +2,32 @@ version: "3.8"
 
 services:
 
-  database:
-    build: ./database/
-
-  website:
-    build: ./app/
-    env_file:
-      - '.env'
+  db:
+    container_name: db
+    image: postgres:14.5-alpine
     ports:
-      - '5001:5000'
-    depends_on:
-      - database
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
-    # 'postgres://{}:{}@{}:{}/{}'.format(db_user, db_pass, db_host, db_port, db_name)
+  nums_api:
+    container_name: nums_api-container
+    image: nums_api
+    build: ./app
+    ports:
+      - '5001:8000'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - FLASK_APP=nums_api
+    depends_on:
+      - db
+
+volumes:
+  pgdata: {}
+
+
+# 'postgres://{}:{}@{}:{}/{}'.format(db_user, db_pass, db_host, db_port, db_name)
