@@ -13,16 +13,17 @@ services:
       - POSTGRES_DB=postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./app/numbers_api.sql:/docker-entrypoint-initdb.d/numbers_api.sql
+      - ./numbers_api.sql:/docker-entrypoint-initdb.d/numbers_api.sql
 
   nums_api:
     container_name: nums_api
     image: nums_api
-    build: ./app
+    build: .
     ports:
-      - '5001:8000'
+      - "5001:5001"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - DATABASE_URL_TEST=""
       - FLASK_APP=nums_api
     depends_on:
       - db

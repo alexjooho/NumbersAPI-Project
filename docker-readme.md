@@ -6,7 +6,7 @@ $ docker build -t postgres-db ./
 # Run the docker image
 $ docker run -d --name postgresdb-container -p 5432:5432 postgres-db
 # Open image and db in interactive mode
-$ docker exec -it <image id> bash
+$ docker exec -it <conatainer-name> bash
 # Connect to psql
 $ psql -U postgres-->
 
@@ -14,7 +14,7 @@ $ psql -U postgres-->
 <!--
 # Run this in the parent directory
 $ docker build -t <container-name> -f app/Dockerfile .
-$ docker run -d -p 5001:5000 <container-name>
+$ docker run -d -p 5001:8000 <container-name>
 # Check in browser port 5001 or the port it's mapped to -->
 
 
