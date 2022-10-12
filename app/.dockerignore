@@ -5,7 +5,8 @@
 # **/.env
 **/.ssh
 Dockerfile
-README.rst
+readme.rst
+docker-readme.md
 docker-compose.yml
 **/.DS_Store
 **/venv
