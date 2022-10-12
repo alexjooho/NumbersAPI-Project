@@ -9,7 +9,8 @@ from nums_api.dates.routes import dates
 from nums_api.years.routes import years
 from nums_api.root.routes import root
 from nums_api.tracking.models import Tracking
-from nums_api.dates.models import Date
+from nums_api.helpers.batch import get_batch_nums
+from nums_api.helpers.dates_batch import get_batch_dates
 
 # create app and add configuration
 app = Flask(__name__)
@@ -30,36 +31,48 @@ app.register_blueprint(years, url_prefix='/api/years')
 def track_request(response):
     """Track request item and category, update total number of requests in DB."""
     
-    #TODO: Either add logic to handle batch requests or explicitly exclude (once batch requests PRs are complete).
-    
     PATH_SPLIT_INDEX = 5
     
-    #if route was invalid, return response and do not write to DB:
+    # ignore responses from requests for things like css files
     try:
-        response_value = response.get_data()
         if not response.json:
             return response
     except:
-        print("css error")
+        pass
 
-    #ensure route is parsable, otherwise return:
+    # ignore invalid requests like /api/math/banana
+    # also ignores requests to routes that don't have data like /api/math/23423423
+    try:
+        response.json["error"]
+        return response
+    except:
+        pass
+
+    # ensure route is parsable (/api/category/req_item(s)), otherwise return:
     try:
         [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
     except ValueError:
-        print('enter')
         return response
     
-    #ignore responses for random:
+    # ignore responses for random:
     if req_item == "random":
         return response
 
-    #convert dates to whole numbers:
-    if category == "dates":
-        [month, day] = req_item.split("/")
-        req_item = Date.date_to_day_of_year(int(month), int(day))
+    # req_item can be a single number like "5", or a batch request like "1..5, 9"
+    # for simplicity, pass either format to get_batch_nums or get_batch_dates since 
+    # there is useful logic there for converting dates and handing ints and floats
+    if category != "dates":
+        # takes in a string of numbers like "1..3, 5" and sets batch_container 
+        # equal to a list of every number implied by the ".." like: [1, 2, 3, 5]
+        batch_container = get_batch_nums(req_item)
+    else:
+        # takes in dates like "1/1..1/3, 1/5" and sets batch_container equal to a 
+        # list of days represented as one of 366 like: [1, 2, 3, 5]
+        batch_container = get_batch_dates(req_item)
 
-    #write to DB:
-    Tracking.update_request_count(req_item, category)
+    # loop through batch_container and write to DB:
+    for item in batch_container:
+        Tracking.update_request_count(item, category)
 
     return response
     
