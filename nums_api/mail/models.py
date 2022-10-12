@@ -17,11 +17,9 @@ class Email(db.Model):
         unique=True,
     )
 
-
     @classmethod
     def subscribe(cls, email):
-        """Add email to mailing list.
-        """
+        """Add email to mailing list."""
 
         email = Email(
             email=email,

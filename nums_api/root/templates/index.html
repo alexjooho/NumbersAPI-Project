@@ -39,6 +39,8 @@
 <body>
   <div id="body-inner">
     <div class="body-container">
+      {% extends "flash.html" %}
+      {% block body %}
       <div id="logo-outer">
         <h1 class="logo">
           Numbers
@@ -149,25 +151,26 @@
           {{ documentation|safe }}
         </div>
       </section>
-    </div>
 
-    <div class="row justify-content-md-center">
-      <div class="col-md-7 col-lg-5">
-        <h2 class="join-message">Join the Numbers API mailing list.</h2>
-        <p>Get weekly updates on new facts</p>
-        <form method="POST" action="/">
-          {{ form.hidden_tag() }}
+      <section id="mailing-list">
+        <div id="mailing">
+          <h2 class="join-message">Join the Numbers API mailing list.</h2>
+          <p>Get weekly updates on new facts</p>
+          <form method="POST" action="/">
+            {{ form.hidden_tag() }}
 
-          {% for field in form if field.widget.input_type != 'hidden' %}
+            {% for field in form if field.widget.input_type != 'hidden' %}
             {% for error in field.errors %}
-              <span class="text-danger">{{ error }}</span>
+            <span class="text-danger">{{ error }}</span>
             {% endfor %}
             {{ field(placeholder=field.label.text, class="form-control") }}
-          {% endfor %}
+            {% endfor %}
 
-          <button class="btn btn-primary btn-lg">Sign me up!</button>
-        </form>
-      </div>
+            <button class="btn btn-primary btn-lg">Sign me up!</button>
+          </form>
+          {% endblock %}
+        </div>
+      </section>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>

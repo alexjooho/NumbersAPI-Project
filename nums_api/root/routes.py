@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, flash, redirect
 from nums_api.mail.models import Email
-from datetime import date
-
 from nums_api.mail.forms import EmailAddForm
+
+# from datetime import date
 # import requests
 import markdown
 
@@ -31,12 +31,13 @@ def homepage():
     if form.validate_on_submit():
         email = Email.subscribe(
             form.email.data)
-        print("***********", email)
-        if email:
-            flash(f"{email} added!", "success")
-            return redirect("/")
 
-        flash("Invalid email.", 'danger')
+        if email:
+            flash(f"{email.email} added!", "success")
+
+        else: flash("Invalid email.", 'danger')
+
+        return redirect("/")
 
     return render_template('index.html',
                             documentation=html,
