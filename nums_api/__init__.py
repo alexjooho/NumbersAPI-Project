@@ -10,27 +10,12 @@ from nums_api.years.routes import years
 from nums_api.root.routes import root
 from nums_api.tracking.models import Tracking
 from nums_api.dates.models import Date
-from nums_api.twilio.twilio import sms
 from flask_ngrok2 import run_with_ngrok
 
-import os
-from twilio.rest import Client
-from dotenv import load_dotenv
-# from flask import request, Blueprint, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
 import requests
 
-load_dotenv()
-
-# sms = Blueprint("sms", __name__)
-
-ACCOUNT_SID = os.environ['ACCOUNT_SID']
-AUTH_TOKEN = os.environ['AUTH_TOKEN']
-FROM_NUMBER = os.environ['FROM_NUMBER']
-TO_NUMBER = os.environ['TO_NUMBER']
-
-client = Client(ACCOUNT_SID, AUTH_TOKEN)
-
+# Replace URL with production/live URL
 RANDOM_TRIVIA_FACT_URL = "http://localhost:5002/api/trivia/random"
 
 # create app and add configuration
@@ -49,7 +34,6 @@ app.register_blueprint(trivia, url_prefix='/api/trivia')
 app.register_blueprint(math, url_prefix='/api/math')
 app.register_blueprint(dates, url_prefix='/api/dates')
 app.register_blueprint(years, url_prefix='/api/years')
-# app.register_blueprint(sms, url_prefix='/api/sms')
 
 # request tracking
 @app.after_request
@@ -87,37 +71,37 @@ def track_request(response):
 
 @app.route("/api/sms", methods=['GET', 'POST'])
 def incoming_sms():
-    """Send a dynamic reply to an incoming text message"""
+    """Send a dynamic reply back to a user from an incoming text message
+    If incoming text message is 'fact', user will recieve a random trivia fact text
+    If incoming text message is not 'fact', user will recieve a text message
+    prompting "Please text 'fact' to get a random fact"
+    """
     # Get the message the user sent our Twilio number
-    # txt = request.values.get('Body')
+    txt = request.values.get('Body').lower()
 
-    print("THIS IS THE TXT")
-
-    body = request.data.decode('utf8').lower()
-    breakpoint()
-    response = requests.get("http://localhost:5001/api/math/1")
+    # When database is updated, use below line to get fact. When website is live,
+    # replace RANDOM_TRIVIA_FACT_URL with production/live URL for random trivia fact
+    # response = requests.get(RANDOM_TRIVIA_FACT_URL)
+    # When database is updated, delete line directly below
+    response = requests.get("http://localhost:5001/api/trivia/1")
 
     random_fact = response.json()
 
-    # Returns json:
-    #         { fact:{
-    #             "number" : number,
-    #             "fragment" : "fragment",
-    #             "statement" : "statement",
-    #             "type" : "type"
-    #         }}
-
-
     # Start our TwiML response
     resp = MessagingResponse()
-    # resp.message("Hello")
-    # Determine the right reply for this message
-    if body == 'fact':
-        resp.message(f"interesting fact for {random_fact['error']['message']}")
 
+    # # When database is updated, use this instead to get fact statement
+    # # Determine the right reply for this message
+    # if txt == 'fact':
+    #     resp.message(f"{random_fact['fact']['statement']}")
+    # else:
+    #     resp.message("Please text 'fact' to get a random fact")
+
+    # When database is updated, delete below if/else statement
+    if txt == 'fact':
+        resp.message(f"interesting fact for {random_fact['error']['message']}")
     else:
         resp.message("Please type Fact to get a random fact")
-
 
     return str(resp)
 
