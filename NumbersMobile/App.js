@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import axios from 'axios';
 
 export default function App() {
   const [isLoading, setLoading] = useState(true);
@@ -8,9 +9,11 @@ export default function App() {
 
   const getRandomFact = async () => {
     try {
-      const response = await fetch ('http://localhost:5001/api/trivia/random');
-      const json = await response.json();
-      setData(json.fact.statement);
+      console.log('entering try block')
+      const response = await axios('http://numbersapi.com/23/trivia?fragment');
+      // const response = await axios('http://172.24.21.34:5001/api/trivia/random');
+      console.log('json:', response.data)
+      setData(response.data);
     }
     catch (error) {
       console.log(error);
@@ -27,7 +30,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
-      {isLoading ? <ActivityIndicator/> : (
+      {isLoading ? <Text>IS LOADING</Text> : (
         <Text>{data}</Text>
       ) }
       <StatusBar style="auto" />
