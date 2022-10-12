@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask_mail import Mail
 
-from nums_api.config import DATABASE_URL, EMAIL_PASSWORD
+from nums_api.config import DATABASE_URL, EMAIL_PASSWORD, SECRET_KEY
 from nums_api.database import connect_db
 from nums_api.trivia.routes import trivia
 from nums_api.maths.routes import math
@@ -18,6 +18,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
+app.config['SECRET_KEY'] = SECRET_KEY
 
 
 # flask-mail config

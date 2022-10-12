@@ -1,12 +1,15 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, flash, redirect
+from nums_api.mail.models import Email
 from datetime import date
+
+from nums_api.mail.forms import EmailAddForm
 # import requests
 import markdown
 
 root = Blueprint("root", __name__, template_folder='templates',
                  static_folder='static')
 
-@root.get("/")
+@root.route("/", methods=["GET", "POST"])
 def homepage():
     """Show homepage:
         - Renders API docs from a markdown file to Jinja Templates.
@@ -17,11 +20,25 @@ def homepage():
     # date_data = resp.json()
     # couldn't use this yet because no database data
 
+
     with open("nums_api/documentation.md", "r", encoding="utf-8") as file:
         text = file.read()
 
     html = markdown.markdown(text, output_format="xhtml",
                              extensions=["fenced_code"])
+    form = EmailAddForm()
+
+    if form.validate_on_submit():
+        email = Email.subscribe(
+            form.email.data)
+        print("***********", email)
+        if email:
+            flash(f"{email} added!", "success")
+            return redirect("/")
+
+        flash("Invalid email.", 'danger')
 
     return render_template('index.html',
-                            documentation=html)
+                            documentation=html,
+                            form=form)
+
