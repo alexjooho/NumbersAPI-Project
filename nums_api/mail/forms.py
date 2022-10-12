@@ -10,4 +10,6 @@ class CSRFProtection(FlaskForm):
 class EmailAddForm(FlaskForm):
     """Form for adding subscription emails."""
 
-    email = StringField('E-mail', validators=[DataRequired(), Email()])
+    email = StringField('E-mail', validators=[
+        DataRequired(),
+        Email(message='Please input a valid e-mail address')])

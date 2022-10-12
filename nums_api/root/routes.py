@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, flash, redirect
 from nums_api.mail.models import Email
 from nums_api.mail.forms import EmailAddForm
+from nums_api.database import db
+from sqlalchemy.exc import IntegrityError
 
 # from datetime import date
 # import requests
@@ -29,14 +31,19 @@ def homepage():
     form = EmailAddForm()
 
     if form.validate_on_submit():
-        email = Email.subscribe(
-            form.email.data)
+        try:
+            email = Email.subscribe(form.email.data)
+            db.session.commit()
+        except IntegrityError:
+            flash("Email already added", 'danger')
+            return render_template('index.html',
+                            documentation=html,
+                            form=form)
 
         if email:
             flash(f"{email.email} added!", "success")
-
-        else: flash("Invalid email.", 'danger')
-
+        else:
+            flash("Invalid email.", 'danger')
         return redirect("/")
 
     return render_template('index.html',
