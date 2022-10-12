@@ -6,7 +6,6 @@ from wtforms.validators import DataRequired, Email
 class CSRFProtection(FlaskForm):
     """CSRFProtection form, intentionally left blank."""
 
-
 class EmailAddForm(FlaskForm):
     """Form for adding subscription emails."""
 

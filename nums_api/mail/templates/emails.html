@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numbers API - weekly email</title>
+</head>
+<body>
+
+<h1>New number facts of the week</h1>
+
+<!--Date facts---------------------------------------->
+<h2>Date facts</h2>
+{% if date_facts %}
+<ul>
+  {% for fact in date_facts %}
+  <li> {{ fact.fact_statement }} </li>
+  {% endfor %}
+</ul>
+{% else %}
+  <p>No new facts added this week</p>
+{% endif %}
+
+<!--Math facts---------------------------------------->
+<h2>Math facts</h2>
+{% if math_facts %}
+<ul>
+  {% for fact in math_facts %}
+  <li> {{ fact.fact_statement }} </li>
+  {% endfor %}
+</ul>
+{% else %}
+  <p>No new facts added this week</p>
+{% endif %}
+
+<!--Trivia facts---------------------------------------->
+<h2>Trivia facts</h2>
+{% if trivia_facts %}
+<ul>
+  {% for fact in trivia_facts %}
+  <li> {{ fact.fact_statement }} </li>
+  {% endfor %}
+</ul>
+{% else %}
+  <p>No new facts added this week</p>
+{% endif %}
+
+<!--Year facts---------------------------------------->
+<h2>Year facts</h2>
+{% if year_facts %}
+<ul>
+  {% for fact in year_facts %}
+  <li> {{ fact.fact_statement }} </li>
+  {% endfor %}
+</ul>
+{% else %}
+  <p>No new facts added this week</p>
+{% endif %}
+
+</body>
+</html>

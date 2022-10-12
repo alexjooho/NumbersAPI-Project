@@ -22,8 +22,6 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 
 # flask-mail config
-# creating instance here (if not get key error mail) but not imported so ???
-# cant access class methods connect and send...
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_TLS'] = False
@@ -33,6 +31,7 @@ app.config['MAIL_PASSWORD'] = EMAIL_PASSWORD
 app.config['MAIL_DEFAULT_SENDER'] = 'r27numbersapi@gmail.com'
 app.config['MAIL_SUPPRESS_SEND'] = app.testing
 app.config['MAIL_DEBUG'] = app.debug
+app.config['MAIL_ASCII_ATTACHMENTS'] : True
 mail = Mail(app)
 
 # register blueprints

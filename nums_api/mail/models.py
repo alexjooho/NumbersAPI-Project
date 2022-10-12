@@ -1,7 +1,7 @@
 from nums_api.database import db
 
 class Email(db.Model):
-    """User in the system."""
+    """Emails in the system."""
 
     __tablename__ = 'emails'
 
