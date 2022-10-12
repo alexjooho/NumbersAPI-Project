@@ -13,9 +13,10 @@ services:
       - POSTGRES_DB=postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./app/numbers_api.sql:/docker-entrypoint-initdb.d/numbers_api.sql
 
   nums_api:
-    container_name: nums_api-container
+    container_name: nums_api
     image: nums_api
     build: ./app
     ports:

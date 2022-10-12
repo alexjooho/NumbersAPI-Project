@@ -1,10 +1,12 @@
-FROM python:3
-
-WORKDIR /nums_api
+FROM python:3.8
 
 COPY ./requirements.txt ./
 
 RUN pip3 install -r requirements.txt
+
+RUN mkdir /nums_api
+
+WORKDIR /nums_api
 
 COPY . .
 
