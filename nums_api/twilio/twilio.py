@@ -32,11 +32,15 @@ RANDOM_TRIVIA_FACT_URL = "http://localhost:5002/api/trivia/random"
 def incoming_sms():
     """Send a dynamic reply to an incoming text message"""
     # Get the message the user sent our Twilio number
-    body = request.data.decode('utf8').lower()
+    # txt = request.values.get('Text')
 
-    response = requests.get("http://localhost:5002/api/math/1")
+    print("THIS IS THE TXT")
 
-    random_fact = response.json()
+    # body = request.data.decode('utf8').lower()
+
+    # response = requests.get("http://localhost:5001/api/math/1")
+
+    # random_fact = response.json()
 
     # Returns json:
     #         { fact:{
@@ -49,14 +53,16 @@ def incoming_sms():
 
     # Start our TwiML response
     resp = MessagingResponse()
-
+    resp.message("Hello")
     # Determine the right reply for this message
-    if body == 'fact':
-        resp.message(f"interesting fact for {random_fact['error']['message']}")
-        return str(resp)
-    else:
-        resp.message("Please type Fact to get a random fact")
-        return str(resp)
+    # if body == 'fact':
+    #     resp.message(f"interesting fact for {random_fact['error']['message']}")
+
+    # else:
+    #     resp.message("Please type Fact to get a random fact")
+
+
+    return str(resp)
 
 
 # if __name__ == "__main__":
