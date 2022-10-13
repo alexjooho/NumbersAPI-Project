@@ -40,3 +40,33 @@ class Year (db.Model):
         db.Boolean,
         nullable=False,
     )
+    
+class YearLike(db.Model):
+    """Likes for year facts about numbers."""
+
+    __tablename__ = "year_likes"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    
+    fact_id = db.Column(
+        db.Integer,
+        db.ForeignKey("years.id")
+    )
+    
+    category = db.Column(
+        db.String(5),
+        nullable=False,
+        default="year"
+    )
+    
+    like_timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
+
+    like = db.relationship("Year", backref="likes")

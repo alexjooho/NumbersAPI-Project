@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
-from nums_api.years.models import Year
+from sqlalchemy import and_
+from nums_api.database import db
+from nums_api.years.models import Year, YearLike
 import random
 import re
 from nums_api.helpers.batch import get_batch_nums
@@ -212,3 +214,72 @@ def get_year_fact_random():
         facts.append(fact)
 
     return jsonify(facts=facts)
+
+@years.post("/like")
+def like_year_fact():
+    """
+    Allows users to like a specific fact.
+    
+    Accepts JSON:
+        { "fact": {
+            "year": number,
+            "statement": "fact_statement",
+        }}
+        
+    If matching year is invalid or fact statement are not provided, 
+    returns error JSON, i.e:
+            { "error": {
+                    "message": "Invalid year",
+                    "status": 400
+            }}
+        OR
+            { "error": {
+                    "message": "No matching fact found for 4."
+                    "status": 400
+            }}
+
+    If successful, returns 201 and success message:
+        {
+            "status": "success"
+        }
+    """
+    
+    #TODO: JSON validation, currently route will accept any additional JSON not specified in docstring.
+
+    try:
+        fact_year = int(request.json["fact"]["year"])
+    except ValueError:
+        return (jsonify(
+            error={
+                "message": "Invalid year",
+                "status": 400
+            }), 400)
+
+    try:
+        fact_statement = request.json["fact"]["statement"] 
+    except KeyError:
+        return (jsonify(
+            error={
+                "message": "Please provide a fact statement",
+                "status": 400
+            }), 400)
+
+    fact = Year.query.filter(
+            and_(
+                Year.year == fact_year,
+                Year.fact_statement.like(fact_statement)
+                )).first()    
+
+    if not fact:
+        return (jsonify(error={
+                "message": f"No matching fact found for {fact_year}.",
+                "status": 400
+            }), 400)   
+    
+    else: 
+        new_like = YearLike(fact_id=fact.id)
+        db.session.add(new_like)
+        db.session.commit()
+        return jsonify(status="success"), 201
+ 
+    

@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
-from nums_api.trivia.models import Trivia
+from sqlalchemy import and_
+from nums_api.database import db
+from nums_api.trivia.models import Trivia, TriviaLike
 from random import choice
 import random
 import re
@@ -206,3 +208,72 @@ def get_trivia_fact_random():
         facts.append(fact)
 
     return jsonify(facts)
+
+@trivia.post("/like")
+def like_trivia_fact():
+    """
+    Allows users to like a specific fact.
+    
+    Accepts JSON:
+        { "fact": {
+            "number": number,
+            "statement": "fact_statement",
+        }}
+        
+    If matching number is invalid or fact statement are not provided, 
+    returns error JSON, i.e:
+            { "error": {
+                    "message": "Invalid number",
+                    "status": 400
+            }}
+        OR
+            { "error": {
+                    "message": "No matching fact found for 4."
+                    "status": 400
+            }}
+
+    If successful, returns 201 and success message:
+        {
+            "status": "success"
+        }
+    """
+    
+    #TODO: JSON validation, currently route will accept any additional JSON not specified in docstring.
+
+    try:
+        fact_number = int(request.json["fact"]["number"])
+    except ValueError:
+        return (jsonify(
+            error={
+                "message": "Invalid number",
+                "status": 400
+            }), 400)
+
+    try:
+        fact_statement = request.json["fact"]["statement"] 
+    except KeyError:
+        return (jsonify(
+            error={
+                "message": "Please provide a fact statement.",
+                "status": 400
+            }), 400)
+
+    fact = Trivia.query.filter(
+            and_(
+                Trivia.number == fact_number,
+                Trivia.fact_statement.like(fact_statement)
+                )).first()    
+
+    if not fact:
+        return (jsonify(error={
+                "message": f"No matching fact found for {fact_number}.",
+                "status": 400
+            }), 400)   
+    
+    else: 
+        new_like = TriviaLike(fact_id=fact.id)
+        db.session.add(new_like)
+        db.session.commit()
+        return jsonify(status="success"), 201
+ 
+    

@@ -235,20 +235,21 @@ def like_date_fact():
     
     Accepts JSON:
         { "fact": {
-            "number": 1,
+            "number": 100,
             "year": 2000,
             "statement": "fact_statement"
         }}
         
     If matching number is invalid or fact statement are not provided, 
-    returns error JSON:
+    returns error JSON, i.e.:
             { "error": {
                     "message": "Invalid number for date. Please format as whole number",
                     "status": 400
             }}
         OR
             { "error": {
-                    "message": "No matching fact found for 4."
+                    "message": "No matching fact found for day 100 in year 2000."
+                    "status": 400
             }}
 
     If successful, returns 201 and success message:
@@ -274,7 +275,7 @@ def like_date_fact():
     except KeyError:
         return (jsonify(
             error={
-                "message": "Invalid fact statement",
+                "message": "Please provide a fact statement.",
                 "status": 400
             }), 400)
         
@@ -294,8 +295,11 @@ def like_date_fact():
                 )).first()    
 
     if not fact:
-        return jsonify(error={"message": f"No matching fact found for day {fact_number} in year {fact_year}."})   
-    
+        return (jsonify(error={
+            "message": f"No matching fact found for day {fact_number} in year {fact_year}.",
+            "status": 400
+        }), 400)   
+        
     else: 
         new_like = DateLike(fact_id=fact.id)
         db.session.add(new_like)

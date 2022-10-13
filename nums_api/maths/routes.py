@@ -234,6 +234,7 @@ def like_math_fact():
         OR
             { "error": {
                     "message": "No matching fact found for 4."
+                    "status": 400
             }}
 
     If successful, returns 201 and success message:
@@ -261,7 +262,7 @@ def like_math_fact():
     except KeyError:
         return (jsonify(
             error={
-                "message": "Invalid fact statement",
+                "message": "Please provide a fact statement",
                 "status": 400
             }), 400)
             
@@ -273,8 +274,10 @@ def like_math_fact():
                 )).first()    
 
     if not fact:
-        return jsonify(error={"message": f"No matching fact found for {fact_number}."})   
-    
+        return (jsonify(error={
+                "message": f"No matching fact found for {fact_number}.",
+                "status": 400
+            }), 400)   
     else: 
         new_like = MathLike(fact_id=fact.id)
         db.session.add(new_like)

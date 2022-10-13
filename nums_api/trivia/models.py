@@ -42,3 +42,33 @@ class Trivia(db.Model):
         db.Boolean,
         nullable=False,
     )
+
+class TriviaLike(db.Model):
+    """Likes for trivia facts about numbers."""
+
+    __tablename__ = "trivia_likes"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    
+    fact_id = db.Column(
+        db.Integer,
+        db.ForeignKey("trivia.id")
+    )
+    
+    category = db.Column(
+        db.String(7),
+        nullable=False,
+        default="trivia"
+    )
+    
+    like_timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
+
+    like = db.relationship("Trivia", backref="likes")
