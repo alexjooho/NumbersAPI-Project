@@ -10,3 +10,5 @@ An API of interesting facts about numbers and dates!
 - `Code style <docs/code-style.rst>`__
 
 - `Running and Organizing Tests <docs/test-setup.rst>`__
+
+- `Setting Up the Slack App <docs/slack-integration.md>`__
