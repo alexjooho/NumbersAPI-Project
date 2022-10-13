@@ -1,6 +1,6 @@
 from nums_api import app
 from nums_api.database import db
-from nums_api.maths.models import Math
+from nums_api.maths.models import Math, MathLike
 from nums_api.trivia.models import Trivia
 from nums_api.years.models import Year
 from nums_api.dates.models import Date
