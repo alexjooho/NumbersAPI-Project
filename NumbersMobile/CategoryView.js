@@ -9,9 +9,6 @@ const CategoryView = ({ navigation, route }) => {
   const [input, setInput] = useState("");
 
   const category = route.params.category;
-  const title = category[0].toUpperCase() + category.slice(1);
-
-  navigation.setOptions({ title });
 
   let promptText;
 
@@ -50,7 +47,7 @@ const CategoryView = ({ navigation, route }) => {
         <TextInput
           style={styles.input}
           placeholder="Type here for a fact!"
-          onChangeText={(newText) => setInput(newText)}
+          onChangeText={newText => setInput(newText)}
           onSubmitEditing={() => { getFact(input); }}>
         </TextInput>
         {fact

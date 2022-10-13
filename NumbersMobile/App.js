@@ -16,7 +16,10 @@ export default function App() {
         </Stack.Screen>
         <Stack.Screen
         name="CategoryView"
-        component={CategoryView}>
+        component={CategoryView}
+        options={({ route }) => ({
+          title: route.params.category[0].toUpperCase() +
+          route.params.category.slice(1)})}>
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
