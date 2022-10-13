@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Button, ActivityIndicator } from "react-native";
 import axios from "axios";
 import { StatusBar } from "expo-status-bar";
+import { BASE_URL } from "@env";
 
 const Home = ({ navigation }) => {
   const [isLoading, setLoading] = useState(true);
@@ -11,7 +12,8 @@ const Home = ({ navigation }) => {
   const getRandomFact = async () => {
     try {
       // const response = await axios("http://numbersapi.com/23/trivia?fragment");
-      const response = await axios("http://192.168.1.87:5001/api/trivia/random");
+      // const response = await axios("https://43ab-2603-8000-8844-a041-54e2-4dc3-95ec-96bb.ngrok.io/api/trivia/random");
+      const response = await axios(`${BASE_URL}/api/trivia/random`);
       setData(response.data.fact.statement);
     }
     catch (error) {

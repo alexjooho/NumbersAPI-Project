@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { StyleSheet, View, Text, TextInput, Keyboard, TouchableWithoutFeedback } from "react-native";
 import axios from "axios";
+import { BASE_URL } from "@env";
 
 const CategoryView = ({ navigation, route }) => {
 
@@ -27,7 +28,8 @@ const CategoryView = ({ navigation, route }) => {
 
   async function getFact(text) {
     try {
-      const response = await axios(`http://192.168.1.87:5001/api/${category}/${text}`);
+      // const response = await axios(`https://43ab-2603-8000-8844-a041-54e2-4dc3-95ec-96bb.ngrok.io/api/${category}/${text}`);
+      const response = await axios(`${BASE_URL}/api/${category}/${text}`);
       setFact(response.data.fact.statement);
     }
     catch (error) {
