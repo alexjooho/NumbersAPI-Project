@@ -10,3 +10,5 @@ An API of interesting facts about numbers and dates!
 - `Code style <docs/code-style.rst>`__
 
 - `Running and Organizing Tests <docs/test-setup.rst>`__
+
+- `Automate Sending Emails <docs/automate_emails.rst>`__
