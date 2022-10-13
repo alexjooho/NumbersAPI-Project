@@ -2,7 +2,7 @@ from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
-from nums_api.dates.models import Date
+from nums_api.dates.models import Date, DateLike
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
@@ -12,12 +12,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.drop_all()
 db.create_all()
 
-
 class DateRouteBaseTestCase(TestCase):
     def setUp(self):
         """Set up test data here"""
         self.client = app.test_client()
 
+        DateLike.query.delete()
         Date.query.delete()
 
         self.d1 = Date(
@@ -357,4 +357,97 @@ class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
             self.assertEqual(resp_random.status_code, 400)
 
 
+class DateRoutePostLikeTestCase(DateRouteBaseTestCase):          
+    def test_success_post_date_fact_like(self):
+        """Test successful POST request to like a fact"""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/dates/like", 
+                            json={"fact": {
+                                    "number": 10,
+                                    "year": 1900,
+                                    "statement": "t1 statement"
+                                }})
 
+            self.assertEqual(resp.json, {"status": "success"})
+            self.assertEqual(resp.status_code, 201)
+            
+    def test_failure_post_date_bad_date_number(self):
+        """Test successful POST request to like a fact"""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/dates/like", 
+                            json={"fact": {
+                                    "number": "BAD_NUMBER",
+                                    "year": 1900,
+                                    "statement": "t1 statement"
+                                }})
+
+            self.assertEqual(resp.json, 
+                {
+                    "error": {
+                        "message": "Invalid number for date or year. Please format as whole number.",
+                        "status": 400
+                    }
+                })
+            self.assertEqual(resp.status_code, 400)
+        
+    def test_failure_post_date_no_fact_statement(self):
+        """Test successful POST request to like a fact"""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/dates/like", 
+                            json={"fact": {
+                                    "number": 10,
+                                    "year": 1900,
+                                }})
+
+            self.assertEqual(resp.json, 
+                {
+                    "error": {
+                        "message": "Please provide a fact statement.",
+                        "status": 400
+                    }
+                })
+            self.assertEqual(resp.status_code, 400)
+            
+    def test_failure_post_date_num_too_large(self):
+        """Test successful POST request to like a fact"""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/dates/like", 
+                            json={"fact": {
+                                    "number": 400,
+                                    "year": 1900,
+                                    "statement": "t1 statement"
+                                }})
+
+            self.assertEqual(resp.json, 
+                {
+                    "error": {
+                        "message": "Date number must be less than 366.",
+                        "status": 400
+                    }
+                })
+            self.assertEqual(resp.status_code, 400)
+            
+    def test_failure_post_date_bad_fact_statement(self):
+        """Test successful POST request to like a fact"""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/dates/like", 
+                            json={"fact": {
+                                    "number": 10,
+                                    "year": 1900,
+                                    "statement": "MISMATCHED STATEMENT"
+                                }})
+
+            self.assertEqual(resp.json, 
+                {
+                    "error": {
+                        "message": "No matching fact found for day 10 in year 1900.",
+                        "status": 400
+                    }
+                })
+            self.assertEqual(resp.status_code, 400)
+            
