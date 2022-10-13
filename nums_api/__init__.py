@@ -33,6 +33,9 @@ def track_request(response):
     
     PATH_SPLIT_INDEX = 5
     
+    if request.method != 'GET':
+        return response
+    
     # ignore responses from requests for things like css files
     try:
         if not response.json:
