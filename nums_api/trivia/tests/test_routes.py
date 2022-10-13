@@ -2,7 +2,7 @@ from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
-from nums_api.trivia.models import Trivia
+from nums_api.trivia.models import Trivia, TriviaLike
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
@@ -17,6 +17,8 @@ class TriviaRouteTestCase(TestCase):
     def setUp(self):
         """Set up test data here"""
         self.client = app.test_client()
+        
+        TriviaLike.query.delete()
         Trivia.query.delete()
 
         self.t1 = Trivia(
@@ -328,3 +330,74 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
                 }})
 
             self.assertEqual(resp.status_code, 400)
+
+class TriviaRoutePostLikeTestCase(TriviaRouteTestCase):          
+    def test_success_post_trivia_fact_like(self):
+        """Test successful POST request to like a fact"""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/trivia/like", 
+                            json={"fact": {
+                                    "number": "1",
+                                    "statement": "1 is the number for this test fact statement.",
+                                }})
+
+            self.assertEqual(resp.json, {"status": "success"})
+            self.assertEqual(resp.status_code, 201)
+            
+    def test_failure_post_trivia_bad_number(self):
+        """Test POST failure when bad number provided."""
+        with app.test_client() as c:
+            
+            resp =  c.post("/api/trivia/like", 
+                            json={"fact": {
+                                    "number": "BADNUMBER",
+                                    "statement": "1 is the number for this test fact statement."
+                                }})
+
+            self.assertEqual(resp.json, 
+                    {
+                        "error": {
+                            "message": "Invalid number",
+                            "status": 400
+                        }
+                    })
+            self.assertEqual(resp.status_code, 400)
+        
+    def test_failure_post_trivia_no_fact_statement(self):
+        """Test POST failure when no fact statement is provided."""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/trivia/like", 
+                            json={"fact": {
+                                    "number": "1",
+                                }})
+
+            self.assertEqual(resp.json, 
+                    {
+                        "error": {
+                            "message": "Please provide a fact statement.",
+                            "status": 400
+                        }
+                    })
+            self.assertEqual(resp.status_code, 400)
+
+    def test_failure_post_trivia_bad_fact_statement(self):
+        """Test POST failure when number does not match existing fact statement."""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/trivia/like", 
+                            json={"fact": {
+                                    "number": 1,
+                                    "statement": "MISMATCHED STATEMENT"
+                                }})
+            
+            self.assertEqual(resp.json, 
+                {
+                    "error": {
+                        "message": "No matching fact found for 1.",
+                        "status": 400
+                    }
+                })
+            self.assertEqual(resp.status_code, 400)
+            

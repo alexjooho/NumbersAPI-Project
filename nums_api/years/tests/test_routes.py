@@ -2,7 +2,7 @@ from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
-from nums_api.years.models import Year
+from nums_api.years.models import Year, YearLike
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
@@ -19,6 +19,7 @@ class YearRouteTestCase(TestCase):
 
         self.client = app.test_client()
 
+        YearLike.query.delete()
         Year.query.delete()
 
         self.y1 = Year(
@@ -295,3 +296,74 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
                 }})
 
             self.assertEqual(resp.status_code, 400)
+            
+class YearRoutePostLikeTestCase(YearRouteTestCase):          
+    def test_success_post_year_fact_like(self):
+        """Test successful POST request to like a fact"""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/years/like", 
+                            json={"fact": {
+                                    "year": "1",
+                                    "statement": "1 is the year for this test fact statement.",
+                                }})
+
+            self.assertEqual(resp.json, {"status": "success"})
+            self.assertEqual(resp.status_code, 201)
+            
+    def test_failure_post_year_bad_number(self):
+        """Test POST failure when bad year provided."""
+        with app.test_client() as c:
+            
+            resp =  c.post("/api/years/like", 
+                            json={"fact": {
+                                    "year": "BADNUMBER",
+                                    "statement": "1 is the year for this test fact statement.",
+                                }})
+
+            self.assertEqual(resp.json, 
+                    {
+                        "error": {
+                            "message": "Invalid year",
+                            "status": 400
+                        }
+                    })
+            self.assertEqual(resp.status_code, 400)
+        
+    def test_failure_post_year_no_fact_statement(self):
+        """Test POST failure when no fact statement is provided."""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/years/like", 
+                            json={"fact": {
+                                    "year": "1",
+                                }})
+
+            self.assertEqual(resp.json, 
+                    {
+                        "error": {
+                            "message": "Please provide a fact statement.",
+                            "status": 400
+                        }
+                    })
+            self.assertEqual(resp.status_code, 400)
+
+    def test_failure_post_year_bad_fact_statement(self):
+        """Test POST failure when number does not match existing fact statement."""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/years/like", 
+                            json={"fact": {
+                                    "year": 1,
+                                    "statement": "MISMATCHED STATEMENT"
+                                }})
+            
+            self.assertEqual(resp.json, 
+                {
+                    "error": {
+                        "message": "No matching fact found for 1.",
+                        "status": 400
+                    }
+                })
+            self.assertEqual(resp.status_code, 400)
+            

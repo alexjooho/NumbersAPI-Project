@@ -2,7 +2,7 @@ from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
-from nums_api.trivia.models import Trivia
+from nums_api.trivia.models import Trivia, TriviaLike
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
@@ -15,7 +15,8 @@ db.create_all()
 class TriviaModelTestCase(TestCase):
     def setUp(self):
         """Set up test data here"""
-
+        
+        TriviaLike.query.delete()
         Trivia.query.delete()
 
         self.t1 = Trivia(
@@ -43,3 +44,49 @@ class TriviaModelTestCase(TestCase):
 
         self.assertEqual(Trivia.query.count(), 1)
         self.assertEqual(Trivia.query.filter_by(number=1).one().number, 1)
+
+
+class TriviaLikeModelTestCase(TestCase):
+    def setUp(self):
+        """Set up test data here"""
+        
+        TriviaLike.query.delete()
+        Trivia.query.delete()
+        
+        self.t1 = Trivia(
+            number=1,
+            fact_fragment="the number for this t1 test fact fragment",
+            fact_statement="1 is the number for this t1 test fact statement.",
+            was_submitted=False
+        )
+
+        db.session.add(self.t1)
+        db.session.commit()
+
+    def tearDown(self):
+        """Clean up any fouled transaction."""
+        db.session.rollback()
+
+    def test_setup(self):
+        """Test to make sure tests are set up correctly"""
+        test_setup_correct = True
+        self.assertEqual(test_setup_correct, True)
+        
+    def test_trivialike_model(self):
+        """Test creating a new TriviaLike instance and adding it to the database"""
+
+        self.assertEqual(TriviaLike.query.count(), 0)
+
+        self.fact_to_like = Trivia.query.filter_by(number=1).one()
+        
+        self.new_trivialike = TriviaLike(
+            fact_id = self.fact_to_like.id
+        )
+        
+        db.session.add(self.new_trivialike)
+        db.session.commit()
+        
+        self.assertEqual(TriviaLike.query.count(), 1)
+        self.assertEqual(TriviaLike.query.filter_by(fact_id=self.fact_to_like.id).one().category, "trivia")
+
+

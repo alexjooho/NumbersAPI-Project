@@ -62,7 +62,6 @@ class MathRouteBaseTestCase(TestCase):
         test_setup_correct = True
         self.assertEqual(test_setup_correct, True)
 
-
 class SingleMathRouteTestCase(MathRouteBaseTestCase):
     def test_get_math_fact(self):
         """Test GET route for math/number returns correct JSON response"""
@@ -98,7 +97,6 @@ class SingleMathRouteTestCase(MathRouteBaseTestCase):
             resp = client.get(url)
 
             self.assertEqual(resp.status_code, 400)
-
 
 class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
     def test_get_batch_math_fact(self):
@@ -255,7 +253,6 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
 
             self.assertEqual(resp.status_code, 400)
 
-
 class MathRouteRandomTestCase(MathRouteBaseTestCase):
     
     
@@ -362,8 +359,6 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
                 }})
 
             self.assertEqual(resp.status_code, 400)
-
-
 
 class MathRoutePostLikeTestCase(MathRouteBaseTestCase):          
     def test_success_post_math_fact_like(self):
