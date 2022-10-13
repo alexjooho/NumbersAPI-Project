@@ -3,11 +3,20 @@ from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
 from nums_api.trivia.models import Trivia
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["1 per day", "1 per hour"],
+    storage_uri="memory://",
+)
 
 db.drop_all()
 db.create_all()
@@ -57,6 +66,8 @@ class SingleTriviaRouteTestCase(TriviaRouteTestCase):
     def test_get_trivia_fact(self):
         """ Tests for getting a fact for number 1 """
         with self.client as c:
+            limiter.enabled = False
+
             resp = c.get("/api/trivia/1")
             data = resp.json
 
@@ -74,6 +85,8 @@ class SingleTriviaRouteTestCase(TriviaRouteTestCase):
     def test_error_for_number_with_no_fact(self):
         """ Tests that a number with no fact will return an error """
         with self.client as c:
+            limiter.enabled = False
+
             resp = c.get("/api/trivia/5")
             data = resp.json
 
@@ -88,6 +101,7 @@ class SingleTriviaRouteTestCase(TriviaRouteTestCase):
     def test_get_trivia_fact_invalid_number(self):
         """ Tests that an error will be thrown if an invalid number is given in URL parameter """
         with self.client as c:
+            limiter.enabled = False
             resp = c.get("/api/trivia/test")
 
             self.assertEqual(resp.status_code, 400)
@@ -97,7 +111,9 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
     def test_get_batch_Trivia_fact(self):
         """Test GET route for batch trivia facts with ".." returns correct JSON response"""
         with self.client as client:
+            limiter.enabled = False
             self.maxDiff = None
+
             resp = client.get("/api/trivia/1..3")
 
             self.assertEqual(resp.json,
@@ -132,6 +148,8 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
         by comma works.
         """
         with self.client as c:
+            limiter.enabled = False
+
             resp = c.get("/api/trivia/1,2")
 
             self.assertEqual(resp.json,
@@ -159,6 +177,7 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
         """Tests for getting a facts for multiple numbers seperated by comma or by '..'
         """
         with self.client as c:
+            limiter.enabled = False
 
             resp = c.get("api/trivia/1..2,3")
 
@@ -191,6 +210,8 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
         """Test error handling for batch trivia facts"""
 
         with self.client as c:
+            limiter.enabled = False
+
             resp = c.get("/api/trivia/TEST..TEST")
 
             self.assertEqual(resp.status_code, 400)
@@ -205,6 +226,7 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
         there are no facts available.
         """
         with self.client as c:
+            limiter.enabled = False
 
             resp = c.get("api/trivia/5,6..10")
 
@@ -218,6 +240,7 @@ class TriviaBatchRouteTestCase(TriviaRouteTestCase):
     def test_invalid_number_url_input(self):
         """Test for invalid URL input for a number."""
         with self.client as c:
+            limiter.enabled = False
 
             resp = c.get("api/trivia/TEST")
             self.assertEqual(
@@ -235,6 +258,7 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
         """Test for getting a single fact on a random number (default, no count
         param)."""
         with self.client as c:
+            limiter.enabled = False
 
             t1resp = c.get("/api/trivia/1")
             t2resp = c.get("/api/trivia/2")
@@ -254,6 +278,7 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
         """Test for getting a count number of random trivia facts if count param
         is specified."""
         with app.test_client() as client:
+            limiter.enabled = False
 
             resp1 = client.get("/api/trivia/1")
             resp2 = client.get("/api/trivia/2")
@@ -304,6 +329,7 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
     def test_error_get_trivia_fact_random_count_is_negative(self):
         """Test error if count param is negative for random trivia facts."""
         with self.client as c:
+            limiter.enabled = False
 
             resp = c.get("api/trivia/random?count=-100")
             self.assertEqual(
@@ -318,6 +344,7 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
     def test_error_get_trivia_fact_random_count_is_not_an_integer(self):
         """Test error if count param is not an integer for random trivia facts."""
         with self.client as c:
+            limiter.enabled = False
 
             resp = c.get("api/trivia/random?count=TEST")
             self.assertEqual(
@@ -328,3 +355,34 @@ class TriviaRandomRouteTestCase(TriviaRouteTestCase):
                 }})
 
             self.assertEqual(resp.status_code, 400)
+
+class TriviaRouteTestCaseWithLimiter(TriviaRouteTestCase):
+    def test_get_year_fact_with_limiter(self):
+        """Tests limiter for get trivia fact route"""
+        with self.client as c:
+            limiter.enabled = True
+
+            resp1 = c.get("/api/trivia/1")
+            resp2 = c.get("/api/trivia/2")
+
+            self.assertEqual(resp2.status_code, 429)
+
+    def test_range_trivia_with_limiter(self):
+        """Tests limiter for get range trivia facts route"""
+        with self.client as c:
+            limiter.enabled = True
+
+            resp1 = c.get("api/trivia/1..3")
+            resp2 = c.get("api/trivia/1..2")
+
+            self.assertEqual(resp2.status_code, 429)
+
+    def test_random_trivia_with_limiter(self):
+        """Tests limiter for get random trivia fact route"""
+        with self.client as c:
+            limiter.enabled = True
+
+            resp1 = c.get("api/trivia/random")
+            resp2 = c.get("api/trivia/random")
+
+            self.assertEqual(resp2.status_code, 429)

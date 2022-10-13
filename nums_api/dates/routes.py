@@ -7,7 +7,6 @@ from nums_api.config import MAX_BATCH
 
 dates = Blueprint("dates", __name__)
 
-
 @dates.get("/<int:month>/<int:day>")
 def get_date_fact(month, day):
     """Route to retrieve a random date fact on specified month/day.

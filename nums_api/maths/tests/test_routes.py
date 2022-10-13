@@ -3,11 +3,20 @@ from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
 from nums_api.maths.models import Math
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["1 per day", "1 per hour"],
+    storage_uri="memory://",
+)
 
 db.drop_all()
 db.create_all()
@@ -66,6 +75,7 @@ class SingleMathRouteTestCase(MathRouteBaseTestCase):
     def test_get_math_fact(self):
         """Test GET route for math/number returns correct JSON response"""
         with app.test_client() as client:
+            limiter.enabled = False
             url = f"/api/math/{self.m1.number}"
             resp = client.get(url)
 
@@ -81,6 +91,7 @@ class SingleMathRouteTestCase(MathRouteBaseTestCase):
     def test_error_for_number_with_no_fact(self):
         """Test GET route for math/number returns 404 if number not found"""
         with app.test_client() as client:
+            limiter.enabled = False
             url = "/api/math/0"
             resp = client.get(url)
 
@@ -93,6 +104,7 @@ class SingleMathRouteTestCase(MathRouteBaseTestCase):
     def test_error_for_invalid_number(self):
         """Test GET route for math/number returns 404 if number not valid"""
         with app.test_client() as client:
+            limiter.enabled = False
             url = "/api/math/minaj"
             resp = client.get(url)
 
@@ -103,6 +115,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
     def test_get_batch_math_fact(self):
         """Test GET route for batch math with '..' returns correct JSON response"""
         with app.test_client() as client:
+            limiter.enabled = False
             resp = client.get("/api/math/1..2")
 
             self.assertEqual(resp.json,
@@ -131,6 +144,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
         by comma works.
         """
         with self.client as c:
+            limiter.enabled = False
             resp = c.get("/api/math/1,2")
 
             self.assertEqual(resp.json,
@@ -158,7 +172,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
         """Tests for getting a facts for multiple numbers seperated by comma or by '..'
         """
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/math/1..2,3.14")
 
             self.assertEqual(resp.json, {
@@ -190,7 +204,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
         """Test getting a math fact with decimal"""
 
         with app.test_client() as client:
-
+            limiter.enabled = False
             resp = client.get("/api/math/3..3.14")
 
             self.assertEqual(resp.json,
@@ -218,6 +232,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
         """Test error handling for batch math facts"""
 
         with self.client as c:
+            limiter.enabled = False
             resp = c.get("/api/math/TEST..TEST")
 
             self.assertEqual(resp.json, {
@@ -231,7 +246,7 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
         """Tests for getting multiple math facts separated by comma
         where there are no facts available."""
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/math/5,6,7")
 
             self.assertEqual(resp.json, {"error": {
@@ -243,8 +258,9 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
     def test_invalid_math_url_input(self):
         """Test for invalid URL input for a number."""
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/math/TEST")
+
             self.assertEqual(
                 resp.json,
                 {"error": {
@@ -259,7 +275,7 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
     def test_get_random_math_fact(self):
         """Test GET route for math/random returns correct JSON response"""
         with app.test_client() as client:
-
+            limiter.enabled = False
             resp1 = client.get("/api/math/1")
             resp2 = client.get("/api/math/2")
             resp3 = client.get("/api/math/3")
@@ -268,15 +284,15 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
             resp_list = [resp1.json, resp2.json, resp3.json, resp4.json]
 
             resp_random = client.get("/api/math/random")
-
             data = resp_random.json
+
             self.assertIn(data, resp_list)
             self.assertEqual(resp_random.status_code, 200)
 
     def test_get_random_math_fact_with_count(self):
         """Test GET route for math/random returns correct JSON response"""
         with app.test_client() as client:
-
+            limiter.enabled = False
             resp1 = client.get("/api/math/1")
             resp2 = client.get("/api/math/2")
             resp3 = client.get("/api/math/3")
@@ -289,8 +305,8 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
                          ]
 
             resp_random = client.get("/api/math/random?count=2")
-
             data = resp_random.json
+
             self.assertIn(data["facts"][0], resp_list)
             self.assertIn(data["facts"][1], resp_list)
             self.assertIs(len(data["facts"]), 2)
@@ -335,8 +351,9 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
     def test_error_get_math_fact_random_count_is_negative(self):
         """Test error if count param is negative for random math facts."""
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/math/random?count=-100")
+
             self.assertEqual(
                 resp.json,
                 {"error": {
@@ -349,8 +366,9 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
     def test_error_get_math_fact_random_count_is_not_an_integer(self):
         """Test error if count param is not an integer for random math facts."""
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/math/random?count=TEST")
+
             self.assertEqual(
                 resp.json,
                 {"error": {
@@ -359,3 +377,31 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
                 }})
 
             self.assertEqual(resp.status_code, 400)
+
+class MathRouteTestCaseWithLimiter(MathRouteBaseTestCase):
+    def test_get_math_fact_with_limiter(self):
+        """Tests limiter for get math fact route"""
+        with self.client as c:
+            limiter.enabled = True
+            resp1 = c.get("/api/math/1")
+            resp2 = c.get("/api/math/2")
+
+            self.assertEqual(resp2.status_code, 429)
+
+    def test_range_math_with_limiter(self):
+        """Tests limiter for get range math facts route"""
+        with self.client as c:
+            limiter.enabled = True
+            resp1 = c.get("api/math/1..3")
+            resp2 = c.get("api/math/1..2")
+
+            self.assertEqual(resp2.status_code, 429)
+
+    def test_random_math_with_limiter(self):
+        """Tests limiter for get random math fact route"""
+        with self.client as c:
+            limiter.enabled = True
+            resp1 = c.get("api/math/random")
+            resp2 = c.get("api/math/random")
+
+            self.assertEqual(resp2.status_code, 429)

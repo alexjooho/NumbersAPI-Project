@@ -1,5 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from nums_api.config import DATABASE_URL
 from nums_api.database import connect_db
@@ -18,6 +20,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",
+)
 
 # register blueprints
 app.register_blueprint(root)
@@ -30,9 +38,9 @@ app.register_blueprint(years, url_prefix='/api/years')
 @app.after_request
 def track_request(response):
     """Track request item and category, update total number of requests in DB."""
-    
+
     PATH_SPLIT_INDEX = 5
-    
+
     # ignore responses from requests for things like css files
     try:
         if not response.json:
@@ -53,20 +61,20 @@ def track_request(response):
         [category, req_item] = request.path.lower()[PATH_SPLIT_INDEX:].split("/",1)
     except ValueError:
         return response
-    
+
     # ignore responses for random:
     if req_item == "random":
         return response
 
     # req_item can be a single number like "5", or a batch request like "1..5, 9"
-    # for simplicity, pass either format to get_batch_nums or get_batch_dates since 
+    # for simplicity, pass either format to get_batch_nums or get_batch_dates since
     # there is useful logic there for converting dates and handing ints and floats
     if category != "dates":
-        # takes in a string of numbers like "1..3, 5" and sets batch_container 
+        # takes in a string of numbers like "1..3, 5" and sets batch_container
         # equal to a list of every number implied by the ".." like: [1, 2, 3, 5]
         batch_container = get_batch_nums(req_item)
     else:
-        # takes in dates like "1/1..1/3, 1/5" and sets batch_container equal to a 
+        # takes in dates like "1/1..1/3, 1/5" and sets batch_container equal to a
         # list of days represented as one of 366 like: [1, 2, 3, 5]
         batch_container = get_batch_dates(req_item)
 
@@ -75,7 +83,7 @@ def track_request(response):
         Tracking.update_request_count(item, category)
 
     return response
-    
+
 
 # allow CORS and connect app to database
 CORS(app)

@@ -3,12 +3,20 @@ from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
 from nums_api.years.models import Year
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["1 per day", "1 per hour"],
+    storage_uri="memory://",
+)
 
 db.drop_all()
 db.create_all()
@@ -57,7 +65,7 @@ class SingleYearRouteTestCase(YearRouteTestCase):
         """Tests for getting a single fact by year.
         Get a single fact about the year 1"""
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("/api/years/1")
             self.assertEqual(
                 resp.json,
@@ -74,7 +82,7 @@ class SingleYearRouteTestCase(YearRouteTestCase):
         """Tests for getting an error for a year without a fact.
         """
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/years/100000")
             self.assertEqual(
                 resp.json,
@@ -89,7 +97,7 @@ class MultipleYearsRangeRouteTestCase(YearRouteTestCase):
     def test_range_years_double_period_syntax(self):
         """Tests for getting a range of years with '..' works"""
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/years/1..3")
 
             self.assertEqual(resp.json, {'facts':
@@ -111,7 +119,7 @@ class MultipleYearsRangeRouteTestCase(YearRouteTestCase):
         """Tests for getting a facts of multiple years seperated by comma works.
         """
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/years/1,3")
 
             self.assertEqual(resp.json, {'facts':
@@ -130,7 +138,7 @@ class MultipleYearsRangeRouteTestCase(YearRouteTestCase):
         works.
         """
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/years/0..1,3..5")
 
             self.assertEqual(resp.json, {'facts':
@@ -148,7 +156,7 @@ class MultipleYearsRangeRouteTestCase(YearRouteTestCase):
         """Tests for getting facts of multiple years with no facts found.
         """
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/years/5,6..10")
 
             self.assertEqual(resp.json, {"error": {
@@ -160,7 +168,7 @@ class MultipleYearsRangeRouteTestCase(YearRouteTestCase):
     def test_invalid_year_url_input(self):
         """Test for invalid URL input for a year."""
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/years/BLAH")
             self.assertEqual(
                 resp.json,
@@ -176,7 +184,7 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
         """Test for getting a single fact on a random year (default, no count
         param)."""
         with self.client as c:
-
+            limiter.enabled = False
             y1_resp = c.get("api/years/1")
             y2_resp = c.get("api/years/2")
             y3_resp = c.get("api/years/3")
@@ -192,7 +200,7 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
         """Test for getting a count number of random year facts if count param
         is specified."""
         with self.client as c:
-
+            limiter.enabled = False
             y1_resp = c.get("api/years/1")
             y2_resp = c.get("api/years/2")
             y3_resp = c.get("api/years/3")
@@ -218,7 +226,7 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
         """Test for getting a count number that exceeds total number of random
         year facts."""
         with self.client as c:
-
+            limiter.enabled = False
             y1_resp = c.get("api/years/1")
             y2_resp = c.get("api/years/2")
             y3_resp = c.get("api/years/3")
@@ -271,7 +279,7 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
     def test_error_get_year_fact_random_count_is_negative(self):
         """Test error if count param is negative for random year facts."""
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/years/random?count=-100")
             self.assertEqual(
                 resp.json,
@@ -285,7 +293,7 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
     def test_error_get_year_fact_random_count_is_not_an_integer(self):
         """Test error if count param is not an integer for random year facts."""
         with self.client as c:
-
+            limiter.enabled = False
             resp = c.get("api/years/random?count=applepie")
             self.assertEqual(
                 resp.json,
@@ -295,3 +303,31 @@ class YearsRandomRouteTestCase(YearRouteTestCase):
                 }})
 
             self.assertEqual(resp.status_code, 400)
+
+class YearRouteTestCaseWithLimiter(YearRouteTestCase):
+    def test_get_year_fact_with_limiter(self):
+        """Tests limiter for get year fact route"""
+        with self.client as c:
+            limiter.enabled = True
+            resp1 = c.get("/api/years/1")
+            resp2 = c.get("/api/years/2")
+
+            self.assertEqual(resp2.status_code, 429)
+
+    def test_range_years_with_limiter(self):
+        """Tests limiter for get range year facts route"""
+        with self.client as c:
+            limiter.enabled = True
+            resp1 = c.get("api/years/1..3")
+            resp2 = c.get("api/years/1..2")
+
+            self.assertEqual(resp2.status_code, 429)
+
+    def test_random_years_with_limiter(self):
+        """Tests limiter for get random year fact route"""
+        with self.client as c:
+            limiter.enabled = True
+            resp1 = c.get("api/years/random")
+            resp2 = c.get("api/years/random")
+
+            self.assertEqual(resp2.status_code, 429)
