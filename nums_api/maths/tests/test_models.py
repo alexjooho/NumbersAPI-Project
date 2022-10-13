@@ -2,7 +2,7 @@ from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
-from nums_api.maths.models import Math
+from nums_api.maths.models import Math, MathLike
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
@@ -43,3 +43,48 @@ class MathModelTestCase(TestCase):
 
         self.assertEqual(Math.query.count(), 1)
         self.assertEqual(Math.query.filter_by(number=1.5).one().number, 1.5)
+        
+class MathLikeModelTestCase(TestCase):
+    def setUp(self):
+        """Set up test data here"""
+        
+        MathLike.query.delete()
+        Math.query.delete()
+        
+        self.m1 = Math(
+            number=1.5,
+            fact_fragment="the number for this m1 test fact fragment",
+            fact_statement="1.5 is the number for m1 this test fact statement.",
+            was_submitted=False
+        )
+
+        db.session.add(self.m1)
+        db.session.commit()
+
+    def tearDown(self):
+        """Clean up any fouled transaction."""
+        db.session.rollback()
+
+    def test_setup(self):
+        """Test to make sure tests are set up correctly"""
+        test_setup_correct = True
+        self.assertEqual(test_setup_correct, True)
+        
+    def test_mathlike_model(self):
+        """Test creating a new MathLike instance and adding it to the database"""
+
+        self.assertEqual(MathLike.query.count(), 0)
+
+        self.num_to_like = Math.query.filter_by(number=1.5).one()
+        
+        self.new_mathlike = MathLike(
+            fact_id = self.num_to_like.id
+        )
+        
+        db.session.add(self.new_mathlike)
+        db.session.commit()
+        
+        self.assertEqual(MathLike.query.count(), 1)
+        self.assertEqual(MathLike.query.filter_by(fact_id=self.num_to_like.id).one().category, "math")
+
+

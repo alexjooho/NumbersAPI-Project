@@ -2,7 +2,7 @@ from unittest import TestCase
 from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
-from nums_api.maths.models import Math
+from nums_api.maths.models import Math, MathLike
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
@@ -18,6 +18,7 @@ class MathRouteBaseTestCase(TestCase):
         """Set up test data here"""
         self.client = app.test_client()
 
+        MathLike.query.delete()
         Math.query.delete()
 
         self.m1 = Math(
@@ -256,6 +257,8 @@ class MathRouteGetBatchMathFact(MathRouteBaseTestCase):
 
 
 class MathRouteRandomTestCase(MathRouteBaseTestCase):
+    
+    
     def test_get_random_math_fact(self):
         """Test GET route for math/random returns correct JSON response"""
         with app.test_client() as client:
@@ -359,3 +362,76 @@ class MathRouteRandomTestCase(MathRouteBaseTestCase):
                 }})
 
             self.assertEqual(resp.status_code, 400)
+
+
+
+class MathRoutePostLikeTestCase(MathRouteBaseTestCase):          
+    def test_success_post_math_fact_like(self):
+        """Test successful POST request to like a fact"""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/math/like", 
+                            json={"fact": {
+                                    "number": 3.14,
+                                    "statement": "3.14 is the number for m4 test fact statement."
+                                }})
+
+            self.assertEqual(resp.json, {"status": "success"})
+            self.assertEqual(resp.status_code, 201)
+            
+    def test_failure_post_math_bad_number(self):
+        """Test POST failure when bad number provided."""
+        with app.test_client() as c:
+            
+            resp =  c.post("/api/math/like", 
+                            json={"fact": {
+                                    "number": "BADNUMBER",
+                                    "statement": "3.14 is the number for m4 test fact statement."
+                                }})
+
+            self.assertEqual(resp.json, 
+                    {
+                        "error": {
+                            "message": "Invalid number",
+                            "status": 400
+                        }
+                    })
+            self.assertEqual(resp.status_code, 400)
+        
+    def test_failure_post_math_no_fact_statement(self):
+        """Test POST failure when no fact statement is provided."""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/math/like", 
+                            json={"fact": {
+                                    "number": 3.14,
+                                }})
+
+
+            self.assertEqual(resp.json, 
+                    {
+                        "error": {
+                            "message": "Please provide a fact statement",
+                            "status": 400
+                        }
+                    })
+            self.assertEqual(resp.status_code, 400)
+
+    def test_failure_post_math_bad_fact_statement(self):
+        """Test POST failure when number does not match existing fact statement."""
+        with app.test_client() as c:
+            
+            resp = c.post("/api/math/like", 
+                            json={"fact": {
+                                    "number": 3.14,
+                                    "statement": "MISMATCHED STATEMENT"
+                                }})
+            self.assertEqual(resp.json, 
+                {
+                    "error": {
+                        "message": "No matching fact found for 3.14.",
+                        "status": 400
+                    }
+                })
+            self.assertEqual(resp.status_code, 400)
+            

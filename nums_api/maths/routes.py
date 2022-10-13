@@ -245,11 +245,18 @@ def like_math_fact():
     
     #TODO: JSON validation, currently route will accept any additional JSON not specified in docstring.
 
+    # convert submitted number to string to allow int/float filtering:
+    req_num = str(request.json["fact"]["number"])
+    
     try:
-        fact_number = int(request.json["fact"]["number"])
+        #catch floats so they are not truncated to integers:
+        if "." in req_num:
+            raise ValueError
+        
+        fact_number = int(req_num)
     except ValueError:
         try:
-            fact_number = float(request.json["fact"]["number"]) 
+            fact_number = float(req_num) 
         except ValueError:
             return (jsonify(
                 error={
@@ -265,7 +272,6 @@ def like_math_fact():
                 "message": "Please provide a fact statement",
                 "status": 400
             }), 400)
-            
 
     fact = Math.query.filter(
             and_(
