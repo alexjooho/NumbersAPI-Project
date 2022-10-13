@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "NumbersMobile",
-    "slug": "NumbersMobile",
+    "name": "numbersapi",
+    "slug": "numbersapi",
+    "owner": "alexjooho",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
