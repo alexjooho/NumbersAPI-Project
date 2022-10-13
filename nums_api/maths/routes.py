@@ -1,11 +1,14 @@
 from flask import Blueprint, jsonify, request
 from nums_api.config import MAX_BATCH
 from nums_api.helpers.batch import get_batch_nums
-from nums_api.maths.models import Math
+from nums_api.maths.models import Math, MathLike
 import random
 import re
 
-from sqlalchemy import or_
+from sqlalchemy import and_
+#TODO: how to import this from database.py?
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
 
 math = Blueprint("math", __name__)
 
@@ -213,41 +216,73 @@ def get_math_fact_random():
     return jsonify(facts=facts)
 
 
-@math.post("/<int:number>/like")
-def like_math_fact(number):
+@math.post("/like")
+def like_math_fact():
     """
     Allows users to like a specific fact.
     
-    Accepts JSON (only fragment OR statement need to be provided):
-        { "fact": 
-            {
+    Accepts JSON:
+        { "fact": {
             "number": number,
-            "fragment": "fact_fragment",
             "statement": "fact_statement",
-            }
-        }
+        }}
         
+    If matching number is invalid or fact statement are not provided, 
+    returns error JSON:
+            { "error": {
+                    "message": "Invalid number",
+                    "status": 400
+            }}
+        OR
+            { "error": {
+                    "message": "No matching fact found for 4."
+            }}
+
     If successful, returns 201 and success message:
+        {
+            "status": "success"
+        }
     
-    
-    If unsuccessful, returns error message:
-    
+
     """
     
-    # print('request info:', request.json)
-    fact_fragment = request.json["fact"]["fragment"] or None
-    fact_statement = request.json["fact"]["statement"] or None
-    
-    print("fact fragment:", fact_fragment)
-    print("fact statement:", fact_statement)
+    #TODO: JSON validation, currently route will accept any additional JSON not specified in docstring.
 
-    facts = Math.query.filter(or_(
-            Math.fact_statement.like(fact_statement),
-            Math.fact_fragment.like(fact_fragment))).first()    
-    
-    print('facts', facts.number)
+    try:
+        fact_number = int(request.json["fact"]["number"])
+    except ValueError:
+        try:
+            fact_number = float(request.json["fact"]["number"]) 
+        except ValueError:
+            return (jsonify(
+                error={
+                    "message": "Invalid number",
+                    "status": 400
+                }), 400)
 
-    return jsonify(error={
-                "message": "success"
-            })    
+    try:
+        fact_statement = request.json["fact"]["statement"] 
+    except KeyError:
+        return (jsonify(
+            error={
+                "message": "Invalid fact statement",
+                "status": 400
+            }), 400)
+            
+
+    fact = Math.query.filter(
+            and_(
+                Math.number == fact_number,
+                Math.fact_statement.like(fact_statement)
+                )).first()    
+
+    if not fact:
+        return jsonify(error={"message": f"No matching fact found for {fact_number}."})   
+    
+    else: 
+        new_like = MathLike(fact_id=fact.id)
+        db.session.add(new_like)
+        db.session.commit()
+        return jsonify(status="success"), 201
+ 
     

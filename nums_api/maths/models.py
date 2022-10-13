@@ -56,7 +56,7 @@ class MathLike(db.Model):
     
     fact_id = db.Column(
         db.Integer,
-        db.ForeignKey("math.id")
+        db.ForeignKey("math.id", ondelete="cascade")
     )
     
     category = db.Column(
