@@ -18,11 +18,11 @@ $(".example-box-address").on("click", async function (evt) {
 
 $("#search-link").on("click", function (evt) {
     const searchText = $("#search-text").val();
-    
+
     const urlToVisit = `${BASE_URL}${searchText}`;
-    
+
     window.location.href = urlToVisit;
-})
+});
 
 /** Async function for replacing result-temporary-text box with text based
  * on URL text given, and updates counter.
@@ -30,7 +30,7 @@ $("#search-link").on("click", function (evt) {
 async function updateResultTextAndCounter() {
     const text = $("#search-text").val();
     const respData = await getFacts(text);
-    
+
     console.log('resp', respData);
 
     if (respData.error) {
@@ -44,11 +44,11 @@ async function updateResultTextAndCounter() {
         } else {
             updateCounter(respData.fact.number);
         }
-        
+
         $("#result-temporary-text").text(respData.fact.statement);
     }
     catch (error) {
-        const errorMessage = "Uh oh, we don't understand that URL. Maybe read the API docs below?"
+        const errorMessage = "Uh oh, we don't understand that URL. Maybe read the API docs below?";
         $("#result-temporary-text").text(errorMessage);
     }
 }
@@ -173,14 +173,51 @@ async function getFacts(address) {
     // } else {
     //     resp = await axios.get(BASE_URL + address);
     // }
-    
+
     let resp;
-    
+
     try {
         resp = await axios.get(BASE_URL + address);
         return resp.data;
     }
     catch (error) {
-        return error.response.data
+        return error.response.data;
     }
 }
+
+/**
+ * Accepts a search term. Displays search results. 
+ */
+async function displaySearchResults(searchTerm) {
+    const $searchResults = $("#fact-search-results");
+    $searchResults.empty();
+
+    let resp = await axios.get(`${BASE_URL}search/?query=${searchTerm}`);
+
+    let results = resp.data.results;
+
+    for (let category in results) {
+        if (results[category].length > 0) {
+
+            for (let { statement } of results[category]) {
+                $searchResults.append(`<li>${statement}</li>`);
+            }
+        }
+    }
+}
+
+
+/** Runs displaySearchResults on search form submit.
+ * 
+ */
+$("#fact-search-form").on("submit", async function (evt) {
+    evt.preventDefault();
+
+    const $factSearchForm = $("#fact-search-input");
+
+    let searchTerm = $factSearchForm.val();
+
+    displaySearchResults(searchTerm);
+
+    $factSearchForm.val("");
+});

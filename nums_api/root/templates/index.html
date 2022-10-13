@@ -72,9 +72,9 @@
                 </div>
               </div>
             </div>
-              <!-- example-box -->
-            </div>
-            <div id="examples-2">
+            <!-- example-box -->
+          </div>
+          <div id="examples-2">
             <div class="example">
               <h2>Years</h2>
               <div class="example-box">
@@ -144,12 +144,33 @@
         </div>
       </section>
 
+      <section>
+        <h2>Search Facts</h2>
+        <form action="/search" id="fact-search-form">
+          <input name="query" id="fact-search-input" />
+          <button> Search</button>
+          <div class="example">
+            <div class="example-box">
+              <!-- <div class="example-box-address">results</div> -->
+              <div class="api-result scroll">
+                <ul id="fact-search-results">
+
+                </ul>
+              </div>
+            </div>
+        </form>
+
+
+      </section>
+
       <section id="api-outer">
         <div id="api">
           {{ documentation|safe }}
         </div>
       </section>
     </div>
+
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <!-- <script src="/js/jquery.mousewheel.js" type="text/javascript"></script>
