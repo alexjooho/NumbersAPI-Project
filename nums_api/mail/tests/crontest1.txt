@@ -1,3 +1,0 @@
-* * * * * /usr/local/bin/python3 /Users/bryanpitman/Desktop/numbers_api_v2/nums_api/automate_email.py
-
-* * * * * /Users/bryanpitman/Desktop/numbers_api_v2/venv/bin/python3 /Users/bryanpitman/Desktop/numbers_api_v2/nums_api/automate_email.py
