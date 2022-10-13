@@ -30,7 +30,7 @@ Run:
 
 **Note**
 
-        You can use ctrl + D to close interactive shell.
+        You can use ctrl + D to quit interactive shell.
 
 ### To build only the application container:
 <br>
@@ -39,6 +39,6 @@ Run:
 
             $ docker build -t <container-name> .
 
-            $ docker run -d -p 5001:8000 <container-name>
+            $ docker run -d -p 5001:5001 <container-name>
 
  **Check in browser port 5001 or the port it's mapped to**
