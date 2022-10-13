@@ -3,7 +3,7 @@ from nums_api.database import db
 from nums_api.maths.models import Math, MathLike
 from nums_api.trivia.models import Trivia
 from nums_api.years.models import Year
-from nums_api.dates.models import Date
+from nums_api.dates.models import Date, DateLike
 from csv import DictReader
 
 # import all models - necessary for create_all()

@@ -101,3 +101,32 @@ class Date (db.Model):
         return day_of_year
 
 
+class DateLike(db.Model):
+    """Likes for date facts about numbers."""
+
+    __tablename__ = "date_likes"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    
+    fact_id = db.Column(
+        db.Integer,
+        db.ForeignKey("dates.id")
+    )
+    
+    category = db.Column(
+        db.String(5),
+        nullable=False,
+        default="date"
+    )
+    
+    like_timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
+
+    like = db.relationship("Date", backref="likes")

@@ -1,14 +1,12 @@
 from flask import Blueprint, jsonify, request
+from sqlalchemy import and_
+from nums_api.database import db
 from nums_api.config import MAX_BATCH
 from nums_api.helpers.batch import get_batch_nums
 from nums_api.maths.models import Math, MathLike
 import random
 import re
 
-from sqlalchemy import and_
-#TODO: how to import this from database.py?
-from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
 
 math = Blueprint("math", __name__)
 

@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
-from nums_api.dates.models import Date
+from sqlalchemy import and_
+from nums_api.database import db
+from nums_api.dates.models import Date, DateLike
 import random
 import re
 from nums_api.helpers.dates_batch import get_batch_dates
@@ -224,3 +226,80 @@ def get_date_fact_random():
         facts.append(fact)
 
     return jsonify(facts=facts)
+
+
+@dates.post("/like")
+def like_date_fact():
+    """
+    Allows users to like a specific fact.
+    
+    Accepts JSON:
+        { "fact": {
+            "number": 1,
+            "year": 2000,
+            "statement": "fact_statement"
+        }}
+        
+    If matching number is invalid or fact statement are not provided, 
+    returns error JSON:
+            { "error": {
+                    "message": "Invalid number for date. Please format as whole number",
+                    "status": 400
+            }}
+        OR
+            { "error": {
+                    "message": "No matching fact found for 4."
+            }}
+
+    If successful, returns 201 and success message:
+        {
+            "status": "success"
+        }
+    """
+    
+    #TODO: JSON validation, currently route will accept any additional JSON not specified in docstring.
+
+    try:
+        fact_number = int(request.json["fact"]["number"])
+        fact_year = int(request.json["fact"]["year"])
+    except ValueError:
+        return (jsonify(
+            error={
+                "message": "Invalid number for date or year. Please format as whole number.",
+                "status": 400
+            }), 400)
+
+    try:
+        fact_statement = request.json["fact"]["statement"] 
+    except KeyError:
+        return (jsonify(
+            error={
+                "message": "Invalid fact statement",
+                "status": 400
+            }), 400)
+        
+    # Return error message if numeric date exceeds 366:
+    if fact_number > 366:
+        return (jsonify(
+            error={
+                "message": "Date number must be less than 366.",
+                "status": 400
+            }), 400)
+        
+    fact = Date.query.filter(and_(
+            and_(
+                Date.day_of_year == fact_number,
+                Date.year == fact_year),
+                Date.fact_statement.like(fact_statement)
+                )).first()    
+
+    if not fact:
+        return jsonify(error={"message": f"No matching fact found for day {fact_number} in year {fact_year}."})   
+    
+    else: 
+        new_like = DateLike(fact_id=fact.id)
+        db.session.add(new_like)
+        db.session.commit()
+        return jsonify(status="success"), 201
+ 
+    
