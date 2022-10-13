@@ -242,8 +242,6 @@ def like_math_fact():
         {
             "status": "success"
         }
-    
-
     """
     
     #TODO: JSON validation, currently route will accept any additional JSON not specified in docstring.
