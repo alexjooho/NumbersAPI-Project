@@ -207,9 +207,7 @@ async function displaySearchResults(searchTerm) {
 }
 
 
-/** Runs displaySearchResults on search form submit.
- * 
- */
+/** Runs displaySearchResults on search form submit. */
 $("#fact-search-form").on("submit", async function (evt) {
     evt.preventDefault();
 
