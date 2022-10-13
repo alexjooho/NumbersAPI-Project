@@ -6,12 +6,14 @@ from nums_api.dates.models import Date
 from nums_api.years.models import Year
 from nums_api.maths.models import Math
 from nums_api.trivia.models import Trivia
+# from crontab import CronTab
+
 
 emails = Blueprint("emails", __name__, template_folder="templates")
 
 
 @emails.route("/")
-def index():
+def send_email():
     """Emails subscribers on a weekly basis
 
     - fetch subscribers from Email database
@@ -55,3 +57,9 @@ def index():
             mail.send(msg)
 
         return f"emails sent successfully"
+
+
+
+
+
+
