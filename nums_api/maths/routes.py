@@ -5,6 +5,8 @@ from nums_api.maths.models import Math
 import random
 import re
 
+from sqlalchemy import or_
+
 math = Blueprint("math", __name__)
 
 
@@ -209,3 +211,43 @@ def get_math_fact_random():
         facts.append(fact)
 
     return jsonify(facts=facts)
+
+
+@math.post("/<int:number>/like")
+def like_math_fact(number):
+    """
+    Allows users to like a specific fact.
+    
+    Accepts JSON (only fragment OR statement need to be provided):
+        { "fact": 
+            {
+            "number": number,
+            "fragment": "fact_fragment",
+            "statement": "fact_statement",
+            }
+        }
+        
+    If successful, returns 201 and success message:
+    
+    
+    If unsuccessful, returns error message:
+    
+    """
+    
+    # print('request info:', request.json)
+    fact_fragment = request.json["fact"]["fragment"] or None
+    fact_statement = request.json["fact"]["statement"] or None
+    
+    print("fact fragment:", fact_fragment)
+    print("fact statement:", fact_statement)
+
+    facts = Math.query.filter(or_(
+            Math.fact_statement.like(fact_statement),
+            Math.fact_fragment.like(fact_fragment))).first()    
+    
+    print('facts', facts.number)
+
+    return jsonify(error={
+                "message": "success"
+            })    
+    

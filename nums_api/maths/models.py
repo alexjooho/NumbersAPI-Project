@@ -42,3 +42,33 @@ class Math(db.Model):
         db.Boolean,
         nullable=False,
     )
+
+class MathLike(db.Model):
+    """Likes for math facts about numbers."""
+
+    __tablename__ = "math_likes"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    
+    fact_id = db.Column(
+        db.Integer,
+        db.ForeignKey("math.id")
+    )
+    
+    category = db.Column(
+        db.String(5),
+        nullable=False,
+        default="math"
+    )
+    
+    like_timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
+
+    like = db.relationship("Math", backref="likes")
