@@ -11,9 +11,8 @@ const Home = ({ navigation }) => {
 
   const getRandomFact = async () => {
     try {
-      // const response = await axios("http://numbersapi.com/23/trivia?fragment");
-      const response = await axios("https://c357-2603-8000-8844-a041-54e2-4dc3-95ec-96bb.ngrok.io/api/trivia/random");
-      // const response = await axios(`${BASE_URL}/api/trivia/random`);
+      const response = await axios(`${BASE_URL}/api/trivia/random`);
+      // the BASE_URL in the .env file needs to be changed whenever a new ngrok url is given
       setData(response.data.fact.statement);
     }
     catch (error) {

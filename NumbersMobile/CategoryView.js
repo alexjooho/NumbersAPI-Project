@@ -4,7 +4,7 @@ import { StyleSheet, View, Text, TextInput, Keyboard, TouchableWithoutFeedback }
 import axios from "axios";
 import { BASE_URL } from "@env";
 
-const CategoryView = ({ navigation, route }) => {
+const CategoryView = ({ route }) => {
 
   const [fact, setFact] = useState("");
   const [input, setInput] = useState("");
@@ -28,8 +28,8 @@ const CategoryView = ({ navigation, route }) => {
 
   async function getFact(text) {
     try {
-      const response = await axios(`https://c357-2603-8000-8844-a041-54e2-4dc3-95ec-96bb.ngrok.io/api/${category}/${text}`);
-      // const response = await axios(`${BASE_URL}/api/${category}/${text}`);
+      const response = await axios(`${BASE_URL}/api/${category}/${text}`);
+      // the BASE_URL in the .env file needs to be changed whenever a new ngrok url is given
       setFact(response.data.fact.statement);
     }
     catch (error) {
