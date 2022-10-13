@@ -1,5 +1,6 @@
 from datetime import datetime
-from nums_api.database import db
+from nums_api.database import db, TSVector
+from sqlalchemy import Index
 
 
 class Year (db.Model):
@@ -40,3 +41,10 @@ class Year (db.Model):
         db.Boolean,
         nullable=False,
     )
+    
+    __ts_vector__ = db.Column(TSVector(),db.Computed(
+         "to_tsvector('english', fact_statement)",
+         persisted=True))
+         
+    __table_args__ = (Index('ix_years___ts_vector__',
+          __ts_vector__, postgresql_using='gin'),)
