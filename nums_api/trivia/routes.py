@@ -248,6 +248,12 @@ def like_trivia_fact():
                 "message": "Invalid number",
                 "status": 400
             }), 400)
+    except KeyError: 
+        return (jsonify(
+            error={
+                "message": "Please provide number.",
+                "status": 400
+            }), 400)  
 
     try:
         fact_statement = request.json["fact"]["statement"] 

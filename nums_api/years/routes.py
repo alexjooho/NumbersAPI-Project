@@ -254,13 +254,19 @@ def like_year_fact():
                 "message": "Invalid year",
                 "status": 400
             }), 400)
+    except KeyError: 
+        return (jsonify(
+            error={
+                "message": "Please provide year.",
+                "status": 400
+            }), 400)    
 
     try:
         fact_statement = request.json["fact"]["statement"] 
     except KeyError:
         return (jsonify(
             error={
-                "message": "Please provide a fact statement",
+                "message": "Please provide a fact statement.",
                 "status": 400
             }), 400)
 
