@@ -1,6 +1,6 @@
 SMS with Twilio
 ======================
-In order to activate SMS functionality, you must set up Ngrok and Twilio.
+In order to activate SMS functionality locally, you must set up Ngrok and Twilio.
 
 Set up Ngrok
 -------------------
@@ -11,6 +11,7 @@ Set up Ngrok
 4. In venv > lib > flask_ngrok2.py
     - Change port to 5001
         - Search for `5000` and change to `5001`
+    - ngrok http 5001
 5. In __init__.py
     - Follow https://github.com/MohamedAliRashad/flask-ngrok2 instructions
     - python3 __init__.py to start ngrok server
