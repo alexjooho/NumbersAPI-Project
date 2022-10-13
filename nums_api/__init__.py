@@ -8,6 +8,7 @@ from nums_api.maths.routes import math
 from nums_api.dates.routes import dates
 from nums_api.years.routes import years
 from nums_api.root.routes import root
+from nums_api.search.routes import search
 from nums_api.tracking.models import Tracking
 from nums_api.helpers.batch import get_batch_nums
 from nums_api.helpers.dates_batch import get_batch_dates
@@ -21,6 +22,7 @@ app.config['SQLALCHEMY_ECHO'] = True
 
 # register blueprints
 app.register_blueprint(root)
+app.register_blueprint(search, url_prefix='/api/search')
 app.register_blueprint(trivia, url_prefix='/api/trivia')
 app.register_blueprint(math, url_prefix='/api/math')
 app.register_blueprint(dates, url_prefix='/api/dates')
@@ -58,10 +60,12 @@ def track_request(response):
     if req_item == "random":
         return response
 
+    if category == "search":
+        return response
     # req_item can be a single number like "5", or a batch request like "1..5, 9"
     # for simplicity, pass either format to get_batch_nums or get_batch_dates since 
     # there is useful logic there for converting dates and handing ints and floats
-    if category != "dates":
+    elif category != "dates":
         # takes in a string of numbers like "1..3, 5" and sets batch_container 
         # equal to a list of every number implied by the ".." like: [1, 2, 3, 5]
         batch_container = get_batch_nums(req_item)
