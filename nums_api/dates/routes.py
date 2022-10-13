@@ -269,6 +269,12 @@ def like_date_fact():
                 "message": "Invalid number for date or year. Please format as whole number.",
                 "status": 400
             }), 400)
+    except KeyError: 
+        return (jsonify(
+            error={
+                "message": "Please provide numeric date and year.",
+                "status": 400
+            }), 400)
 
     try:
         fact_statement = request.json["fact"]["statement"] 

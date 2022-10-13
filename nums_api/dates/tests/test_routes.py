@@ -373,7 +373,7 @@ class DateRoutePostLikeTestCase(DateRouteBaseTestCase):
             self.assertEqual(resp.status_code, 201)
             
     def test_failure_post_date_bad_date_number(self):
-        """Test successful POST request to like a fact"""
+        """Test POST failure when bad day number provided."""
         with app.test_client() as c:
             
             resp = c.post("/api/dates/like", 
@@ -393,7 +393,7 @@ class DateRoutePostLikeTestCase(DateRouteBaseTestCase):
             self.assertEqual(resp.status_code, 400)
         
     def test_failure_post_date_no_fact_statement(self):
-        """Test successful POST request to like a fact"""
+        """Test POST failure when no fact statement is provided."""
         with app.test_client() as c:
             
             resp = c.post("/api/dates/like", 
@@ -412,7 +412,7 @@ class DateRoutePostLikeTestCase(DateRouteBaseTestCase):
             self.assertEqual(resp.status_code, 400)
             
     def test_failure_post_date_num_too_large(self):
-        """Test successful POST request to like a fact"""
+        """Test POST failure when date number is too large."""
         with app.test_client() as c:
             
             resp = c.post("/api/dates/like", 
@@ -432,7 +432,7 @@ class DateRoutePostLikeTestCase(DateRouteBaseTestCase):
             self.assertEqual(resp.status_code, 400)
             
     def test_failure_post_date_bad_fact_statement(self):
-        """Test successful POST request to like a fact"""
+        """Test POST failure when date does not match existing fact statement."""
         with app.test_client() as c:
             
             resp = c.post("/api/dates/like", 
