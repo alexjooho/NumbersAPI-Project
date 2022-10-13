@@ -5,6 +5,8 @@
 
 1. Install Docker engine from https://docs.docker.com/get-docker/
 
+1. Make sure to open Docker Desktop and that the engine is running while performing further steps
+
 1. Within your terminal navigate to the same directory as docker-compose.yml
 
 1. Run the command ```docker-compose up -d```
@@ -31,14 +33,3 @@ Run:
 **Note**
 
         You can use ctrl + D to quit interactive shell.
-
-### To build only the application container:
-<br>
-
- **Run this in the parent directory:**
-
-            $ docker build -t <container-name> .
-
-            $ docker run -d -p 5001:5001 <container-name>
-
- **Check in browser port 5001 or the port it's mapped to**
