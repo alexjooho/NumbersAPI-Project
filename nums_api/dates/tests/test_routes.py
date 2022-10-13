@@ -3,11 +3,20 @@ from nums_api import app
 from nums_api.database import db
 from nums_api.config import DATABASE_URL_TEST
 from nums_api.dates.models import Date
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_TEST
 app.config["TESTING"] = True
 app.config["SQLALCHEMY_ECHO"] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["1 per day", "1 per hour"],
+    storage_uri="memory://",
+)
 
 db.drop_all()
 db.create_all()
@@ -69,6 +78,7 @@ class DateRouteSpecificDateTestCase(DateRouteBaseTestCase):
     def test_get_date_fact(self):
         """Test GET route for dates/month/day returns correct JSON response"""
         with app.test_client() as c:
+            limiter.enabled = False
             resp = c.get('/api/dates/1/10')
 
             data = resp.json
@@ -88,6 +98,7 @@ class DateRouteSpecificDateTestCase(DateRouteBaseTestCase):
     def test_error_invalid_day(self):
         """Test GET route for dates/month/day returns 400 if invalid day"""
         with app.test_client() as c:
+            limiter.enabled = False
             resp = c.get('/api/dates/10/32')
 
             data = resp.json
@@ -104,6 +115,7 @@ class DateRouteSpecificDateTestCase(DateRouteBaseTestCase):
     def test_error_invalid_month(self):
         """Test GET route for dates/month/day returns 400 if invalid month"""
         with app.test_client() as c:
+            limiter.enabled = False
             resp = c.get('/api/dates/100/30')
 
             data = resp.json
@@ -120,6 +132,7 @@ class DateRouteSpecificDateTestCase(DateRouteBaseTestCase):
     def test_error_date_without_fact(self):
         """Test GET route for dates/month/day returns 404 if date does not have fact"""
         with app.test_client() as c:
+            limiter.enabled = False
             resp = c.get('/api/dates/1/30')
 
             data = resp.json
@@ -139,6 +152,7 @@ class DatesRangeRouteSpecificDateTestCase(DateRouteBaseTestCase):
         """Test GET route for range of dates/month/day separated by ".." works
         and returns correct JSON response"""
         with app.test_client() as c:
+            limiter.enabled = False
             resp = c.get('/api/dates/1/10..2/19')
 
             self.assertEqual(resp.json,
@@ -171,6 +185,7 @@ class DatesRangeRouteSpecificDateTestCase(DateRouteBaseTestCase):
         """Test GET route for range of dates/month/day separated by commas works
         and returns correct JSON response"""
         with app.test_client() as c:
+            limiter.enabled = False
             resp = c.get('/api/dates/1/10,1/20')
 
             self.assertEqual(resp.json,
@@ -195,7 +210,7 @@ class DatesRangeRouteSpecificDateTestCase(DateRouteBaseTestCase):
     def test_error_range_dates_with_no_facts(self):
         """Test GET route error msg if no facts were found for range of dates"""
         with app.test_client() as c:
-
+            limiter.enabled = False
             resp = c.get("api/dates/3/1..4/15")
 
             self.assertEqual(resp.json, {"error": {
@@ -207,7 +222,7 @@ class DatesRangeRouteSpecificDateTestCase(DateRouteBaseTestCase):
     def test_error_range_dates_regex_doesnt_match(self):
         """Test for getting a facts of multiple dates with invalid regex."""
         with app.test_client() as c:
-
+            limiter.enabled = False
             resp = c.get("api/dates/applepie")
 
             self.assertEqual(resp.json, {"error": {
@@ -220,7 +235,7 @@ class DatesRangeRouteSpecificDateTestCase(DateRouteBaseTestCase):
         """Test for getting facts of multiple dates with out of bound dates.
         """
         with app.test_client() as c:
-
+            limiter.enabled = False
             resp = c.get("api/dates/13/31,1/10")
 
             self.assertEqual(resp.json, {"error": {
@@ -234,7 +249,7 @@ class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
     def test_get_random_date_fact(self):
         """Test GET route for dates/random returns correct JSON response"""
         with app.test_client() as c:
-
+            limiter.enabled = False
             resp1 = c.get('/api/dates/1/10')  # this is test1 input month/day
             resp2 = c.get('/api/dates/2/19')  # this is test2 input month/day
             resp3 = c.get('/api/dates/2/20')  # this is test3 input month/day
@@ -253,7 +268,7 @@ class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
         """Test GET route for dates/random if count param is specified,
         and returns correct JSON response"""
         with app.test_client() as c:
-
+            limiter.enabled = False
             resp1 = c.get('/api/dates/1/10')  # this is test1 input month/day
             resp2 = c.get('/api/dates/2/19')  # this is test2 input month/day
             resp3 = c.get('/api/dates/2/20')  # this is test3 input month/day
@@ -276,7 +291,7 @@ class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
         """Test GET route for dates/random if count param exceeds total number
         of dates facts"""
         with app.test_client() as c:
-
+            limiter.enabled = False
             resp1 = c.get('/api/dates/1/10')  # this is test1 input month/day
             resp2 = c.get('/api/dates/2/19')  # this is test2 input month/day
             resp3 = c.get('/api/dates/2/20')  # this is test3 input month/day
@@ -327,7 +342,7 @@ class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
     def test_get_random_date_facts_count_is_negative(self):
         """Test GET route for dates/random if count param is a negative number"""
         with app.test_client() as c:
-
+            limiter.enabled = False
             resp_random = c.get('/api/dates/random?count=-60')
             resp = resp_random.json
 
@@ -343,7 +358,7 @@ class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
     def test_get_random_date_facts_count_is_not_an_integer(self):
         """Test GET route for dates/random if count param is a not an integer"""
         with app.test_client() as c:
-
+            limiter.enabled = False
             resp_random = c.get('/api/dates/random?count=applepie')
             resp = resp_random.json
 
@@ -356,5 +371,32 @@ class DateRouteRandomDateTestCase(DateRouteBaseTestCase):
 
             self.assertEqual(resp_random.status_code, 400)
 
+class DateRouteTestCaseWithLimiter(DateRouteBaseTestCase):
+    def test_get_year_fact_with_limiter(self):
+        """Tests limiter for get date fact route"""
+        with self.client as c:
+            limiter.enabled = True
+            resp1 = c.get("/api/dates/10")
+            resp2 = c.get("/api/dates/20")
+
+            self.assertEqual(resp2.status_code, 429)
+
+    def test_range_dates_with_limiter(self):
+        """Tests limiter for get range date facts route"""
+        with self.client as c:
+            limiter.enabled = True
+            resp1 = c.get("api/dates/10..20")
+            resp2 = c.get("api/dates/50..51")
+
+            self.assertEqual(resp2.status_code, 429)
+
+    def test_random_dates_with_limiter(self):
+        """Tests limiter for get random date fact route"""
+        with self.client as c:
+            limiter.enabled = True
+            resp1 = c.get("api/dates/random")
+            resp2 = c.get("api/dates/random")
+
+            self.assertEqual(resp2.status_code, 429)
 
 
