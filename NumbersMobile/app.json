@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "numbersapi",
+    "name": "NumbersAPI",
     "slug": "numbersapi",
+    "description": "Mobile app for NumbersAPI.",
     "owner": "alexjooho",
     "version": "1.0.0",
     "orientation": "portrait",
